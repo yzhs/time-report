@@ -12,12 +12,18 @@ extern crate time;
 // Argument parsing
 extern crate argonaut;
 
+// Create a secure temporary directory to handle the LaTeX side of things.
+extern crate tempdir;
+
 
 use std::env;
+use std::fs::File;
+use std::io::{self, Write};
 use std::path::Path;
 use std::process;
 
 use argonaut::{ArgDef, help_arg, version_arg};
+use tempdir::TempDir;
 
 
 const NUM_WORKERS: usize = 100;
@@ -31,7 +37,7 @@ const TABLE_HEADER: [&str; 5] = ["Name", "Datum", "von", "bis", "Woche/Bemerkung
 /// Each of these structures is a row in the generated table, but not every row in the table
 /// represents a Line struct.
 #[derive(Debug)]
-struct Line {
+pub struct Line {
     date: String, // TODO use a proper datatype (time::something?)
     hours: u16,
     minutes: u16,
@@ -41,7 +47,7 @@ struct Line {
 /// Data related to one person:  Their name, how long they worked in the accounting period and the
 /// specific data of when the worked.  Each of these structures is rendered as one table.
 #[derive(Debug)]
-struct Worker {
+pub struct Worker {
     name: String, // TODO separate last name?
     hours: u32,
     minutes: u32,
@@ -69,7 +75,10 @@ impl Worker {
             result.push_str(&line.to_latex());
         }
 
-        result.push_str("  \\end{person}");
+        result.push_str(&format!("    \\midrule\n    \\bfseries{{Summe}} && \\bfseries{{{}}} & \\bfseries{{{}}}\\\\\n",
+                                self.hours,
+                                self.minutes));
+        result.push_str("  \\end{person}\n\n");
 
         result
     }
@@ -150,10 +159,93 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
         person.lines.push(line);
     }
 
-    // Produce a list of workers
-    let result = workers.into_iter().map(|(_, person)| person).collect();
+    // Produce a list of workers and handle carry
+    let result = workers.into_iter().map(|(_, mut person)| {
+        person.hours += person.minutes / 60;
+        person.minutes %= 60;
+        person
+    }).collect();
 
     Ok(result)
+}
+
+const LATEX_HEADER_1: &[u8] = b"\\documentclass[a4paper]{article}
+\\usepackage[ngerman]{babel}
+\\usepackage{booktabs} % Nicer vertical lines
+\\usepackage{tabularx} % paragraphs in tables
+\\usepackage{fullpage} % Use the entire page
+\\usepackage{fontspec} % Allow the use of unicode
+\\usepackage{array} % Provide b column type for bottom alignment
+
+%\\renewcommand{\\arraystretch}{1.2}
+
+\\newcommand*{\\headerfor}[1]{%
+  \\bfseries{#1} & \\textsc{Datum} & \\textsc{Stunden} & \\textsc{Minuten} &
+  \\textsc{Woche/Bemerkung}\\\\
+  \\midrule
+}
+\\newenvironment{person}[1]{%
+  \\begin{tabular*}{0.96\\linewidth}{b{0.3\\textwidth}rrrp{0.28\\textwidth}}
+    \\headerfor{#1}
+}{%
+  \\end{tabular*}\\vspace{1cm}
+}
+
+\\title{Abrechnung BetreuerInnen ";
+
+const LATEX_HEADER_2: &[u8] = b"\\vspace{-1cm}}
+\\author{}
+\\date{\\today}
+
+\\begin{document}
+\\maketitle
+";
+
+const LATEX_FOOTER: &[u8] = b"\\end{document}\n";
+
+/// Create a PDF file from the given workers' data.
+pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), io::Error> {
+    let input = input.as_ref();
+    let title = input.file_stem().unwrap().to_str().unwrap();
+
+    let dir = TempDir::new("generate-pdf")?;
+
+    // Generate LaTeX file
+    let file_path = dir.path().join("abrechnung.tex");
+    println!("{:?}", file_path);
+
+    let mut f = File::create(&file_path)?;
+
+    f.write_all(LATEX_HEADER_1)?;
+    write!(f, "{}", title)?;
+    f.write_all(LATEX_HEADER_2)?;
+
+    for worker in workers {
+        write!(f, "{}", worker.to_latex())?;
+    }
+
+    f.write_all(LATEX_FOOTER)?;
+
+    f.sync_all()?;
+    drop(f);
+
+    // Run XeLaTeX
+    {
+        let tempdir_path_string = dir.path().to_str().unwrap();
+        let file_path_string = file_path.to_str().unwrap();
+        process::Command::new("xelatex")
+            .arg("-output-directory")
+            .arg(tempdir_path_string)
+            .arg(file_path_string)
+            .output().unwrap();
+    }
+
+    let pdf = file_path.with_extension("pdf");
+    std::fs::copy(pdf, input.with_extension("pdf"))?;
+
+    dir.close()?;
+
+    Ok(())
 }
 
 fn main() {
@@ -179,8 +271,10 @@ fn main() {
         };
     }
 
-    let data = read_csv_file(csv_file).unwrap();
-    for worker in data {
+    let workers = read_csv_file(&csv_file).unwrap();
+    for worker in &workers {
         println!("{}", worker.to_latex());
     }
+
+    assert!(generate_pdf(csv_file, &workers).is_ok());
 }
