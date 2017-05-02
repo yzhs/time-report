@@ -250,8 +250,6 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
 
     // Generate LaTeX file
     let file_path = dir.path().join("abrechnung.tex");
-    println!("{:?}", file_path);
-
     let mut f = File::create(&file_path)?;
 
     f.write_all(LATEX_HEADER_1)?;
@@ -310,9 +308,5 @@ fn main() {
     }
 
     let workers = read_csv_file(&csv_file).unwrap();
-    for worker in &workers {
-        println!("{}", worker.to_latex());
-    }
-
-    assert!(generate_pdf(csv_file, &workers).is_ok());
+    generate_pdf(csv_file, &workers).unwrap();
 }
