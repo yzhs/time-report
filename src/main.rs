@@ -89,6 +89,42 @@ impl Line {
         format!("    & {} & {} & {} & {}\\\\\n",
                 self.date.replace(".", ".\\,"), self.hours, self.minutes, self.remark)
     }
+
+    pub fn check_data(&self) {
+        if self.hours > 4 {
+            warn!("Hours > 4 in {:?}", self);
+        }
+
+        let remark: Vec<_> = self.remark.chars().collect();
+        if remark.is_empty() {
+            warn!("Remark is empty in {:?}", self);
+        } else if !"ABCD".contains(remark[0]) {
+            warn!("Remark does not start with the week (A-D): {:?}", self);
+        } else if remark.len() > 1 && remark[1] != ' ' {
+            warn!("Remark field does not separate week from comment: {:?}", self);
+        }
+
+        // TODO check date
+        //if self.date > now {
+        //    error!("Date is in the future: {}", self.date);
+        //} else if now - self.date > Duration::years(1) {
+        //    error!("Date is more than one year in the past: {}", self.date);
+        //} else if self.date.tm_wday == 0 || self.date.tm_wday == 6 {
+        //    error!("Date is during a weekend: {}", self.date);
+        //} else if self.date.is_known_holiday() {
+        //    error!("Date is on a holiday: {}", self.date);
+        //}
+    }
+}
+
+fn check_start_and_end(start: &time::Tm, end: &time::Tm) {
+    // TODO figure out how to report errors with better context
+    if start.tm_hour < 12 {
+        warn!("Start time before noon: {:?}", start);
+    }
+    if end.tm_hour > 16 {
+        warn!("End time after 4 o'clock: {:?}", end);
+    }
 }
 
 
@@ -110,19 +146,20 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
         let row_to_line = |row: Row| {
             let start = time::strptime(&row.2, "%H:%M:00").expect("Invalid start time");
             let end = time::strptime(&row.3, "%H:%M:00").expect("Invalid end time");
+            check_start_and_end(&start, &end);
+
             let duration = end - start;
             let hours = duration.num_hours();
             let minutes = duration.num_minutes() % 60;
-            if hours > 4 {
-                warn!("Hours > 4 in line")
-            }
-            (row.0,
-             Line {
-                 date: row.1,
-                 hours: hours as u16,
-                 minutes: minutes as u16,
-                 remark: row.4.join(" "),
-             })
+
+            let line = Line {
+                date: row.1,
+                hours: hours as u16,
+                minutes: minutes as u16,
+                remark: row.4.join(" "),
+            };
+            line.check_data();
+            (row.0, line)
         };
 
         let rows: Vec<Row> = try!(reader.decode().collect());
@@ -133,13 +170,14 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
         // name, date, hours, minutes, remark
         type RowManual = (String, String, u16, u16, Vec<String>);
         let row_to_line = |row: RowManual| {
-            (row.0,
-             Line {
-                 date: row.1,
-                 hours: row.2 as u16,
-                 minutes: row.3 as u16,
-                 remark: row.4.join(" "),
-             })
+            let line = Line {
+                date: row.1,
+                hours: row.2 as u16,
+                minutes: row.3 as u16,
+                remark: row.4.join(" "),
+            };
+            line.check_data();
+            (row.0, line)
         };
 
         let rows: Vec<RowManual> = try!(reader.decode().collect());
