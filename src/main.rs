@@ -252,6 +252,7 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
     let file_path = dir.path().join("abrechnung.tex");
     let mut f = File::create(&file_path)?;
 
+    // Write LaTeX code
     f.write_all(LATEX_HEADER_1)?;
     write!(f, "{}", title)?;
     f.write_all(LATEX_HEADER_2)?;
@@ -262,6 +263,7 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
 
     f.write_all(LATEX_FOOTER)?;
 
+    // and sync to disc
     f.sync_all()?;
     drop(f);
 
@@ -274,6 +276,7 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
             .arg(tempdir_path_string)
             .arg(file_path_string)
             .output().unwrap();
+        // TODO handle LaTeX errors
     }
 
     let pdf = file_path.with_extension("pdf");
