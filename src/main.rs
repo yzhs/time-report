@@ -132,6 +132,8 @@ impl Line {
         //} else if self.date.is_known_holiday() {
         //    error!("Date is on a holiday: {}", self.date);
         //}
+
+        // TODO check whether dates increase monotonically
     }
 }
 
