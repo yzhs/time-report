@@ -82,6 +82,17 @@ impl Worker {
 
         result
     }
+
+    pub fn last_name(&self) -> String {
+        let name = &self.name;
+        if name.contains(",") {
+                name.split(",").next()
+            } else {
+                name.split(" ").last()
+            }
+            .unwrap()
+            .to_string()
+    }
 }
 
 impl Line {
@@ -198,11 +209,17 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
     }
 
     // Produce a list of workers and handle carry
-    let result = workers.into_iter().map(|(_, mut person)| {
-        person.hours += person.minutes / 60;
-        person.minutes %= 60;
-        person
-    }).collect();
+    let mut result: Vec<_> = workers
+        .into_iter()
+        .map(|(_, mut person)| {
+                 person.hours += person.minutes / 60;
+                 person.minutes %= 60;
+                 person
+             })
+        .collect();
+
+    // Sort the list by name
+    result.sort_by_key(|k| k.last_name());
 
     Ok(result)
 }
