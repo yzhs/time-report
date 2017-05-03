@@ -75,9 +75,10 @@ impl Worker {
             result.push_str(&line.to_latex());
         }
 
-        result.push_str(&format!("    \\midrule\n    \\bfseries{{Summe}} && \\bfseries{{{}}} & \\bfseries{{{}}}\\\\\n",
-                                self.hours,
-                                self.minutes));
+        result.push_str("    \\midrule\n    \\bfseries{{Summe}} && ");
+        result.push_str(&format!("\\bfseries{{{}}} & \\bfseries{{{}}}\\\\\n",
+                                 self.hours,
+                                 self.minutes));
         result.push_str("  \\end{person}\n\n");
 
         result
@@ -95,10 +96,15 @@ impl Worker {
     }
 }
 
+
+
 impl Line {
     pub fn to_latex(&self) -> String {
         format!("    & {} & {} & {} & {}\\\\\n",
-                self.date.replace(".", ".\\,"), self.hours, self.minutes, self.remark)
+                self.date.replace(".", ".\\,"),
+                self.hours,
+                self.minutes,
+                self.remark)
     }
 
     pub fn check_data(&self) {
@@ -112,7 +118,8 @@ impl Line {
         } else if !"ABCD".contains(remark[0]) {
             warn!("Remark does not start with the week (A-D): {:?}", self);
         } else if remark.len() > 1 && remark[1] != ' ' {
-            warn!("Remark field does not separate week from comment: {:?}", self);
+            warn!("Remark field does not separate week from comment: {:?}",
+                  self);
         }
 
         // TODO check date
@@ -143,8 +150,7 @@ fn check_start_and_end(start: &time::Tm, end: &time::Tm) {
 /// Read a given CSV file a list of `Line`s.
 #[allow(unreachable_code)] // TODO better solution?
 fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
-    let mut reader = csv::Reader::from_file(path)
-        ?
+    let mut reader = csv::Reader::from_file(path)?
         .has_headers(true)
         .flexible(true);
 
@@ -292,7 +298,8 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
             .arg("-output-directory")
             .arg(tempdir_path_string)
             .arg(file_path_string)
-            .output().unwrap();
+            .output()
+            .unwrap();
         // TODO handle LaTeX errors
     }
 
