@@ -161,8 +161,8 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
         // name, date, start, end, remark
         type Row = (String, String, String, String, Vec<String>);
         let row_to_line = |row: Row| {
-            let start = time::strptime(&row.2, "%H:%M:00").expect("Invalid start time");
-            let end = time::strptime(&row.3, "%H:%M:00").expect("Invalid end time");
+            let start = time::strptime(&row.2, "%H:%M").expect("Invalid start time");
+            let end = time::strptime(&row.3, "%H:%M").expect("Invalid end time");
             check_start_and_end(&start, &end);
 
             let duration = end - start;
