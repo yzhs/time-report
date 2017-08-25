@@ -8,16 +8,16 @@ export class Row {
   name: string;
   date: string;
   week: Week;
-  from: string;
-  to: string;
+  start: string;
+  end: string;
   remark: string;
 }
 
 const ROWS = [
-  { name: 'Foo Bar', date: '2017-08-24', week: Week.A, from: '', to: '', remark: '' },
-  { name: 'Baz', date: '2017-08-25', week: Week.A, from: '', to: '', remark: '' },
-  { name: 'Otto', date: '2017-08-30', week: Week.B, from: '', to: '', remark: '' },
-  { name: '', date: '', week: Week.B, from: '', to: '', remark: '' },
+  { name: 'Foo Bar', date: '2017-08-24', week: Week.A, start: '12:00', end: '15:30', remark: 'Vertretung für Otto' },
+  { name: 'Baz', date: '2017-08-25', week: Week.A, start: '13:55', end: '15:00', remark: '' },
+  { name: 'Otto', date: '2017-08-30', week: Week.B, start: '14:05', end: '15:20', remark: '' },
+  { name: '', date: '', week: Week.B, start: '', end: '', remark: '' },
 ];
 
 export class Globals {
