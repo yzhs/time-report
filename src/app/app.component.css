@@ -1,0 +1,71 @@
+h1, input#heading {
+    color: #369;
+    font-family: sans-serif;
+    font-size: 250%;
+    text-align: center;
+}
+
+input#heading {
+    margin-top: -0.7em;
+    padding-bottom: 0.5em;
+}
+
+
+#table {
+    border-collapse: collapse;
+    background-color: #eee;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 0 10px #aaa;
+}
+
+td {
+    border: 0;
+    padding: 0;
+}
+
+td:nth-child(1) {
+    min-width: 20ex;
+    text-align: left;
+}
+
+th {
+    padding: 1ex 0ex;
+    background-color: #eee;
+}
+
+tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+input[type="date"],
+input[type="text"],
+input[type="time"] {
+    font-size: inherit;
+    background-color: inherit;
+    height: 3ex;
+    padding: 1ex 2ex;
+    border: none;
+}
+
+input:focus {
+    box-shadow: 0 0 10px #369;
+}
+
+select {
+    font-size: inherit;
+    border: none;
+    background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 1ex 2ex;
+    height: 5.2ex;
+}
+select:focus {
+    box-shadow: 0 0 10px #369;
+}
+
+input#heading:focus {
+    box-shadow: none;
+}

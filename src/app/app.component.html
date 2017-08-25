@@ -1,0 +1,46 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    {{title}}
+  </h1>
+  <input type="text" name="heading" id="heading" placeholder="Zeitraum" />
+
+  <table id="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Datum</th>
+        <th>Woche</th>
+        <th>von</th>
+        <th>bis</th>
+        <th>Bemerkung</th>
+      </tr>
+    </thead>
+    <tr *ngFor="let row of rows">
+      <td>
+        <input [(ngModel)]="row.name" type="text" name="name" id="name1" placeholder="Vorname Nachname" />
+      </td>
+      <td>
+        <input [(ngModel)]="row.date" type="date" name="date" id="date1" placeholder="Datum"
+               min="{{globals.mindate}}" max="{{globals.maxdate}}" />
+      </td>
+      <td>
+        <select name="week" id="week1" [(ngModel)]="row.week">
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+          <option value="3">D</option>
+        </select>
+      </td>
+      <td>
+        <input type="time" name="start" id="start1" placeholder="von" value="{{globals.mintime}}" step="300" />
+      </td>
+      <td>
+        <input type="time" name="end" id="end1" placeholder="bis" value="{{globals.maxtime}}" step="300" />
+      </td>
+      <td>
+        <input type="text" name="remark" id="remark1" placeholder="Bemerkung" />
+      </td>
+    </tr>
+  </table>
+</div>
