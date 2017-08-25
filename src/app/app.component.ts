@@ -14,7 +14,7 @@ export class Row {
 }
 
 const ROWS = [
-  { name: 'Foo Bar', date: '2017-08-24', week: Week.A, start: '12:00', end: '15:30', remark: 'Vertretung für Otto' },
+  { name: 'Foo Bar', date: '2017-08-24', week: Week.A, start: '12:45', end: '15:30', remark: 'Vertretung für Otto' },
   { name: 'Baz', date: '2017-08-25', week: Week.A, start: '13:55', end: '15:00', remark: '' },
   { name: 'Otto', date: '2017-08-30', week: Week.B, start: '14:05', end: '15:20', remark: '' },
   { name: '', date: '', week: Week.B, start: '', end: '', remark: '' },
@@ -39,6 +39,6 @@ export class AppComponent {
     mindate: '2017-08-01',
     maxdate: '2017-12-31',
     mintime: '12:30',
-    maxtime: '15:45',
+    maxtime: '16:00',
   };
 }
