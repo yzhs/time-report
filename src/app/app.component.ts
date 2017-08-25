@@ -35,6 +35,7 @@ export class Globals {
 export class AppComponent {
   title = 'Abrechnung BetreuerInnen';
   rows: Row[] = ROWS;
+  timePeriod = '';
   globals: Globals = {
     mindate: '2017-08-01',
     maxdate: '2017-12-31',
