@@ -4,20 +4,32 @@ enum Week {
   A, B, C, D
 }
 
-export class Row {
+export class Entry {
   name: string;
   date: string;
   week: Week;
   start: string;
   end: string;
   remark: string;
+
+  constructor(name = '', date = '', week = Week.A, start = '', end = '', remark = '') {
+    this.name = name;
+    this.date = date;
+    this.week = week;
+    this.start = start;
+    this.end = end;
+    this.remark = remark;
+  }
+
+  next() {
+      return new Entry('', this.date, this.week, '', '', '');
+  }
 }
 
-const ROWS = [
-  { name: 'Foo Bar', date: '2017-08-24', week: Week.A, start: '12:45', end: '15:30', remark: 'Vertretung für Otto' },
-  { name: 'Baz', date: '2017-08-25', week: Week.A, start: '13:55', end: '15:00', remark: '' },
-  { name: 'Otto', date: '2017-08-30', week: Week.B, start: '14:05', end: '15:20', remark: '' },
-  { name: '', date: '', week: Week.B, start: '', end: '', remark: '' },
+const ENTRIES: Entry[] = [
+  new Entry('Alice A', '2017-08-24', Week.B, '14:45', '15:30', 'Vertretung für Bob'),
+  new Entry('Baz', '2017-08-25', Week.A, '13:55', '15:00', ''),
+  new Entry('Otto', '2017-08-30', Week.B, '14:05', '15:20', '')
 ];
 
 export class Globals {
@@ -34,7 +46,7 @@ export class Globals {
 })
 export class AppComponent {
   title = 'Abrechnung BetreuerInnen';
-  rows: Row[] = ROWS;
+  entries = ENTRIES;
   timePeriod = '';
   globals: Globals = {
     mindate: '2017-08-01',

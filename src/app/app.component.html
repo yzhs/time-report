@@ -17,18 +17,18 @@
         <th>Bemerkung</th>
       </tr>
     </thead>
-    <tr *ngFor="let row of rows">
+    <tr *ngFor="let entry of entries">
       <td>
         <input type="text" name="name" required
-               placeholder="Vorname Nachname" [(ngModel)]="row.name" />
+               placeholder="Vorname Nachname" [(ngModel)]="entry.name" />
       </td>
       <td>
         <input type="date" name="date" required placeholder="Datum"
                min="{{globals.mindate}}" max="{{globals.maxdate}}" 
-               [(ngModel)]="row.date" />
+               [(ngModel)]="entry.date" />
       </td>
       <td>
-        <select name="week" [(ngModel)]="row.week">
+        <select name="week" [(ngModel)]="entry.week">
           <option value="0">A</option>
           <option value="1">B</option>
           <option value="2">C</option>
@@ -38,16 +38,16 @@
       <td>
         <input type="time" name="start" placeholder="von" step="300"
                min="{{globals.mintime}}" max="{{globals.maxtime}}" required
-               [(ngModel)]="row.start"/>
+               [(ngModel)]="entry.start"/>
         </td>
         <td>
         <input type="time" name="end" placeholder="bis" step="300"
                min="{{globals.mintime}}" max="{{globals.maxtime}}" required
-               [(ngModel)]="row.end"/>
+               [(ngModel)]="entry.end"/>
       </td>
       <td>
         <input type="text" name="remark" placeholder="Bemerkung"
-               [(ngModel)]="row.remark"/>
+               [(ngModel)]="entry.remark"/>
       </td>
     </tr>
   </table>
