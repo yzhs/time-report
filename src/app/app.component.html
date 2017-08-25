@@ -18,16 +18,16 @@
     </thead>
     <tr *ngFor="let row of rows">
       <td>
-        <input type="text" name="name" id="name1" required
+        <input type="text" name="name" required
                placeholder="Vorname Nachname" [(ngModel)]="row.name" />
       </td>
       <td>
-        <input type="date" name="date" id="date1" required placeholder="Datum"
+        <input type="date" name="date" required placeholder="Datum"
                min="{{globals.mindate}}" max="{{globals.maxdate}}" 
                [(ngModel)]="row.date" />
       </td>
       <td>
-        <select name="week" id="week1" [(ngModel)]="row.week">
+        <select name="week" [(ngModel)]="row.week">
           <option value="0">A</option>
           <option value="1">B</option>
           <option value="2">C</option>
@@ -35,17 +35,17 @@
         </select>
       </td>
       <td>
-        <input type="time" name="start" id="start1" placeholder="von" step="300"
+        <input type="time" name="start" placeholder="von" step="300"
                min="{{globals.mintime}}" max="{{globals.maxtime}}" required
                [(ngModel)]="row.start"/>
         </td>
         <td>
-        <input type="time" name="end" id="end1" placeholder="bis" step="300"
+        <input type="time" name="end" placeholder="bis" step="300"
                min="{{globals.mintime}}" max="{{globals.maxtime}}" required
                [(ngModel)]="row.end"/>
       </td>
       <td>
-        <input type="text" name="remark" id="remark1" placeholder="Bemerkung"
+        <input type="text" name="remark" placeholder="Bemerkung"
                [(ngModel)]="row.remark"/>
       </td>
     </tr>
