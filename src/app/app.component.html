@@ -3,7 +3,7 @@
   <h1>
     {{title}}
   </h1>
-  <input type="text" name="heading" id="heading" placeholder="Zeitraum" />
+  <input type="text" name="heading" id="heading" placeholder="Zeitraum" required/>
 
   <table id="table">
     <thead>
@@ -18,11 +18,13 @@
     </thead>
     <tr *ngFor="let row of rows">
       <td>
-        <input [(ngModel)]="row.name" type="text" name="name" id="name1" placeholder="Vorname Nachname" />
+        <input type="text" name="name" id="name1" required
+               placeholder="Vorname Nachname" [(ngModel)]="row.name" />
       </td>
       <td>
-        <input [(ngModel)]="row.date" type="date" name="date" id="date1" placeholder="Datum"
-               min="{{globals.mindate}}" max="{{globals.maxdate}}" />
+        <input type="date" name="date" id="date1" required placeholder="Datum"
+               min="{{globals.mindate}}" max="{{globals.maxdate}}" 
+               [(ngModel)]="row.date" />
       </td>
       <td>
         <select name="week" id="week1" [(ngModel)]="row.week">
@@ -33,13 +35,18 @@
         </select>
       </td>
       <td>
-        <input type="time" name="start" id="start1" placeholder="von" value="{{globals.mintime}}" step="300" />
+        <input type="time" name="start" id="start1" placeholder="von" step="300"
+               min="{{globals.mintime}}" max="{{global.maxtime}}" required
+               [(ngModel)]="row.start"/>
+        </td>
+        <td>
+        <input type="time" name="end" id="end1" placeholder="bis" step="300"
+               min="{{globals.mintime}}" max="{{globals.maxtime}}" required
+               [(ngModel)]="row.end"/>
       </td>
       <td>
-        <input type="time" name="end" id="end1" placeholder="bis" value="{{globals.maxtime}}" step="300" />
-      </td>
-      <td>
-        <input type="text" name="remark" id="remark1" placeholder="Bemerkung" />
+        <input type="text" name="remark" id="remark1" placeholder="Bemerkung"
+               [(ngModel)]="row.remark"/>
       </td>
     </tr>
   </table>
