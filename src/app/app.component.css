@@ -46,6 +46,7 @@ input[type="time"] {
     height: 3ex;
     padding: 1ex 2ex;
     border: none;
+    border-radius: 5px;
 }
 
 input:focus {
@@ -55,12 +56,14 @@ input:focus {
 select {
     font-size: inherit;
     border: none;
+    border-radius: 5px;
     background: transparent;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     padding: 1ex 2ex;
     height: 5.2ex;
+    /* TODO Why can't we use 3ex here? */
 }
 select:focus {
     box-shadow: 0 0 10px #369;
