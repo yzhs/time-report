@@ -1,0 +1,24 @@
+[package]
+authors = ["Colin Benner <colin@yzhs.de>"]
+name = "time-report"
+version = "0.1.0"
+
+[dependencies]
+dotenv = "0.10.1"
+rocket = "0.3.2"
+rocket_codegen = "0.3"
+serde = "1.0"
+serde_derive = "1.0"
+
+[dependencies.diesel]
+features = ["sqlite"]
+version = "0.16.0"
+
+[dependencies.diesel_codegen]
+features = ["sqlite"]
+version = "0.16.0"
+
+[dependencies.rocket_contrib]
+default-features = false
+features = ["json", "handlebars_templates"]
+version = "0.3"
