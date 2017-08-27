@@ -1,18 +1,15 @@
-import { Component } from '@angular/core';
-
-enum Week {
-  A, B, C, D
-}
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 
 export class Entry {
   name: string;
   date: string;
-  week: Week;
+  week: number;
   start: string;
   end: string;
   remark: string;
 
-  constructor(name = '', date = '', week = Week.A, start = '', end = '', remark = '') {
+  constructor(name = '', date = '', week = 0, start = '', end = '', remark = '') {
     this.name = name;
     this.date = date;
     this.week = week;
@@ -26,12 +23,6 @@ export class Entry {
   }
 }
 
-const ENTRIES: Entry[] = [
-  new Entry('Alice A', '2017-08-24', Week.B, '14:45', '15:30', 'Vertretung für Bob'),
-  new Entry('Baz', '2017-08-25', Week.A, '13:55', '15:00', ''),
-  new Entry('Otto', '2017-08-30', Week.B, '14:05', '15:20', '')
-];
-
 export class Globals {
   mindate: string;
   maxdate: string;
@@ -44,9 +35,9 @@ export class Globals {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Abrechnung BetreuerInnen';
-  entries = ENTRIES;
+  entries: Entry[];
   timePeriod = '';
   globals: Globals = {
     mindate: '2017-08-01',
@@ -54,4 +45,12 @@ export class AppComponent {
     mintime: '12:30',
     maxtime: '16:00',
   };
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.http.get<Entry[]>('/api/rows').subscribe(data => {
+      this.entries = data;
+    });
+  }
 }
