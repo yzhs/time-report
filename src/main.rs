@@ -17,12 +17,7 @@ use time_report::models::{WorkUnit, NewWorkUnit};
 /// Handle static files
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
-}
-
-#[get("/favicon.ico")]
-fn favicon() -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/favicon.ico")).ok()
+    NamedFile::open(Path::new("frontend/dist/").join(file)).ok()
 }
 
 // TODO better name
@@ -42,8 +37,7 @@ fn post_rows(row: Json<NewWorkUnit>) {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![favicon])
-        .mount("/static/", routes![files])
+        .mount("/", routes![files])
         .mount("/api/", routes![get_rows, post_rows])
         .launch();
 }
