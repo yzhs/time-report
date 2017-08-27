@@ -24,6 +24,7 @@ export class Entry {
 }
 
 export class Globals {
+  timePeriod: string;
   mindate: string;
   maxdate: string;
   mintime: string;
@@ -38,19 +39,16 @@ export class Globals {
 export class AppComponent implements OnInit {
   title = 'Abrechnung BetreuerInnen';
   entries: Entry[];
-  timePeriod = '';
-  globals: Globals = {
-    mindate: '2017-08-01',
-    maxdate: '2017-12-31',
-    mintime: '12:30',
-    maxtime: '16:00',
-  };
+  globals: Globals;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.http.get<Entry[]>('/api/rows').subscribe(data => {
       this.entries = data;
+    });
+    this.http.get<Globals>('/api/globals').subscribe(data => {
+      this.globals = data;
     });
   }
 }

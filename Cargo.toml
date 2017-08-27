@@ -4,6 +4,7 @@ name = "time-report"
 version = "0.1.0"
 
 [dependencies]
+chrono = "0.4.0"
 dotenv = "0.10.1"
 rocket = "0.3.2"
 rocket_codegen = "0.3"

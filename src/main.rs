@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 use rocket::response::NamedFile;
 use rocket_contrib::Json;
 
-use time_report::models::{WorkUnit, NewWorkUnit};
+use time_report::models::*;
 
 #[get("/")]
 fn index() -> Option<NamedFile> {
@@ -23,6 +23,12 @@ fn index() -> Option<NamedFile> {
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("frontend/dist/").join(file)).ok()
+}
+
+// TODO better name
+#[get("/globals")]
+fn get_globals() -> Json<Globals> {
+    Json(time_report::get_globals())
 }
 
 // TODO better name
@@ -42,6 +48,6 @@ fn post_rows(row: Json<NewWorkUnit>) {
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, files])
-        .mount("/api/", routes![get_rows, post_rows])
+        .mount("/api/", routes![get_globals, get_rows, post_rows])
         .launch();
 }

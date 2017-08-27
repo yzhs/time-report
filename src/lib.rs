@@ -10,6 +10,8 @@ extern crate diesel;
 extern crate diesel_codegen;
 extern crate dotenv;
 
+extern crate chrono;
+
 pub mod schema;
 pub mod models;
 
@@ -19,7 +21,7 @@ use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use dotenv::dotenv;
 
-use models::{WorkUnit, NewWorkUnit};
+use models::*;
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();
@@ -29,6 +31,10 @@ pub fn establish_connection() -> SqliteConnection {
         "Error connecting to {}",
         database_url
     ))
+}
+
+pub fn get_globals() -> Globals {
+    Globals::new()
 }
 
 pub fn get_rows(conn: &SqliteConnection) -> Vec<WorkUnit> {
