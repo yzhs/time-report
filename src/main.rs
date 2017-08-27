@@ -14,6 +14,11 @@ use rocket_contrib::Json;
 
 use time_report::models::{WorkUnit, NewWorkUnit};
 
+#[get("/")]
+fn index() -> Option<NamedFile> {
+    NamedFile::open(Path::new("frontend/dist/index.html")).ok()
+}
+
 /// Handle static files
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
@@ -37,7 +42,7 @@ fn post_rows(row: Json<NewWorkUnit>) {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![files])
+        .mount("/", routes![index, files])
         .mount("/api/", routes![get_rows, post_rows])
         .launch();
 }
