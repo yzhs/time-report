@@ -32,12 +32,11 @@ fn get_rows() -> Json<Vec<WorkUnit>> {
     Json(time_report::get_rows(&conn))
 }
 
+
 #[post("/rows", format = "application/json", data = "<row>")]
 fn post_rows(row: Json<NewWorkUnit>) {
-    let wu = row.into_inner();
-    println!("Inserting {:?} into table", wu);
     let conn = time_report::establish_connection();
-    time_report::create_row(&conn, wu);
+    time_report::create_row(&conn, row.into_inner());
 }
 
 fn main() {
