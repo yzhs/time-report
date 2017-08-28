@@ -17,10 +17,6 @@ export class Entry {
     this.end = end;
     this.remark = remark;
   }
-
-  next() {
-      return new Entry('', this.date, this.week, '', '', '');
-  }
 }
 
 export class Globals {
