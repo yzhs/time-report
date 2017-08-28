@@ -48,9 +48,16 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.http.get<Entry[]>('/api/rows').subscribe(data => {
       this.entries = data;
+      this.next();
     });
     this.http.get<Globals>('/api/globals').subscribe(data => {
       this.globals = data;
+    });
+  }
+
+  next() {
+    this.http.get<Entry>('/api/new_row').subscribe(data => {
+      this.entries.push(data);
     });
   }
 }
