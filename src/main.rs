@@ -2,7 +2,6 @@
 #![plugin(rocket_codegen)]
 
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
 
 extern crate time_report;
@@ -33,7 +32,7 @@ fn get_globals() -> Json<Globals> {
 
 // TODO better name
 #[get("/rows")]
-fn get_rows() -> Json<Vec<WorkUnit>> {
+fn get_rows() -> Json<Vec<DbWorkUnit>> {
     let conn = time_report::establish_connection();
     Json(time_report::get_rows(&conn))
 }
@@ -45,9 +44,15 @@ fn post_rows(row: Json<NewWorkUnit>) {
     time_report::create_row(&conn, row.into_inner());
 }
 
+#[get("/new_row")]
+fn new_row() -> Json<DbWorkUnit> {
+    let conn = time_report::establish_connection();
+    Json(time_report::new_row_template(&conn))
+}
+
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, files])
-        .mount("/api/", routes![get_globals, get_rows, post_rows])
+        .mount("/api/", routes![get_globals, get_rows, post_rows, new_row])
         .launch();
 }
