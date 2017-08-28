@@ -25,13 +25,13 @@ fn files(file: PathBuf) -> Option<NamedFile> {
 }
 
 // TODO better name
-#[get("/globals")]
+#[get("/globals", format = "application/json")]
 fn get_globals() -> Json<Globals> {
     Json(time_report::get_globals())
 }
 
 // TODO better name
-#[get("/rows")]
+#[get("/rows", format = "application/json")]
 fn get_rows() -> Json<Vec<DbWorkUnit>> {
     let conn = time_report::establish_connection();
     Json(time_report::get_rows(&conn))
@@ -44,7 +44,7 @@ fn post_rows(row: Json<NewWorkUnit>) {
     time_report::create_row(&conn, row.into_inner());
 }
 
-#[get("/new_row")]
+#[get("/new_row", format = "application/json")]
 fn new_row() -> Json<DbWorkUnit> {
     let conn = time_report::establish_connection();
     Json(time_report::new_row_template(&conn))
