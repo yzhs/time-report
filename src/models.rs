@@ -126,7 +126,6 @@ pub struct NewWorkUnit {
 
 #[derive(Serialize)]
 pub struct Globals {
-    #[serde(rename = "timePeriod")]
     pub title: Option<String>,
 
     pub mindate: String,

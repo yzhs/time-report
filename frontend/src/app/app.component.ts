@@ -20,7 +20,7 @@ export class Entry {
 }
 
 export class Globals {
-  timePeriod: string;
+  title: string;
   mindate: string;
   maxdate: string;
   mintime: string;
@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
   title = 'Abrechnung BetreuerInnen';
   entries: Entry[] = [];
   globals: Globals = {
-    timePeriod: '',
+    title: '',
     mindate: '2017-08-01',
     maxdate: '2018-07-31',
     mintime: '12:30',
