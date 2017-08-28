@@ -1,11 +1,27 @@
-use chrono::{NaiveDate, NaiveTime};
+use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
 use serde::{Serialize, Deserialize};
 use serde::{Serializer, Deserializer};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Date(pub NaiveDate);
 
-const DATE_FORMAT: &'static str = "%Y-%d-%d";
+const DATE_FORMAT: &'static str = "%Y-%m-%d";
+
+fn is_work_day(date: NaiveDate) -> bool {
+    use chrono::Weekday::*;
+    match date.weekday() {
+        Sat | Sun => return false,
+        _ => {}
+    }
+
+    // TODO handle other holidays
+    if date.month() == 10 && date.day() == 3 {
+        return false;
+    }
+
+    true
+}
+
 
 impl Date {
     pub fn from_ymd(year: i32, month: u8, day: u8) -> Self {
@@ -14,6 +30,15 @@ impl Date {
 
     pub fn format(&self) -> String {
         format!("{}", self.0.format(DATE_FORMAT))
+    }
+
+    pub fn next(&self) -> Date {
+        let day = Duration::days(1);
+        let mut new_date = self.0 + day;
+        while !is_work_day(new_date) {
+            new_date = new_date + day;
+        }
+        Date(new_date)
     }
 }
 
@@ -38,6 +63,14 @@ impl<'de> Deserialize<'de> for Date {
                 "Could not parse time {}",
                 s
             )),
+        ))
+    }
+}
+
+impl From<String> for Date {
+    fn from(x: String) -> Date {
+        Date(x.parse::<NaiveDate>().expect(
+            &format!("Parsing date {} failed", x),
         ))
     }
 }
@@ -84,5 +117,14 @@ impl<'de> Deserialize<'de> for Time {
                 s
             )),
         ))
+    }
+}
+
+impl From<String> for Time {
+    fn from(x: String) -> Time {
+        Time(NaiveTime::parse_from_str(&x, "%H:%M").expect(&format!(
+            "Parsing time {} failed",
+            x
+        )))
     }
 }

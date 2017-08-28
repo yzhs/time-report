@@ -22,10 +22,8 @@ use std::env;
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use dotenv::dotenv;
-use chrono::{Datelike, Duration, NaiveDate};
 
 use models::*;
-use datetime::*;
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();
@@ -41,56 +39,35 @@ pub fn get_globals() -> Globals {
     Globals::new()
 }
 
-pub fn get_rows(conn: &SqliteConnection) -> Vec<DbWorkUnit> {
+pub fn get_rows(conn: &SqliteConnection) -> Vec<WorkUnit> {
     use schema::work_units::dsl::work_units;
-    work_units.load::<DbWorkUnit>(conn).expect(
-        "Error loading data",
-    )
+    work_units
+        .load::<DbWorkUnit>(conn)
+        .expect("Error loading data")
+        .into_iter()
+        .map(|x| x.into())
+        .collect()
 }
 
-fn is_work_day(date: NaiveDate) -> bool {
-    use chrono::Weekday::*;
-    match date.weekday() {
-        Sat | Sun => return false,
-        _ => {}
-    }
-
-    // TODO handle other holidays
-    if date.month() == 10 && date.day() == 3 {
-        return false;
-    }
-
-    true
-}
-
-fn next_date(date: Date) -> Date {
-    let day = Duration::days(1);
-    let mut new_date = date.0 + day;
-    while !is_work_day(new_date) {
-        new_date = new_date + day;
-    }
-    Date(new_date)
-}
-
-pub fn new_row_template(conn: &SqliteConnection) -> DbWorkUnit {
+pub fn new_row_template(conn: &SqliteConnection) -> WorkUnit {
     let rows: Vec<WorkUnit> = get_rows(conn).into_iter().map(|x| x.into()).collect();
     let mut result = WorkUnit::new();
 
     if rows.is_empty() {
-        return result.into();
+        return result;
     }
 
     let last = &rows[rows.len() - 1];
     result = result.date(last.date).week(last.week);
     if rows.len() == 1 {
-        return result.into();
+        return result;
     }
 
     let last_but_one = &rows[rows.len() - 2];
     if last_but_one.date == last.date {
-        result.date(next_date(last.date)).into()
+        result.date(last.date.next())
     } else {
-        result.into()
+        result
     }
 }
 

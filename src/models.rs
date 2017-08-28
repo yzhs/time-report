@@ -1,9 +1,9 @@
 use super::schema::work_units;
 
 use chrono;
-use chrono::{Duration, NaiveDate, NaiveTime};
+use chrono::Duration;
 
-use datetime::*;
+use datetime::{Date, Time};
 
 /// Represent one row in the database.
 #[derive(Debug, Queryable, Serialize, Deserialize)]
@@ -70,26 +70,13 @@ impl From<DbWorkUnit> for WorkUnit {
     fn from(wu: DbWorkUnit) -> Self {
         Self {
             name: wu.name,
-            date: parse_date(&wu.date),
+            date: wu.date.into(),
             week: wu.week,
-            start: parse_time(&wu.start),
-            end: parse_time(&wu.end),
+            start: wu.start.into(),
+            end: wu.end.into(),
             remark: wu.remark,
         }
     }
-}
-
-pub fn parse_date(x: &str) -> Date {
-    Date(x.parse::<NaiveDate>().expect(
-        &format!("Parsing date {} failed", x),
-    ))
-}
-
-pub fn parse_time(x: &str) -> Time {
-    Time(NaiveTime::parse_from_str(x, "%H:%M").expect(&format!(
-        "Parsing time {} failed",
-        x
-    )))
 }
 
 impl From<WorkUnit> for DbWorkUnit {

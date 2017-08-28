@@ -32,7 +32,7 @@ fn get_globals() -> Json<Globals> {
 
 // TODO better name
 #[get("/rows", format = "application/json")]
-fn get_rows() -> Json<Vec<DbWorkUnit>> {
+fn get_rows() -> Json<Vec<WorkUnit>> {
     let conn = time_report::establish_connection();
     Json(time_report::get_rows(&conn))
 }
@@ -45,7 +45,7 @@ fn post_rows(row: Json<NewWorkUnit>) {
 }
 
 #[get("/new_row", format = "application/json")]
-fn new_row() -> Json<DbWorkUnit> {
+fn new_row() -> Json<WorkUnit> {
     let conn = time_report::establish_connection();
     Json(time_report::new_row_template(&conn))
 }
