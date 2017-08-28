@@ -34,8 +34,14 @@ export class Globals {
 })
 export class AppComponent implements OnInit {
   title = 'Abrechnung BetreuerInnen';
-  entries: Entry[];
-  globals: Globals;
+  entries: Entry[] = [];
+  globals: Globals = {
+    timePeriod: '',
+    mindate: '2017-08-01',
+    maxdate: '2018-07-31',
+    mintime: '12:30',
+    maxtime: '16:00'
+  };
 
   constructor(private http: HttpClient) {}
 
