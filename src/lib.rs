@@ -15,15 +15,17 @@ extern crate chrono;
 
 pub mod schema;
 pub mod models;
+mod datetime;
 
 use std::env;
 
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use dotenv::dotenv;
-use chrono::Duration;
+use chrono::{Datelike, Duration, NaiveDate};
 
 use models::*;
+use datetime::*;
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();
@@ -46,9 +48,28 @@ pub fn get_rows(conn: &SqliteConnection) -> Vec<DbWorkUnit> {
     )
 }
 
+fn is_work_day(date: NaiveDate) -> bool {
+    use chrono::Weekday::*;
+    match date.weekday() {
+        Sat | Sun => return false,
+        _ => {}
+    }
+
+    // TODO handle other holidays
+    if date.month() == 10 && date.day() == 3 {
+        return false;
+    }
+
+    true
+}
+
 fn next_date(date: Date) -> Date {
-    date + Duration::days(1)
-    // TODO skip weekends and holidays
+    let day = Duration::days(1);
+    let mut new_date = date.0 + day;
+    while !is_work_day(new_date) {
+        new_date = new_date + day;
+    }
+    Date(new_date)
 }
 
 pub fn new_row_template(conn: &SqliteConnection) -> DbWorkUnit {

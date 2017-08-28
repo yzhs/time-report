@@ -3,16 +3,7 @@ use super::schema::work_units;
 use chrono;
 use chrono::{Duration, NaiveDate, NaiveTime};
 
-pub type Date = NaiveDate;
-pub type Time = NaiveTime;
-
-pub fn format_date(x: Date) -> String {
-    format!("{}", x.format("%Y-%m-%d"))
-}
-
-pub fn format_time(x: Time) -> String {
-    format!("{}", x.format("%H:%M"))
-}
+use datetime::*;
 
 /// Represent one row in the database.
 #[derive(Debug, Queryable, Serialize, Deserialize)]
@@ -27,6 +18,7 @@ pub struct DbWorkUnit {
     pub processed: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct WorkUnit {
     pub name: String,
     pub date: Date,
@@ -88,13 +80,16 @@ impl From<DbWorkUnit> for WorkUnit {
 }
 
 pub fn parse_date(x: &str) -> Date {
-    x.parse::<Date>().expect(
+    Date(x.parse::<NaiveDate>().expect(
         &format!("Parsing date {} failed", x),
-    )
+    ))
 }
 
 pub fn parse_time(x: &str) -> Time {
-    chrono::NaiveTime::parse_from_str(x, "%H:%M").expect(&format!("Parsing time {} failed", x))
+    Time(NaiveTime::parse_from_str(x, "%H:%M").expect(&format!(
+        "Parsing time {} failed",
+        x
+    )))
 }
 
 impl From<WorkUnit> for DbWorkUnit {
@@ -102,10 +97,10 @@ impl From<WorkUnit> for DbWorkUnit {
         Self {
             id: 0,
             name: wu.name,
-            date: format_date(wu.date),
+            date: wu.date.format(),
             week: wu.week,
-            start: format_time(wu.start),
-            end: format_time(wu.end),
+            start: wu.start.format(),
+            end: wu.end.format(),
             remark: wu.remark,
             processed: false,
         }
@@ -139,17 +134,17 @@ impl Globals {
     pub fn new() -> Self {
         use chrono::Datelike;
         let today = chrono::Local::today();
-        let today_naive = NaiveDate::from_ymd(today.year(), today.month(), today.day());
-        let half_a_year_ago = today_naive - Duration::weeks(26);
-        let mintime = NaiveTime::from_hms(12, 30, 0);
-        let maxtime = NaiveTime::from_hms(16, 0, 0);
+        let today_naive = Date::from_ymd(today.year(), today.month() as u8, today.day() as u8);
+        let half_a_year_ago = Date(today_naive.0 - Duration::weeks(26));
+        let mintime = Time::from_hms(12, 30, 0);
+        let maxtime = Time::from_hms(16, 0, 0);
 
         Self {
             title: None,
-            mindate: format_date(half_a_year_ago), // FIXME compute proper minimal date
-            maxdate: format_date(today_naive),
-            mintime: format_time(mintime),
-            maxtime: format_time(maxtime),
+            mindate: half_a_year_ago.format(), // FIXME compute proper minimal date
+            maxdate: today_naive.format(),
+            mintime: mintime.format(),
+            maxtime: maxtime.format(),
         }
     }
 }
