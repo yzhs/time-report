@@ -5,7 +5,7 @@ extern crate serde;
 extern crate serde_derive;
 
 #[macro_use]
-extern crate diesel;
+pub extern crate diesel;
 
 #[macro_use]
 extern crate diesel_codegen;
@@ -16,6 +16,7 @@ extern crate chrono;
 pub mod schema;
 pub mod models;
 mod datetime;
+
 
 use std::env;
 

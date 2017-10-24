@@ -1,6 +1,6 @@
 use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
-use serde::{Serialize, Deserialize};
-use serde::{Serializer, Deserializer};
+use serde::{Deserialize, Serialize};
+use serde::{Deserializer, Serializer};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Date(pub NaiveDate);
