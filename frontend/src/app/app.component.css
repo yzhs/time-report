@@ -72,3 +72,14 @@ select:focus {
 input#heading:focus {
     box-shadow: none;
 }
+
+button {
+    background-color: yellow;
+    border: none;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+button.saved {
+    background-color: lightgreen;
+}

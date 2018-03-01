@@ -49,6 +49,11 @@
         <input type="text" name="remark" placeholder="Bemerkung"
                [(ngModel)]="entry.remark"/>
       </td>
+      <td>
+        <input type="text" name="id" required [(ngModel)]="entry.id" />
+        <!--<input type="hidden" name="id" [(ngModel)]="entry.id"/>-->
+        <button name="submit">Speichern</button>
+      </td>
     </tr>
   </table>
 </div>
