@@ -17,33 +17,6 @@ tables:
   CREATE TABLE holidays (date integer NOT NULL, title varchar NOT NULL)
   ```
 
-* `reports`
-  | id  | title  | start_date | end_date | was_pdf_generated |
-  |-----|--------|------------|----------|-------------------|
-  | int | string | date       | date     | boolean           |
-
-  ``` sql
-  CREATE TABLE reports (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    title varchar NOT NULL,
-    start_date integer NOT NULL,
-    end_date integer NOT NULL,
-    was_pdf_generated boolean NOT NULL DEFAULT(false)
-  )
-  ```
-
-* `employees`
-  | id  | name   |
-  |-----|--------|
-  | int | string |
-
-  ``` sql
-  CREATE TABLE employees (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    name varchar NOT NULL
-  )
-  ```
-
 * `weeks`
   Maybe use year/month/day format?
   | year               | week_of_year | week_type |
@@ -64,19 +37,49 @@ tables:
   ``` sql
   CREATE TABLE weeks (
     year integer NOT NULL
-      CHECK (year >= 2017 AND year <= cast(strftime('%y', 'now') as integer + 1)),
+      CHECK (2017 <= year AND year <= cast(strftime('%y', 'now') as integer) + 1),
 
     week_of_year integer NOT NULL
       CHECK (0 < week_of_year AND week_of_year <= 52),
   )
   ```
 
+* `employees`
+  | id  | name   |
+  |-----|--------|
+  | int | string |
+
+  ``` sql
+  CREATE TABLE employees (
+    id integer PRIMARY KEY AUTOINCREMENT,
+    name varchar NOT NULL
+  )
+  ```
+
+* `reports`
+  | id  | title  | start_date | end_date | was_pdf_generated |
+  |-----|--------|------------|----------|-------------------|
+  | int | string | date       | date     | boolean           |
+
+  ``` sql
+  CREATE TABLE reports (
+    id integer PRIMARY KEY AUTOINCREMENT,
+    title varchar NOT NULL CHECK (length(title) > 7),
+    start_date integer NOT NULL,
+    end_date integer NOT NULL CHECK (
+      start_date <= end_date AND
+      end_date <= cast(strftime('%s', 'now') as integer) + 7*24*60*60
+    ),
+    was_pdf_generated boolean NOT NULL DEFAULT false
+  )
+  ```
+
 * `items`
   Basically, who worked when for how long.
 
-  | id  | report_id   | employee_id | date | start_time | end_time | remark |
-  |-----|-------------|-------------|------|------------|----------|--------|
-  | int | foreign key | foreign key | date | time       | time     | string |
+  | id  | report_id   | employee_id | start_time | end_time | remark |
+  |-----|-------------|-------------|------------|----------|--------|
+  | int | foreign key | foreign key | time       | time     | string |
 
   NB: SQLite does not support foreign keys by default. They have to be enabled
   for each connection using `PRAGMA foreign_keys = ON`.
@@ -87,14 +90,16 @@ tables:
     report_id integer NOT NULL REFERENCES reports(id),
     employee_id integer NOT NULL REFERENCES employees(id),
 
-    date integer NOT NULL
-      CHECK (date >= SELECT start_date FROM reports WHERE reports.id =
-      items.id LIMIT 1),
 
-    start_time integer NOT NULL
-      CHECK (start_time >= '11:00'),
-    end_time integer NOT NULL
-      CHECK (start_time <= end_time - 15min && end_time <= '16:00'),
+    start_datetime integer NOT NULL CHECK(
+      date(start_datetime) >= '2017-08-01' AND
+      time(start_datetime) >= '11:00'
+    ),
+    end_datetime integer NOT NULL CHECK (
+      date(start_datetime) = date(end_datetime) AND
+      start_datetime <= end_datetime - 15*60 AND
+      time(end_datetime) <= '16:00'
+    ),
 
     remark varchar
   )
