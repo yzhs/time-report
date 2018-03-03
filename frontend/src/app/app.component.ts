@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 export class Entry {
   name: string;
@@ -25,6 +26,16 @@ export class Globals {
   maxdate: string;
   mintime: string;
   maxtime: string;
+
+  constructor(public titleService: Title,
+    title = '', mindate = '2017-08-01',
+    maxdate = '2018-07-31',
+    mintime = '12:30',
+    maxtime = '16:00') { }
+
+  onChangeMe() {
+    this.titleService.setTitle('Abrechnung BetreuerInnen ' + this.title);
+  }
 }
 
 @Component({
@@ -33,17 +44,10 @@ export class Globals {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'Abrechnung BetreuerInnen';
   entries: Entry[] = [];
-  globals: Globals = {
-    title: '',
-    mindate: '2017-08-01',
-    maxdate: '2018-07-31',
-    mintime: '12:30',
-    maxtime: '16:00'
-  };
+  globals: Globals = new Globals(this.titleService);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private titleService: Title) {}
 
   ngOnInit() {
     this.http.get<Entry[]>('/api/rows').subscribe(data => {

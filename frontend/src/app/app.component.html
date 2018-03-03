@@ -1,10 +1,10 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div style="text-align:center">
   <h1>
-    {{title}}
+    Abrechnung BetreuerInnen
   </h1>
   <input type="text" name="heading" id="heading" placeholder="Zeitraum"
-         [(ngModel)]="globals.title" required/>
+         [(ngModel)]="globals.title" required (change)="globals.onChangeMe()"/>
 
   <table id="table">
     <thead>
