@@ -10,7 +10,7 @@ use datetime::{Date, Time};
 pub struct RawInvoiceItem {
     pub id: i32,
     pub name: String,
-    pub date: String,
+    pub day: i32,
     pub week: i32,
     pub start: String,
     pub end: String,
@@ -21,7 +21,7 @@ pub struct RawInvoiceItem {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InvoiceItem {
     pub name: String,
-    pub date: Date,
+    pub day: Date,
     pub week: i32,
     pub start: Time,
     pub end: Time,
@@ -32,7 +32,7 @@ impl InvoiceItem {
     pub fn new() -> Self {
         InvoiceItem {
             name: "".into(),
-            date: Date::from_ymd(2017, 8, 1),
+            day: Date::from_ymd(2017, 8, 1),
             week: 0,
             start: Time::from_hms(13, 00, 0),
             end: Time::from_hms(15, 30, 0),
@@ -45,8 +45,8 @@ impl InvoiceItem {
         self
     }
 
-    pub fn date(mut self, date: Date) -> Self {
-        self.date = date;
+    pub fn day(mut self, day: Date) -> Self {
+        self.day = day;
         self
     }
 
@@ -70,7 +70,7 @@ impl From<DbWorkUnit> for WorkUnit {
     fn from(wu: DbWorkUnit) -> Self {
         Self {
             name: wu.name,
-            date: wu.date.into(),
+            day: wu.day.into(),
             week: wu.week,
             start: wu.start.into(),
             end: wu.end.into(),
@@ -84,7 +84,7 @@ impl From<WorkUnit> for DbWorkUnit {
         Self {
             id: 0,
             name: wu.name,
-            date: wu.date.format(),
+            day: wu.day.format(),
             week: wu.week,
             start: wu.start.format(),
             end: wu.end.format(),

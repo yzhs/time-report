@@ -60,14 +60,14 @@ pub fn new_row_template(conn: &SqliteConnection) -> InvoiceItem {
     }
 
     let last = &rows[rows.len() - 1];
-    result = result.date(last.date).week(last.week);
+    result = result.day(last.day).week(last.week);
     if rows.len() == 1 {
         return result;
     }
 
     let last_but_one = &rows[rows.len() - 2];
-    if last_but_one.date == last.date {
-        result.date(last.date.next())
+    if last_but_one.day == last.day {
+        result.day(last.day.next())
     } else {
         result
     }
