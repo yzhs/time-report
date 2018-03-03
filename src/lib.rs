@@ -1,4 +1,4 @@
-#![recursion_limit="128"]
+#![recursion_limit = "128"]
 
 extern crate serde;
 #[macro_use]
@@ -17,7 +17,6 @@ pub mod schema;
 pub mod models;
 mod datetime;
 
-
 use std::env;
 
 use diesel::prelude::*;
@@ -34,10 +33,8 @@ pub fn establish_connection() -> SqliteConnection {
     } else {
         "TEST_DATABASE_URL"
     }).expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&database_url).expect(&format!(
-        "Error connecting to {}",
-        database_url
-    ))
+    SqliteConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}", database_url))
 }
 
 pub fn get_globals() -> Globals {

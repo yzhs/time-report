@@ -22,7 +22,6 @@ fn is_work_day(date: NaiveDate) -> bool {
     true
 }
 
-
 impl Date {
     pub fn from_ymd(year: i32, month: u8, day: u8) -> Self {
         Date(NaiveDate::from_ymd(year, month as u32, day as u32))
@@ -59,22 +58,20 @@ impl<'de> Deserialize<'de> for Date {
     {
         let s = String::deserialize(deserializer)?;
         Ok(Date(
-            NaiveDate::parse_from_str(&s, TIME_FORMAT).expect(&format!(
-                "Could not parse time {}",
-                s
-            )),
+            NaiveDate::parse_from_str(&s, TIME_FORMAT)
+                .expect(&format!("Could not parse time {}", s)),
         ))
     }
 }
 
 impl From<String> for Date {
     fn from(x: String) -> Date {
-        Date(x.parse::<NaiveDate>().expect(
-            &format!("Parsing date {} failed", x),
-        ))
+        Date(
+            x.parse::<NaiveDate>()
+                .expect(&format!("Parsing date {} failed", x)),
+        )
     }
 }
-
 
 const TIME_FORMAT: &'static str = "%H:%M";
 
@@ -112,19 +109,14 @@ impl<'de> Deserialize<'de> for Time {
     {
         let s = String::deserialize(deserializer)?;
         Ok(Time(
-            NaiveTime::parse_from_str(&s, TIME_FORMAT).expect(&format!(
-                "Could not parse time {}",
-                s
-            )),
+            NaiveTime::parse_from_str(&s, TIME_FORMAT)
+                .expect(&format!("Could not parse time {}", s)),
         ))
     }
 }
 
 impl From<String> for Time {
     fn from(x: String) -> Time {
-        Time(NaiveTime::parse_from_str(&x, "%H:%M").expect(&format!(
-            "Parsing time {} failed",
-            x
-        )))
+        Time(NaiveTime::parse_from_str(&x, "%H:%M").expect(&format!("Parsing time {} failed", x)))
     }
 }
