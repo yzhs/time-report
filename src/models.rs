@@ -66,8 +66,8 @@ impl InvoiceItem {
     }
 }
 
-impl From<DbWorkUnit> for WorkUnit {
-    fn from(wu: DbWorkUnit) -> Self {
+impl From<RawInvoiceItem> for InvoiceItem {
+    fn from(wu: RawInvoiceItem) -> Self {
         Self {
             name: wu.name,
             day: wu.day.into(),
@@ -79,8 +79,8 @@ impl From<DbWorkUnit> for WorkUnit {
     }
 }
 
-impl From<WorkUnit> for DbWorkUnit {
-    fn from(wu: WorkUnit) -> Self {
+impl From<InvoiceItem> for RawInvoiceItem {
+    fn from(wu: InvoiceItem) -> Self {
         Self {
             id: 0,
             name: wu.name,
@@ -97,12 +97,12 @@ impl From<WorkUnit> for DbWorkUnit {
 /// Data needed to create a new row in the database.
 #[derive(Debug, Deserialize, Insertable)]
 #[table_name = "work_units"]
-pub struct NewWorkUnit {
     pub name: String,
     pub date: String,
     pub week: i32,
     pub start: String,
     pub end: String,
+pub struct NewInvoiceItem {
     pub remark: Option<String>,
 }
 
