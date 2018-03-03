@@ -1,4 +1,4 @@
-use super::schema::work_units;
+use super::schema::{employees, holidays, items, reports, weeks};
 
 use chrono;
 use chrono::Duration;
@@ -7,7 +7,7 @@ use datetime::{Date, Time};
 
 /// Represent one row in the database.
 #[derive(Debug, Queryable, Serialize, Deserialize)]
-pub struct DbWorkUnit {
+pub struct RawInvoiceItem {
     pub id: i32,
     pub name: String,
     pub date: String,
@@ -19,7 +19,7 @@ pub struct DbWorkUnit {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct WorkUnit {
+pub struct InvoiceItem {
     pub name: String,
     pub date: Date,
     pub week: i32,
@@ -28,9 +28,9 @@ pub struct WorkUnit {
     pub remark: Option<String>,
 }
 
-impl WorkUnit {
+impl InvoiceItem {
     pub fn new() -> Self {
-        WorkUnit {
+        InvoiceItem {
             name: "".into(),
             date: Date::from_ymd(2017, 8, 1),
             week: 0,

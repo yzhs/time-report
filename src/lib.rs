@@ -44,19 +44,19 @@ pub fn get_globals() -> Globals {
     Globals::new()
 }
 
-pub fn get_rows(conn: &SqliteConnection) -> Vec<WorkUnit> {
-    use schema::work_units::dsl::work_units;
-    work_units
-        .load::<DbWorkUnit>(conn)
+pub fn get_rows(conn: &SqliteConnection) -> Vec<InvoiceItem> {
+    use schema::items_view::dsl::items_view;
+    items_view
+        .load::<RawInvoiceItem>(conn)
         .expect("Error loading data")
         .into_iter()
         .map(|x| x.into())
         .collect()
 }
 
-pub fn new_row_template(conn: &SqliteConnection) -> WorkUnit {
-    let rows: Vec<WorkUnit> = get_rows(conn).into_iter().map(|x| x.into()).collect();
-    let mut result = WorkUnit::new();
+pub fn new_row_template(conn: &SqliteConnection) -> InvoiceItem {
+    let rows: Vec<InvoiceItem> = get_rows(conn).into_iter().map(|x| x.into()).collect();
+    let mut result = InvoiceItem::new();
 
     if rows.is_empty() {
         return result;
@@ -76,8 +76,8 @@ pub fn new_row_template(conn: &SqliteConnection) -> WorkUnit {
     }
 }
 
-pub fn create_row(conn: &SqliteConnection, wu: NewWorkUnit) {
-    use schema::work_units;
+pub fn create_row(conn: &SqliteConnection, wu: NewInvoiceItem) {
+    use schema::items;
     diesel::insert(&wu)
         .into(work_units::table)
         .execute(conn)

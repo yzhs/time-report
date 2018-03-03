@@ -31,21 +31,20 @@ fn get_globals() -> Json<Globals> {
 }
 
 // TODO better name
-#[get("/rows", format = "application/json")]
-fn get_rows() -> Json<Vec<WorkUnit>> {
+#[get("/items", format = "application/json")]
+fn get_items() -> Json<Vec<InvoiceItem>> {
     let conn = time_report::establish_connection();
-    Json(time_report::get_rows(&conn))
+    Json(time_report::get_items(&conn))
 }
 
-
-#[post("/rows", format = "application/json", data = "<row>")]
-fn post_rows(row: Json<NewWorkUnit>) {
+#[post("/items", format = "application/json", data = "<item>")]
+fn post_items(item: Json<NewInvoiceItem>) {
     let conn = time_report::establish_connection();
-    time_report::create_row(&conn, row.into_inner());
+    time_report::create_item(&conn, item.into_inner());
 }
 
-#[get("/new_row", format = "application/json")]
-fn new_row() -> Json<WorkUnit> {
+#[get("/new_item", format = "application/json")]
+fn new_item() -> Json<InvoiceItem> {
     let conn = time_report::establish_connection();
     Json(time_report::new_row_template(&conn))
 }
@@ -53,6 +52,9 @@ fn new_row() -> Json<WorkUnit> {
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, files])
-        .mount("/api/", routes![get_globals, get_rows, post_rows, new_row])
+        .mount(
+            "/api/",
+            routes![get_globals, get_items, post_items, new_item],
+        )
         .launch();
 }
