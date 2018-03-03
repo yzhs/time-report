@@ -50,10 +50,16 @@ export class AppComponent implements OnInit {
   constructor(private http: HttpClient, private titleService: Title) {}
 
   ngOnInit() {
+    /*
     this.http.get<Entry[]>('/api/rows').subscribe(data => {
       this.entries = data;
       this.next();
     });
+    */
+   this.entries = [
+     new Entry('Alice A.', '2018-01-07', 0, '13:30', '15:30'),
+     new Entry('Bob b.', '2018-01-08', 0, '14:00', '15:30')
+    ];
     this.http.get<Globals>('/api/globals').subscribe(data => {
       this.globals = data;
     });
