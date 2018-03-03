@@ -5,6 +5,10 @@ use chrono::Duration;
 
 use datetime::{Date, Time};
 
+/// Get a list of employees
+#[derive(Debug, Queryable, Serialize, Deserialize)]
+pub struct Employee(pub String);
+
 /// Represent one row in the database.
 #[derive(Debug, Queryable, Serialize, Deserialize)]
 pub struct RawInvoiceItem {
@@ -12,10 +16,9 @@ pub struct RawInvoiceItem {
     pub name: String,
     pub day: i32,
     pub week: i32,
-    pub start: String,
-    pub end: String,
-    pub remark: Option<String>,
-    pub processed: bool,
+    pub start: i32,
+    pub end: i32,
+    pub remark: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -74,7 +77,7 @@ impl From<RawInvoiceItem> for InvoiceItem {
             week: wu.week,
             start: wu.start.into(),
             end: wu.end.into(),
-            remark: wu.remark,
+            remark: Some(wu.remark),
         }
     }
 }
@@ -88,21 +91,19 @@ impl From<InvoiceItem> for RawInvoiceItem {
             week: wu.week,
             start: wu.start.format(),
             end: wu.end.format(),
-            remark: wu.remark,
-            processed: false,
+            remark: wu.remark.unwrap(),
         }
     }
 }
 
 /// Data needed to create a new row in the database.
 #[derive(Debug, Deserialize, Insertable)]
-#[table_name = "work_units"]
-    pub name: String,
-    pub date: String,
-    pub week: i32,
-    pub start: String,
-    pub end: String,
+#[table_name = "items"]
 pub struct NewInvoiceItem {
+    pub employee_id: i32,
+    pub report_id: i32,
+    pub start_datetime: i32,
+    pub end_datetime: i32,
     pub remark: Option<String>,
 }
 

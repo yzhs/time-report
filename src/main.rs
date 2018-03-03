@@ -18,7 +18,7 @@ fn index() -> Option<NamedFile> {
     NamedFile::open(Path::new("frontend/dist/index.html")).ok()
 }
 
-/// Handle static files
+/// Serve static files
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("frontend/dist/").join(file)).ok()

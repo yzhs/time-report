@@ -74,9 +74,11 @@ pub fn new_row_template(conn: &SqliteConnection) -> InvoiceItem {
 }
 
 pub fn create_row(conn: &SqliteConnection, wu: NewInvoiceItem) {
+    /*
     use schema::items;
     diesel::insert(&wu)
-        .into(work_units::table)
+        .into(items::table)
         .execute(conn)
         .expect("Error saving new row");
+        */
 }
