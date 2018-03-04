@@ -19,13 +19,15 @@
       </thead>
       <tr v-for="item in items" :key="item.id">
         <td>
-          <input type="text" name="name" required
-                placeholder="Vorname Nachname" v-model="item.name" />
+          <input type="text" name="name" placeholder="Vorname Nachname"
+                 minlength="2" maxlength="100"
+                 pattern=".*[^. ,-]+.*" required
+                 v-model="item.name"/>
         </td>
         <td>
-          <input type="date" name="date" required placeholder="Datum"
-                :min="globals.mindate" :max="globals.maxdate"
-                v-model="item.date" />
+          <input type="date" name="day" placeholder="Datum" required
+                 :min="globals.mindate" :max="globals.maxdate"
+                 v-model="item.date" />
         </td>
         <td>
           <select name="week" v-model="item.week" tabindex="-1">
@@ -37,21 +39,21 @@
         </td>
         <td>
           <input type="time" name="start" placeholder="von" step="300"
-                :min="globals.mintime" :max="globals.maxtime" required
-                v-model="item.start"/>
+                 :min="globals.mintime" :max="globals.maxtime" required
+                 v-model="item.start"/>
           </td>
           <td>
           <input type="time" name="end" placeholder="bis" step="300"
-                :min="globals.mintime" :max="globals.maxtime" required
-                v-model="item.end"/>
+                 :min="globals.mintime" :max="globals.maxtime" required
+                 v-model="item.end"/>
         </td>
         <td>
           <input type="text" name="remark" placeholder="Bemerkung"
-                v-model="item.remark"/>
+                 v-model="item.remark"/>
         </td>
         <td>
           {{item.id}}
-          <button name="submit">Speichern</button>
+          <button class="add-item" name="submit" v-on:click="addItem">neue Zeile</button>
         </td>
       </tr>
     </table>
@@ -65,14 +67,19 @@ export default {
   data () {
     return {
       globals: {title: ''},
+      numItems: 1,
       items: [
-        {id: 1, name: 'Alice A', date: '2017-12-18', week: '1', start: '13:00', end: '15:30'}
+        {id: 0, name: 'Alice A', date: '2017-12-18', week: '1', start: '13:00', end: '15:30'}
       ]
     }
   },
   methods: {
-    updateTitle: function () {
-      document.title = 'Abrechung BetreuerInnen ' + document.getElementById('heading').value
+    updateTitle: function (e) {
+      document.title = 'Abrechung BetreuerInnen ' + e.target.value
+    },
+    addItem: function () {
+      this.items.push({id: this.numItems, name: ''})
+      this.numItems++
     }
   }
 }
@@ -161,8 +168,10 @@ button {
   margin-right: 10px;
 }
 
-button.saved {
-  background-color: lightgreen;
+button.add-item {
+  background-color: darkblue;
+  color: white;
+  visibility: hidden;
 }
 
 button#generate {
@@ -171,5 +180,8 @@ button#generate {
   font-size: 150%;
   margin: 1em;
   padding: 0.3em;
+}
+tr:last-of-type button.add-item {
+  visibility: visible;
 }
 </style>
