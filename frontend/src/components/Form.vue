@@ -65,11 +65,17 @@
 <script>
 export default {
   data () {
+    let now = new Date()
+    let maxdate = now.toISOString().split('T')[0]
+    let halfAYearAgo = new Date()
+    halfAYearAgo.setMonth(now.getMonth() - 6)
+    let mindate = halfAYearAgo.toISOString().split('T')[0]
+
     return {
-      globals: {title: ''},
+      globals: {mindate: mindate, maxdate: maxdate},
       numItems: 1,
       items: [
-        {id: 0, name: 'Alice A', date: '2017-12-18', week: '1', start: '13:00', end: '15:30'}
+        {id: 0, name: 'Alice A', date: '2018-03-01', week: '1', start: '13:00', end: '15:30'}
       ]
     }
   },
