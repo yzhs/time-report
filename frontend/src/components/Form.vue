@@ -89,6 +89,7 @@ export default {
 <style scoped>
 h1, input#heading {
   color: #369;
+  font-weight: 600;
   font-family: sans-serif;
   font-size: 250%;
   text-align: center;
