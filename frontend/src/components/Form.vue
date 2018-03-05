@@ -56,7 +56,7 @@
         </td>
         <td>
           {{item.id}}
-          <button class="add-item" name="submit" v-on:click="addItem">neue Zeile</button>
+          <button class="add-item" v-on:click="addItem">neue Zeile</button>
         </td>
       </tr>
     </table>
