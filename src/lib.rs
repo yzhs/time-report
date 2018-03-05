@@ -15,7 +15,6 @@ extern crate chrono;
 
 pub mod schema;
 pub mod models;
-mod datetime;
 
 use std::env;
 
