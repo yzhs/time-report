@@ -41,44 +41,44 @@ pub fn get_globals() -> Globals {
     Globals::new()
 }
 
-pub fn get_rows(conn: &SqliteConnection) -> Vec<InvoiceItem> {
+pub fn get_items(conn: &SqliteConnection) -> Vec<InvoiceItem> {
     use schema::items_view::dsl::items_view;
     items_view
-        .load::<RawInvoiceItem>(conn)
+        .load::<InvoiceItem>(conn)
         .expect("Error loading data")
         .into_iter()
         .map(|x| x.into())
         .collect()
 }
 
-pub fn new_row_template(conn: &SqliteConnection) -> InvoiceItem {
-    let rows: Vec<InvoiceItem> = get_rows(conn).into_iter().map(|x| x.into()).collect();
+pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
+    let items: Vec<InvoiceItem> = get_items(conn).into_iter().map(|x| x.into()).collect();
     let mut result = InvoiceItem::new();
 
-    if rows.is_empty() {
+    if items.is_empty() {
         return result;
     }
 
-    let last = &rows[rows.len() - 1];
-    result = result.day(last.day).week(last.week);
-    if rows.len() == 1 {
+    let last = &items[items.len() - 1];
+    result = result.day(last.day).type_of_week(last.type_of_week);
+    if items.len() == 1 {
         return result;
     }
 
-    let last_but_one = &rows[rows.len() - 2];
+    let last_but_one = &items[items.len() - 2];
     if last_but_one.day == last.day {
-        result.day(last.day.next())
+        result.day(last.day.succ())
     } else {
         result
     }
 }
 
-pub fn create_row(conn: &SqliteConnection, wu: NewInvoiceItem) {
+pub fn create_item(conn: &SqliteConnection, wu: NewInvoiceItem) {
     /*
     use schema::items;
     diesel::insert(&wu)
         .into(items::table)
         .execute(conn)
-        .expect("Error saving new row");
+        .expect("Error saving new item");
         */
 }

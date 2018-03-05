@@ -46,7 +46,7 @@ fn post_items(item: Json<NewInvoiceItem>) {
 #[get("/new_item", format = "application/json")]
 fn new_item() -> Json<InvoiceItem> {
     let conn = time_report::establish_connection();
-    Json(time_report::new_row_template(&conn))
+    Json(time_report::new_item_template(&conn))
 }
 
 fn main() {
