@@ -20,6 +20,7 @@
       <tr v-for="item in items" :key="item.id">
         <td>
           <input type="text" name="name" placeholder="Vorname Nachname"
+                 list="employees"
                  minlength="2" maxlength="100"
                  pattern=".*[^. ,-]+.*" required
                  v-model="item.name"/>
@@ -59,6 +60,10 @@
     </table>
 
     <button id="generate" name="generate">PDF erzeugen</button>
+
+    <datalist id="employees">
+      <option v-for="employee in employees" :key="employee.name">{{employee.name}}</option>
+    </datalist>
   </div>
 </template>
 
