@@ -70,16 +70,19 @@
 </template>
 
 <script>
+let formatDate = function (date) {
+  return date.toISOString().split('T')[0]
+}
 export default {
   data () {
     let now = new Date()
-    let maxdate = now.toISOString().split('T')[0]
+    let maxdate = formatDate(now)
     let halfAYearAgo = new Date()
     halfAYearAgo.setMonth(now.getMonth() - 6)
-    let mindate = halfAYearAgo.toISOString().split('T')[0]
+    let mindate = formatDate(halfAYearAgo)
 
     return {
-      globals: {mindate: mindate, maxdate: maxdate},
+      globals: {mindate: mindate, maxdate: maxdate, mintime: '12:30', maxtime: '16:00'},
       numItems: 1,
       employees: [
         {id: 0, name: 'Alice A'},
