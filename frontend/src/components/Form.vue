@@ -81,6 +81,10 @@ export default {
     return {
       globals: {mindate: mindate, maxdate: maxdate},
       numItems: 1,
+      employees: [
+        {id: 0, name: 'Alice A'},
+        {id: 1, name: 'Bob B'}
+      ],
       items: [
         {id: 0, name: 'Alice A', date: '2018-03-01', week: '1', start: '13:00', end: '15:30'}
       ]
