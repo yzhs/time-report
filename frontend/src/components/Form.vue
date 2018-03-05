@@ -4,7 +4,9 @@
       Abrechnung BetreuerInnen
     </h1>
     <input type="text" name="heading" id="heading" placeholder="Zeitraum"
-          v-model="globals.title" required v-on:keyup="updateTitle" v-on:change="updateTitle"/>
+           required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
+           title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden"
+           v-model="globals.title" v-on:keyup="updateTitle" v-on:change="updateTitle"/>
 
     <table id="table">
       <thead>
