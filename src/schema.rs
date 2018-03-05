@@ -4,10 +4,10 @@ table! {
     items_view (id, name, day, type_of_week, start, stop, remark) {
         id -> Integer,
         name -> Text,
-        day -> Integer,
+        day -> Date,
         type_of_week -> Integer,
-        start -> Integer,
-        stop -> Integer,
+        start -> Time,
+        stop -> Time,
         remark -> Text,
     }
 }
