@@ -155,11 +155,8 @@ pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
 }
 
 pub fn get_employees(conn: &SqliteConnection) -> Vec<String> {
-    use schema::employees;
-    employees::table
-        .select(employees::name)
-        .load::<String>(conn)
-        .unwrap()
+    use schema::employees::*;
+    table.select(name).load::<String>(conn).unwrap()
 }
 
 #[cfg(test)]

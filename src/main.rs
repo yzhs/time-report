@@ -49,12 +49,18 @@ fn new_item() -> Json<InvoiceItem> {
     Json(time_report::new_item_template(&conn))
 }
 
+#[get("/employees", format = "application/json")]
+fn get_employees() -> Json<Vec<String>> {
+    let conn = time_report::establish_connection();
+    Json(time_report::get_employees(&conn))
+}
+
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, files])
         .mount(
             "/api/",
-            routes![get_globals, get_items, post_items, new_item],
+            routes![get_globals, get_employees, get_items, post_items, new_item],
         )
         .launch();
 }
