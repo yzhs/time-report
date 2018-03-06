@@ -1,5 +1,5 @@
 CREATE TABLE reports (
-	id integer PRIMARY KEY AUTOINCREMENT,
+	id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	title varchar NOT NULL CHECK (length(title) > 7),
 	start_date text NOT NULL,
 	end_date text NOT NULL CHECK (

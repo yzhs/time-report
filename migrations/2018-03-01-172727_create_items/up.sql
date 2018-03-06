@@ -1,5 +1,5 @@
 CREATE TABLE items (
-	id integer PRIMARY KEY AUTOINCREMENT,
+	id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	report_id integer NOT NULL REFERENCES reports(id),
 	employee_id integer NOT NULL REFERENCES employees(id),
 
