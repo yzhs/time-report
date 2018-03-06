@@ -73,6 +73,34 @@ pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
     }
 }
 
+/// Create a new report with the given title.
+///
+/// Insert a new row into the `reports` table with `start_date` set to the first day after the end
+/// of the final date of the previous report and `end_date` set to today.
+pub fn create_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
+    use schema::reports;
+
+    // Find last end date for last report
+    let prev_end_date_string = reports::table
+        .select(diesel::dsl::max(reports::end_date))
+        .first::<Option<String>>(conn)
+        .unwrap();
+    let start_date = NaiveDate::parse_from_str(
+        &prev_end_date_string.unwrap_or_else(|| "2017-12-01".into()),
+        DATE_FORMAT,
+    ).expect("Invalid date");
+
+    let new_report = (
+        reports::title.eq(title.as_ref()),
+        reports::start_date.eq(format!("{}", start_date.succ().format(DATE_FORMAT))),
+    );
+
+    diesel::insert_into(reports::table)
+        .values(&new_report)
+        .execute(conn)
+        .expect("Failed to create report");
+}
+
 pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
     use schema::{employees, items, reports, weeks};
 
