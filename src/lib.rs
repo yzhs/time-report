@@ -101,20 +101,28 @@ pub fn create_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
         .expect("Failed to create report");
 }
 
-pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
-    use schema::{employees, items, reports, weeks};
+fn create_employee<S: AsRef<str>>(
+    conn: &SqliteConnection,
+    name: S,
+) -> Result<i32, diesel::result::Error> {
+    use schema::employees;
 
-    // Create new employee records as needed
     diesel::insert_or_ignore_into(employees::table)
-        .values(&employees::name.eq(&new_row.employee_name))
+        .values(&employees::name.eq(name.as_ref()))
         .execute(conn)
         .expect("Error creating new employee record");
 
-    let employee_id = employees::table
+    employees::table
         .select(employees::id)
-        .filter(employees::name.eq(&new_row.employee_name))
-        .load::<i32>(conn)
-        .unwrap()[0];
+        .filter(employees::name.eq(name.as_ref()))
+        .first::<i32>(conn)
+}
+
+pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
+    use schema::{items, reports, weeks};
+
+    let employee_id =
+        create_employee(conn, new_row.employee_name).expect("Failed to find employee");
 
     let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).expect("Invalid date");
     let start_time =
@@ -144,4 +152,21 @@ pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
         items::remark.eq(new_row.remark),
     );
     diesel::insert_into(items::table).values(&new_item);
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_create_employee() {
+        let conn = establish_connection();
+        empty_tables(&conn);
+
+        let id = create_employee(&conn, "Alice A.").unwrap();
+        let id2 = create_employee(&conn, "Bob B.").unwrap();
+        assert_ne!(id, id2);
+        assert_eq!(create_employee(&conn, "Alice A.").unwrap(), id);
+        assert_eq!(create_employee(&conn, "Bob B.").unwrap(), id2);
+    }
 }
