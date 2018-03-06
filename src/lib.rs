@@ -1,8 +1,11 @@
 #![recursion_limit = "128"]
 
+extern crate curl;
+
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
 
 #[macro_use]
 pub extern crate diesel;
@@ -15,6 +18,7 @@ extern crate chrono;
 
 pub mod schema;
 pub mod models;
+pub mod holidays;
 
 use std::env;
 
