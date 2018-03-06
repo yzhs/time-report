@@ -38,7 +38,7 @@ fn get_items() -> Json<Vec<InvoiceItem>> {
 }
 
 #[post("/items", format = "application/json", data = "<item>")]
-fn post_items(item: Json<NewInvoiceItem>) {
+fn post_items(item: Json<NewRow>) {
     let conn = time_report::establish_connection();
     time_report::create_item(&conn, item.into_inner());
 }
