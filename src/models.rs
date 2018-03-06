@@ -1,6 +1,5 @@
 use super::schema::{employees, items, weeks};
 
-use chrono;
 use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
 
 pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
@@ -99,8 +98,7 @@ pub struct Globals {
 
 impl Globals {
     pub fn new() -> Self {
-        use chrono::Datelike;
-        let today = chrono::Local::today();
+        let today = ::chrono::Local::today();
         let today_naive = NaiveDate::from_ymd(today.year(), today.month(), today.day());
         // FIXME compute proper minimal date
         let half_a_year_ago = today_naive - Duration::weeks(26);
