@@ -1,16 +1,9 @@
-use super::schema::{employees, items, weeks};
+use super::schema::{items, weeks};
 
 use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
 
 pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
 pub const TIME_FORMAT: &'static str = "%H:%M";
-
-#[derive(Debug, Queryable, Insertable)]
-#[table_name = "employees"]
-pub struct Employee {
-    pub id: i32,
-    pub name: String,
-}
 
 #[derive(Debug, Serialize, Queryable)]
 pub struct InvoiceItem {
