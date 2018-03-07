@@ -6,6 +6,7 @@ version = "0.1.0"
 [dependencies]
 curl = "0.4.11"
 dotenv = "0.10"
+lazy_static = "1.0.0"
 rocket = "0.3"
 rocket_codegen = "0.3"
 serde = "1.0"

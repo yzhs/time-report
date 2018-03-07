@@ -55,12 +55,25 @@ fn get_employees() -> Json<Vec<String>> {
     Json(time_report::get_employees(&conn))
 }
 
+#[get("/holidays", format = "application/json")]
+fn get_holidays() -> Json<std::collections::HashMap<String, String>> {
+    let conn = time_report::establish_connection();
+    Json(time_report::get_holidays(&conn))
+}
+
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, files])
         .mount(
             "/api/",
-            routes![get_globals, get_employees, get_items, post_items, new_item],
+            routes![
+                get_globals,
+                get_employees,
+                get_items,
+                get_holidays,
+                post_items,
+                new_item
+            ],
         )
         .launch();
 }

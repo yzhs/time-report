@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::iter::FromIterator;
+use std::sync::Mutex;
 
-use chrono::{Datelike, NaiveDate, NaiveDateTime};
+use chrono::{Datelike, NaiveDate};
 use curl::easy::Easy;
 use diesel::{RunQueryDsl, SqliteConnection};
 
@@ -10,7 +12,14 @@ use schema::holidays;
 const GENERAL_HOLIDAYS_URL: &str = "https://feiertage-api.de/api/?nur_land=NW&jahr=";
 const SCHOOL_HOLIDAYS_URL: &str = "https://ferien-api.de/api/v1/holidays/NW/";
 
-#[derive(Debug, Deserialize)]
+lazy_static! {
+    pub static ref HOLIDAYS: Mutex<HashMap<NaiveDate, String>> = {
+        let conn = ::establish_connection();
+        Mutex::new(get_holidays(&conn))
+    };
+}
+
+#[derive(Deserialize)]
 struct GeneralHoliday {
     #[serde(rename = "datum")]
     date: NaiveDate,
@@ -19,11 +28,11 @@ struct GeneralHoliday {
     remark: String,
 }
 
-#[derive(Debug, Serialize, Insertable)]
+#[derive(Debug, Serialize, Insertable, Queryable)]
 #[table_name = "holidays"]
 struct Holiday {
-    title: String,
     date: String,
+    title: String,
 }
 
 fn read_general_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
@@ -116,7 +125,26 @@ pub fn populate_holidays_table(conn: &SqliteConnection) {
     };
     let new_school_holidays = read_school_holidays(json);
     store_holidays(conn, &new_school_holidays);
-    println!("{:?}", new_school_holidays);
+
+    *HOLIDAYS.lock().unwrap() = get_holidays(conn);
+}
+
+fn get_holidays(conn: &SqliteConnection) -> HashMap<NaiveDate, String> {
+    use schema::holidays;
+    HashMap::from_iter(
+        holidays::table
+            .load::<Holiday>(conn)
+            .expect("Failed to read from holidays table")
+            .into_iter()
+            .map(|holiday| {
+                (
+                    NaiveDate::parse_from_str(&holiday.date, DATE_FORMAT)
+                        .expect(&format!("Invalid date format: {}", holiday.date)),
+                    holiday.title,
+                )
+            }),
+    )
+}
 }
 
 #[cfg(test)]

@@ -2,6 +2,8 @@ use super::schema::{items, weeks};
 
 use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
 
+use holidays;
+
 pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
 pub const TIME_FORMAT: &'static str = "%H:%M";
 

@@ -11,6 +11,9 @@ extern crate diesel_infer_schema;
 
 extern crate dotenv;
 
+#[macro_use]
+extern crate lazy_static;
+
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -21,6 +24,8 @@ pub mod models;
 pub mod holidays;
 
 use std::env;
+use std::collections::HashMap;
+use std::iter::FromIterator;
 
 use chrono::{NaiveDate, NaiveTime};
 use diesel::prelude::*;
@@ -161,6 +166,25 @@ pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
 pub fn get_employees(conn: &SqliteConnection) -> Vec<String> {
     use schema::employees::*;
     table.select(name).load::<String>(conn).unwrap()
+}
+
+pub fn get_holidays(conn: &SqliteConnection) -> HashMap<String, String> {
+    use schema::holidays::*;
+    use diesel::dsl::max;
+
+    let last_holiday = NaiveDate::parse_from_str(
+        &table
+            .select(max(date))
+            .first::<Option<String>>(conn)
+            .expect("Failed to query holidays table")
+            .unwrap_or_else(|| "2017-01-01".into()),
+        DATE_FORMAT,
+    ).unwrap();
+    if last_holiday < chrono::Local::today().naive_local() {
+        holidays::populate_holidays_table(conn);
+    }
+
+    HashMap::from_iter(table.load::<(String, String)>(conn).unwrap().into_iter())
 }
 
 #[cfg(test)]
