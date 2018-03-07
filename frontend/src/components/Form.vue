@@ -97,7 +97,7 @@ export default {
         let obj = response.body
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)
-        this.items.push(response.body)
+        this.items.push(obj)
       })
       this.numItems++
     }
