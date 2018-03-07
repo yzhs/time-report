@@ -96,7 +96,7 @@ export default {
       this.$http.get('new_item').then(response => {
         let obj = response.body
         obj.start = obj.start.substr(0, 5)
-        obj.end = obj.start.substr(0, 5)
+        obj.end = obj.end.substr(0, 5)
         this.items.push(response.body)
       })
       this.numItems++
