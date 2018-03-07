@@ -10,5 +10,5 @@ FROM items
 JOIN employees
 JOIN weeks
 ON items.employee_id = employees.id AND
-	cast(strftime('%y', start_datetime) AS integer) = weeks.year AND
+	cast(strftime('%Y', start_datetime) AS integer) = weeks.year AND
 	cast(strftime('%W', start_datetime) AS integer) = weeks.week_of_year
