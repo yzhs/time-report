@@ -134,7 +134,8 @@ h1, input#heading {
 
 input#heading {
   margin-top: -0.7em;
-  padding-bottom: 0.5em;
+  margin-bottom: 0.5em;
+  padding: 0;
 }
 
 #table {
