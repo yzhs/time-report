@@ -56,7 +56,6 @@ pub fn get_items(conn: &SqliteConnection) -> Vec<InvoiceItem> {
         .load::<InvoiceItem>(conn)
         .expect("Error loading data")
         .into_iter()
-        .map(|x| x.into())
         .collect()
 }
 
