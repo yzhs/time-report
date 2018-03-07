@@ -19,12 +19,14 @@ lazy_static! {
     };
 }
 
+/// Struct for deserializing the JSON document produced by feiertage-api.de.
 #[derive(Deserialize)]
 struct GeneralHoliday {
     #[serde(rename = "datum")]
     date: NaiveDate,
 }
 
+/// Entries of the holidays table.
 #[derive(Debug, Serialize, Insertable, Queryable)]
 #[table_name = "holidays"]
 struct Holiday {
@@ -32,23 +34,13 @@ struct Holiday {
     title: String,
 }
 
-fn read_general_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
-    let map: HashMap<String, GeneralHoliday> =
-        ::serde_json::from_str(json.as_ref()).expect("Failed to parse general holidays file");
-    map.into_iter()
-        .map(|(title, gh)| Holiday {
-            title,
-            date: format!("{}", gh.date.format(DATE_FORMAT)),
-        })
-        .collect()
-}
-
-fn store_holidays(conn: &SqliteConnection, new_holidays: &[Holiday]) {
-    use schema::holidays;
-    ::diesel::replace_into(holidays::table)
-        .values(new_holidays)
-        .execute(conn)
-        .expect("Failed to write holidays to database");
+/// Represent school holidays as a range with a name. This is used to parse the data produced by
+/// ferien-api.de.
+#[derive(Deserialize)]
+struct SchoolHoliday {
+    start: String,
+    end: String,
+    name: String,
 }
 
 fn fetch_url<S: AsRef<str>>(url: S) -> String {
@@ -71,11 +63,15 @@ fn fetch_url<S: AsRef<str>>(url: S) -> String {
     String::from_utf8_lossy(&dst).into()
 }
 
-#[derive(Deserialize)]
-struct SchoolHoliday {
-    start: String,
-    end: String,
-    name: String,
+fn read_general_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
+    let map: HashMap<String, GeneralHoliday> =
+        ::serde_json::from_str(json.as_ref()).expect("Failed to parse general holidays file");
+    map.into_iter()
+        .map(|(title, gh)| Holiday {
+            title,
+            date: format!("{}", gh.date.format(DATE_FORMAT)),
+        })
+        .collect()
 }
 
 fn read_school_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
@@ -102,6 +98,14 @@ fn read_school_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
     result
 }
 
+fn store_holidays(conn: &SqliteConnection, new_holidays: &[Holiday]) {
+    use schema::holidays;
+    ::diesel::replace_into(holidays::table)
+        .values(new_holidays)
+        .execute(conn)
+        .expect("Failed to write holidays to database");
+}
+
 pub fn populate_holidays_table(conn: &SqliteConnection) {
     let year = ::chrono::Local::today().year();
 
@@ -126,6 +130,7 @@ pub fn populate_holidays_table(conn: &SqliteConnection) {
     *HOLIDAYS.lock().unwrap() = get_holidays(conn);
 }
 
+/// Load the entire holidays table.
 fn get_holidays(conn: &SqliteConnection) -> HashMap<NaiveDate, String> {
     use schema::holidays;
     HashMap::from_iter(
