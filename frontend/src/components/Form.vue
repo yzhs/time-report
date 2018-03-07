@@ -101,6 +101,21 @@ export default {
       })
       this.numItems++
     }
+  },
+  beforeMount () {
+    this.$http.get('items').then(response => {
+      response.body.map(element => {
+        element.start = element.start.substr(0, 5)
+        element.end = element.end.substr(0, 5)
+        this.items.push(element)
+        this.numItems++
+      })
+      // this.addItem()
+    })
+
+    this.$http.get('employees').then(response => {
+      this.employees = response.body
+    })
   }
 }
 </script>
