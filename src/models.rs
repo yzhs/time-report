@@ -91,6 +91,13 @@ impl InvoiceItem {
         self.remark = remark.into();
         self
     }
+
+    pub fn next(&self) -> Self {
+        let next_schoolday = holidays::next_schoolday(self.day);
+        InvoiceItem::new()
+            .day(next_schoolday)
+            .type_of_week(get_type_of_week(next_schoolday))
+    }
 }
 
 fn get_type_of_week(day: NaiveDate) -> i32 {
