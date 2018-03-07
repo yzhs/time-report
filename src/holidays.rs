@@ -45,7 +45,7 @@ fn read_general_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
 
 fn store_holidays(conn: &SqliteConnection, new_holidays: &[Holiday]) {
     use schema::holidays;
-    ::diesel::insert_or_ignore_into(holidays::table)
+    ::diesel::replace_into(holidays::table)
         .values(new_holidays)
         .execute(conn)
         .expect("Failed to write holidays to database");
