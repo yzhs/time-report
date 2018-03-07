@@ -102,10 +102,10 @@ impl Globals {
 
         Self {
             title: None,
-            mindate: format!("{}", half_a_year_ago.format(DATE_FORMAT)),
-            maxdate: format!("{}", today_naive.format(DATE_FORMAT)),
-            mintime: format!("{}", mintime.format(TIME_FORMAT)),
-            maxtime: format!("{}", maxtime.format(TIME_FORMAT)),
+            mindate: half_a_year_ago.format(DATE_FORMAT).to_string(),
+            maxdate: today_naive.format(DATE_FORMAT).to_string(),
+            mintime: mintime.format(TIME_FORMAT).to_string(),
+            maxtime: maxtime.format(TIME_FORMAT).to_string(),
         }
     }
 }
