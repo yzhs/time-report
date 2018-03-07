@@ -23,9 +23,6 @@ lazy_static! {
 struct GeneralHoliday {
     #[serde(rename = "datum")]
     date: NaiveDate,
-
-    #[serde(rename = "hinweis")]
-    remark: String,
 }
 
 #[derive(Debug, Serialize, Insertable, Queryable)]
