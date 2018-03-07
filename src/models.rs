@@ -71,7 +71,7 @@ pub struct NewRow {
 /// Data needed to create a new row in the database.
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "items"]
-pub struct NewInvoiceItem {
+struct NewInvoiceItem {
     pub id: Option<i32>,
     pub employee_id: i32,
     pub report_id: i32,
