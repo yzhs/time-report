@@ -80,7 +80,7 @@ fn read_school_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
 
     let mut result = vec![];
 
-    for SchoolHoliday { start, end, name } in new_holidays.into_iter() {
+    for SchoolHoliday { start, end, name } in new_holidays {
         let start_date = NaiveDate::parse_from_str(&start, "%Y-%m-%dT00:00").unwrap();
         let end_date = NaiveDate::parse_from_str(&end, "%Y-%m-%dT00:00").unwrap();
 

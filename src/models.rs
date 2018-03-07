@@ -9,8 +9,8 @@ use super::schema::{items, weeks};
 
 use holidays;
 
-pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
-pub const TIME_FORMAT: &'static str = "%H:%M";
+pub const DATE_FORMAT: &str = "%Y-%m-%d";
+pub const TIME_FORMAT: &str = "%H:%M";
 
 lazy_static!{
     static ref TYPE_OF_WEEK: Mutex<TypeOfWeek> =

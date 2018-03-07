@@ -60,7 +60,7 @@ pub fn get_items(conn: &SqliteConnection) -> Vec<InvoiceItem> {
 }
 
 pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
-    let items: Vec<InvoiceItem> = get_items(conn).into_iter().map(|x| x.into()).collect();
+    let items: Vec<InvoiceItem> = get_items(conn);
     let mut result = InvoiceItem::new();
 
     if items.is_empty() {
