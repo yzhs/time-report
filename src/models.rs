@@ -1,13 +1,49 @@
-use super::schema::{items, weeks};
+use std::collections::HashMap;
+use std::iter::FromIterator;
+use std::sync::Mutex;
 
 use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
+use diesel::{RunQueryDsl, SqliteConnection};
+
+use super::schema::{items, weeks};
 
 use holidays;
 
 pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
 pub const TIME_FORMAT: &'static str = "%H:%M";
 
-#[derive(Debug, Serialize, Queryable)]
+lazy_static!{
+    static ref TYPE_OF_WEEK: Mutex<TypeOfWeek> = Mutex::new(TypeOfWeek::new(&::establish_connection()));
+}
+
+struct TypeOfWeek {
+    map: HashMap<(i32, i32), i32>,
+}
+
+impl TypeOfWeek {
+    pub fn new(conn: &SqliteConnection) -> Self {
+        let map = HashMap::from_iter(
+            weeks::table
+                .load::<(i32, i32, i32)>(conn)
+                .expect("Failed to query type_of_week")
+                .into_iter()
+                .map(|(year, week, typ)| ((year, week), typ)),
+        );
+        Self { map }
+    }
+
+    pub fn get(&self, day: NaiveDate) -> i32 {
+        let year = day.year();
+        let week_of_year = day.iso_week().week() as i32;
+        if self.map.contains_key(&(year, week_of_year)) {
+            self.map[&(year, week_of_year)]
+        } else {
+            // TODO take a guess
+            0
+        }
+    }
+}
+
 pub struct InvoiceItem {
     pub id: i32,
     pub name: String,
@@ -55,6 +91,10 @@ impl InvoiceItem {
         self.remark = remark.into();
         self
     }
+}
+
+fn get_type_of_week(day: NaiveDate) -> i32 {
+    TYPE_OF_WEEK.lock().unwrap().get(day)
 }
 
 /// All the data stored in a row of the main table of the frontend.
