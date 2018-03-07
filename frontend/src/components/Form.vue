@@ -78,7 +78,7 @@ export default {
     let now = new Date()
     let maxdate = formatDate(now)
     let halfAYearAgo = new Date()
-    halfAYearAgo.setMonth(now.getMonth() - 6)
+    halfAYearAgo.setMonth(now.getMonth() - 12)
     let mindate = formatDate(halfAYearAgo)
 
     return {
