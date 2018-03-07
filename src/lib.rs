@@ -76,7 +76,7 @@ pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
 
     let last_but_one = &items[items.len() - 2];
     if last_but_one.day == last.day {
-        result.day(last.day.succ())
+        result.day(holidays::next_schoolday(last.day))
     } else {
         result
     }
