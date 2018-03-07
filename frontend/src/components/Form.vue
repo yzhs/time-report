@@ -30,10 +30,10 @@
         <td>
           <input type="date" name="day" placeholder="Datum" required
                  :min="globals.mindate" :max="globals.maxdate"
-                 v-model="item.date" />
+                 v-model="item.day" />
         </td>
         <td>
-          <select name="week" v-model="item.week" tabindex="-1">
+          <select name="week" v-model="item.type_of_week" tabindex="-1">
             <option value="0">A</option>
             <option value="1">B</option>
             <option value="2">C</option>
