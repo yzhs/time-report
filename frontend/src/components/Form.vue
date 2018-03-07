@@ -110,7 +110,9 @@ export default {
         this.items.push(element)
         this.numItems++
       })
-      // this.addItem()
+      if (this.numItems === 0) {
+        this.addItem()
+      }
     })
 
     this.$http.get('employees').then(response => {
