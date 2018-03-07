@@ -14,5 +14,7 @@ CREATE TABLE items (
 		time(end_datetime) <= '16:00'
 	),
 
-	remark varchar
+	remark varchar,
+	UNIQUE (employee_id, start_datetime),
+	UNIQUE (employee_id, end_datetime)
 )
