@@ -22,7 +22,7 @@
       <tr v-for="item in items" :key="item.id">
         <td>
           <input type="text" name="name" placeholder="Vorname Nachname"
-                 list="employees"
+                 list="employees" spellcheck="false"
                  minlength="2" maxlength="100"
                  pattern=".*[^. ,-]+.*" required
                  v-model="item.name"/>
