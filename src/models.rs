@@ -44,6 +44,7 @@ impl TypeOfWeek {
     }
 }
 
+#[derive(Serialize, Queryable)]
 pub struct InvoiceItem {
     pub id: i32,
     pub name: String,
