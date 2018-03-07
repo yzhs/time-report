@@ -147,6 +147,11 @@ fn get_holidays(conn: &SqliteConnection) -> HashMap<NaiveDate, String> {
             }),
     )
 }
+
+pub fn is_holiday(date: NaiveDate) -> bool {
+    HOLIDAYS.lock().unwrap().contains_key(&date)
+}
+
 }
 
 #[cfg(test)]
