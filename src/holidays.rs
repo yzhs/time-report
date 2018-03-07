@@ -149,9 +149,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_fetch_holidays() {
+    fn test_populate_holidays_table() {
         let conn = ::establish_connection();
         populate_holidays_table(&conn);
-        assert!(false);
     }
 }
