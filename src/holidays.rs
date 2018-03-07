@@ -152,6 +152,13 @@ pub fn is_holiday(date: NaiveDate) -> bool {
     HOLIDAYS.lock().unwrap().contains_key(&date)
 }
 
+pub fn next_schoolday(mut date: NaiveDate) -> NaiveDate {
+    use chrono::Weekday;
+    date = date.succ();
+    while date.weekday() == Weekday::Sat || date.weekday() == Weekday::Sun || is_holiday(date) {
+        date = date.succ();
+    }
+    date
 }
 
 #[cfg(test)]
