@@ -1,20 +1,20 @@
 #![recursion_limit = "128"]
 
+extern crate chrono;
+
 extern crate curl;
+
+#[macro_use]
+pub extern crate diesel;
+#[macro_use]
+extern crate diesel_infer_schema;
+
+extern crate dotenv;
 
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
-
-#[macro_use]
-pub extern crate diesel;
-
-#[macro_use]
-extern crate diesel_infer_schema;
-extern crate dotenv;
-
-extern crate chrono;
 
 pub mod schema;
 pub mod models;
