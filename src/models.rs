@@ -110,7 +110,7 @@ fn get_type_of_week(day: NaiveDate) -> i32 {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewRow {
     pub id: Option<i32>,
-    pub employee_name: String,
+    pub name: String,
     pub day: String,
     pub type_of_week: i32,
     pub start_time: String,

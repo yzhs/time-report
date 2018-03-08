@@ -129,8 +129,7 @@ fn create_employee<S: AsRef<str>>(
 pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
     use schema::{items, reports, weeks};
 
-    let employee_id =
-        create_employee(conn, &new_row.employee_name).expect("Failed to find employee");
+    let employee_id = create_employee(conn, &new_row.name).expect("Failed to find employee");
 
     let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).expect("Invalid date");
     let start_time =
@@ -154,7 +153,7 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
     if id == 0 {
         println!(
             "Creating new item: {} {} {} {} {} {}",
-            new_row.employee_name,
+            new_row.name,
             new_row.day,
             new_row.type_of_week,
             new_row.start_time,
@@ -177,7 +176,7 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
         println!(
             "Updating item #{}: {} {} {} {} {} {}",
             id,
-            new_row.employee_name,
+            new_row.name,
             new_row.day,
             new_row.type_of_week,
             new_row.start_time,
