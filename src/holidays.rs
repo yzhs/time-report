@@ -2,9 +2,9 @@ use std::collections::HashMap;
 use std::iter::FromIterator;
 use std::sync::Mutex;
 
-use chrono::{Datelike, NaiveDate};
+use chrono::{self, Datelike, NaiveDate};
 use curl::easy::Easy;
-use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::{QueryDsl, RunQueryDsl, SqliteConnection};
 
 use models::DATE_FORMAT;
 use schema::holidays;
@@ -159,6 +159,25 @@ pub fn next_schoolday(mut date: NaiveDate) -> NaiveDate {
         date = date.succ();
     }
     date
+}
+
+pub fn get_holidays_as_str(conn: &SqliteConnection) -> HashMap<String, String> {
+    use schema::holidays::*;
+    use diesel::dsl::max;
+
+    let last_holiday = NaiveDate::parse_from_str(
+        &table
+            .select(max(date))
+            .first::<Option<String>>(conn)
+            .expect("Failed to query holidays table")
+            .unwrap_or_else(|| "2017-01-01".into()),
+        DATE_FORMAT,
+    ).unwrap();
+    if last_holiday < chrono::Local::today().naive_local() {
+        populate_holidays_table(conn);
+    }
+
+    HashMap::from_iter(table.load::<(String, String)>(conn).unwrap().into_iter())
 }
 
 #[cfg(test)]

@@ -22,10 +22,12 @@ extern crate serde_json;
 pub mod schema;
 pub mod models;
 pub mod holidays;
+mod employees;
+
+pub use employees::*;
+pub use holidays::get_holidays_as_str as get_holidays;
 
 use std::env;
-use std::collections::HashMap;
-use std::iter::FromIterator;
 
 use chrono::{NaiveDate, NaiveTime};
 use diesel::prelude::*;
@@ -55,8 +57,6 @@ pub fn get_items(conn: &SqliteConnection) -> Vec<InvoiceItem> {
     items_view
         .load::<InvoiceItem>(conn)
         .expect("Error loading data")
-        .into_iter()
-        .collect()
 }
 
 pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
@@ -218,73 +218,5 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
             .execute(conn)
             .unwrap();
         id
-    }
-}
-
-pub fn get_employees(conn: &SqliteConnection) -> Vec<String> {
-    use schema::employees::*;
-    table.select(name).load::<String>(conn).unwrap()
-}
-
-pub fn get_holidays(conn: &SqliteConnection) -> HashMap<String, String> {
-    use schema::holidays::*;
-    use diesel::dsl::max;
-
-    let last_holiday = NaiveDate::parse_from_str(
-        &table
-            .select(max(date))
-            .first::<Option<String>>(conn)
-            .expect("Failed to query holidays table")
-            .unwrap_or_else(|| "2017-01-01".into()),
-        DATE_FORMAT,
-    ).unwrap();
-    if last_holiday < chrono::Local::today().naive_local() {
-        holidays::populate_holidays_table(conn);
-    }
-
-    HashMap::from_iter(table.load::<(String, String)>(conn).unwrap().into_iter())
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    fn empty_tables(conn: &SqliteConnection) {
-        diesel::delete(schema::employees::table)
-            .execute(conn)
-            .unwrap();
-        diesel::delete(schema::items::table).execute(conn).unwrap();
-        diesel::delete(schema::holidays::table)
-            .execute(conn)
-            .unwrap();
-        diesel::delete(schema::reports::table)
-            .execute(conn)
-            .unwrap();
-        diesel::delete(schema::weeks::table).execute(conn).unwrap();
-    }
-
-    #[test]
-    fn test_create_employee() {
-        let conn = establish_connection();
-        empty_tables(&conn);
-
-        let id = create_employee(&conn, "Alice A.").unwrap();
-        let id2 = create_employee(&conn, "Bob B.").unwrap();
-        assert_ne!(id, id2);
-        assert_eq!(create_employee(&conn, "Alice A.").unwrap(), id);
-        assert_eq!(create_employee(&conn, "Bob B.").unwrap(), id2);
-    }
-
-    #[test]
-    fn test_get_employees() {
-        let conn = establish_connection();
-        empty_tables(&conn);
-
-        let names = vec!["Alice A.", "Bob B.", "Charlie C."];
-        for name in &names {
-            create_employee(&conn, name).unwrap();
-        }
-
-        assert_eq!(get_employees(&conn), names);
     }
 }
