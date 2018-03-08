@@ -19,23 +19,23 @@
           <th>Bemerkung</th>
         </tr>
       </thead>
-      <tr v-for="item in items" :key="item.id">
+      <tr v-for="(item, index) in items" :key="item.id">
         <td>
-          <span class="id">{{item.id}}</span>
+          <span style="height:2em;" class="id">{{item.id}}</span>
           <input type="text" name="name" placeholder="Vorname Nachname"
                  list="employees" spellcheck="false"
                  minlength="2" maxlength="100"
                  pattern=".*[^. ,-]+.*" required
-                 v-model="item.name" v-on:change="onItemChange"/>
+                 v-model="item.name" v-on:change="onItemChange(index)"/>
         </td>
         <td>
           <input type="date" name="day" placeholder="Datum" required
                  :min="globals.mindate" :max="globals.maxdate"
-                 v-model="item.day"  v-on:change="onItemChange"/>
+                 v-model="item.day"  v-on:change="onItemChange(index)"/>
         </td>
         <td>
-          <select name="week" v-model="item.type_of_week" tabindex="-1"
-                  v-on:change="onItemChange">
+          <select name="week" v-model.number="item.type_of_week" tabindex="-1"
+                  v-on:change="onItemChange(index)">
             <option value="0">A</option>
             <option value="1">B</option>
             <option value="2">C</option>
@@ -45,16 +45,16 @@
         <td>
           <input type="time" name="start" placeholder="von" step="300"
                  :min="globals.mintime" :max="globals.maxtime" required
-                 v-model="item.start" v-on:change="onItemChange"/>
+                 v-model="item.start" v-on:change="onItemChange(index)"/>
           </td>
           <td>
           <input type="time" name="end" placeholder="bis" step="300"
                  :min="globals.mintime" :max="globals.maxtime" required
-                 v-model="item.end" v-on:change="onItemChange"/>
+                 v-model="item.end" v-on:change="onItemChange(index)"/>
         </td>
         <td>
           <input type="text" name="remark" placeholder="Bemerkung"
-                 v-model="item.remark" v-on:change="onItemChange"/>
+                 v-model="item.remark" v-on:change="onItemChange(index)"/>
         </td>
         <td>
           <button class="add-item" v-on:click="addItem">neue Zeile</button>
@@ -71,9 +71,10 @@
 </template>
 
 <script>
-let formatDate = function (date) {
+function formatDate (date) {
   return date.toISOString().split('T')[0]
 }
+
 export default {
   data () {
     let now = new Date()
@@ -90,6 +91,10 @@ export default {
     }
   },
   methods: {
+    isComplete: function (id) {
+      let item = this.items[id - 1]
+      return item.name !== ''
+    },
     updateTitle: function (e) {
       document.title = 'Abrechung BetreuerInnen ' + e.target.value
     },
@@ -98,30 +103,33 @@ export default {
         let obj = response.body
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)
+        obj.in_db = false
         this.items.push(obj)
       })
       this.numItems++
     },
-    onItemChange: function (e) {
-      let row = e.target.parentElement.parentElement
-      let id = row.firstChild.firstChild.firstChild.textContent.trim() - 0
-      let item = this.items[id - 1]
-      console.log('Changed item #' + id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
+    onItemChange: function (index) {
+      let item = this.items[index]
+      console.log('Changed item #' + item.id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
       let updateItem = {
-        id: id,
-        employee_name: item.name,
+        id: item.in_db ? item.id : 0,
+        name: item.name,
         day: item.day,
         type_of_week: item.type_of_week,
         start_time: item.start,
         end_time: item.end,
         remark: item.remark
       }
-      this.$http.put('items/' + id, JSON.stringify(updateItem), {
+      this.$http.put('items/' + updateItem.id, JSON.stringify(updateItem), {
         headers: {
           'Content-Type': 'application/json'
         }
       }).then(response => {
-        console.log('Done')
+        console.log('Done', item.in_db ? 'updating' : 'inserting')
+        if (!item.in_db) {
+          item.in_db = true
+          item.id = response.body
+        }
       })
     }
   },
@@ -130,6 +138,7 @@ export default {
       response.body.map(element => {
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)
+        element.in_db = true
         this.items.push(element)
         this.numItems++
       })
