@@ -1,6 +1,6 @@
 CREATE TABLE reports (
 	id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	title varchar NOT NULL UNIQUE CHECK (length(title) > 7),
+	title varchar NOT NULL UNIQUE, --CHECK (length(title) > 7),
 	start_date text NOT NULL UNIQUE,
 	end_date text NOT NULL UNIQUE DEFAULT CURRENT_DATE CHECK (
 		start_date <= end_date AND
