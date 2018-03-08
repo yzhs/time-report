@@ -126,8 +126,28 @@ fn create_employee<S: AsRef<str>>(
         .first::<i32>(conn)
 }
 
+fn find_or_create_report(conn: &SqliteConnection) -> i32 {
+    use schema::reports;
+
+    match reports::table
+        .select(reports::id)
+        .filter(diesel::dsl::not(reports::was_pdf_generated))
+        .first::<i32>(conn)
+    {
+        Ok(id) => id,
+        Err(_) => {
+            let values = (reports::title.eq(""), reports::start_date.eq("2017-08-01"));
+            diesel::insert_into(reports::table)
+                .values(&values)
+                .execute(conn)
+                .unwrap();
+            find_or_create_report(conn)
+        }
+    }
+}
+
 pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
-    use schema::{items, reports, weeks};
+    use schema::{items, weeks};
 
     let employee_id = create_employee(conn, &new_row.name).expect("Failed to find employee");
 
@@ -144,11 +164,7 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     diesel::replace_into(weeks::table).values(&new_week);
 
     // Get report id
-    let report_id = reports::table
-        .select(reports::id)
-        .filter(diesel::dsl::not(reports::was_pdf_generated))
-        .load::<i32>(conn)
-        .expect("Failed to find report_id")[0];
+    let report_id = find_or_create_report(conn);
 
     if id == 0 {
         println!(
