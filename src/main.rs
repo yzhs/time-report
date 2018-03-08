@@ -37,10 +37,10 @@ fn get_items() -> Json<Vec<InvoiceItem>> {
     Json(time_report::get_items(&conn))
 }
 
-#[post("/items", format = "application/json", data = "<item>")]
-fn post_items(item: Json<NewRow>) {
+#[put("/items/<id>", format = "application/json", data = "<item>")]
+fn set_item(id: i32, item: Json<NewRow>) -> Json<bool> {
     let conn = time_report::establish_connection();
-    time_report::create_item(&conn, item.into_inner());
+    Json(time_report::update_item(&conn, id, item.into_inner()))
 }
 
 #[get("/new_item", format = "application/json")]
@@ -71,7 +71,7 @@ fn main() {
                 get_employees,
                 get_items,
                 get_holidays,
-                post_items,
+                set_item,
                 new_item
             ],
         )

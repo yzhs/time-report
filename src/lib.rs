@@ -126,11 +126,11 @@ fn create_employee<S: AsRef<str>>(
         .first::<i32>(conn)
 }
 
-pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
+pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
     use schema::{items, reports, weeks};
 
     let employee_id =
-        create_employee(conn, new_row.employee_name).expect("Failed to find employee");
+        create_employee(conn, &new_row.employee_name).expect("Failed to find employee");
 
     let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).expect("Invalid date");
     let start_time =
@@ -151,15 +151,55 @@ pub fn create_item(conn: &SqliteConnection, new_row: NewRow) {
         .load::<i32>(conn)
         .expect("Failed to find report_id")[0];
 
-    // Insert new item
-    let new_item = (
-        items::employee_id.eq(employee_id),
-        items::report_id.eq(report_id),
-        items::start_datetime.eq(format!("{}", start_datetime)),
-        items::end_datetime.eq(format!("{}", end_datetime)),
-        items::remark.eq(new_row.remark),
-    );
-    diesel::insert_into(items::table).values(&new_item);
+    if id == 0 {
+        println!(
+            "Creating new item: {} {} {} {} {} {}",
+            new_row.employee_name,
+            new_row.day,
+            new_row.type_of_week,
+            new_row.start_time,
+            new_row.end_time,
+            new_row.remark
+        );
+        // Insert new item
+        let new_item = (
+            items::employee_id.eq(employee_id),
+            items::report_id.eq(report_id),
+            items::start_datetime.eq(format!("{}", start_datetime)),
+            items::end_datetime.eq(format!("{}", end_datetime)),
+            items::remark.eq(new_row.remark),
+        );
+        diesel::insert_into(items::table)
+            .values(&new_item)
+            .execute(conn)
+            .unwrap();
+    } else {
+        println!(
+            "Updating item #{}: {} {} {} {} {} {}",
+            id,
+            new_row.employee_name,
+            new_row.day,
+            new_row.type_of_week,
+            new_row.start_time,
+            new_row.end_time,
+            new_row.remark
+        );
+        // Update existing item
+        let new_item = (
+            items::id.eq(id),
+            items::employee_id.eq(employee_id),
+            items::report_id.eq(report_id),
+            items::start_datetime.eq(format!("{}", start_datetime)),
+            items::end_datetime.eq(format!("{}", end_datetime)),
+            items::remark.eq(new_row.remark),
+        );
+        diesel::replace_into(items::table)
+            .values(&new_item)
+            .execute(conn)
+            .unwrap();
+    }
+
+    true
 }
 
 pub fn get_employees(conn: &SqliteConnection) -> Vec<String> {
