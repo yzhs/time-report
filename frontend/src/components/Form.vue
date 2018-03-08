@@ -21,6 +21,7 @@
       </thead>
       <tr v-for="item in items" :key="item.id">
         <td>
+          <span class="id">{{item.id}}</span>
           <input type="text" name="name" placeholder="Vorname Nachname"
                  list="employees" spellcheck="false"
                  minlength="2" maxlength="100"
@@ -56,7 +57,6 @@
                  v-model="item.remark" v-on:change="onItemChange"/>
         </td>
         <td>
-          {{item.id}}
           <button class="add-item" v-on:click="addItem">neue Zeile</button>
         </td>
       </tr>
@@ -104,7 +104,7 @@ export default {
     },
     onItemChange: function (e) {
       let row = e.target.parentElement.parentElement
-      let id = row.lastChild.firstChild.textContent.trim() - 0
+      let id = row.firstChild.firstChild.firstChild.textContent.trim() - 0
       let item = this.items[id - 1]
       console.log('Changed item #' + id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
       let updateItem = {
