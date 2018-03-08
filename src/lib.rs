@@ -126,7 +126,7 @@ fn create_employee<S: AsRef<str>>(
         .first::<i32>(conn)
 }
 
-pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
+pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     use schema::{items, reports, weeks};
 
     let employee_id = create_employee(conn, &new_row.name).expect("Failed to find employee");
@@ -172,6 +172,11 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
             .values(&new_item)
             .execute(conn)
             .unwrap();
+        items::table
+            .select(diesel::dsl::max(items::id))
+            .first::<Option<_>>(conn)
+            .unwrap()
+            .expect("Empty table")
     } else {
         println!(
             "Updating item #{}: {} {} {} {} {} {}",
@@ -196,9 +201,8 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> bool {
             .values(&new_item)
             .execute(conn)
             .unwrap();
+        id
     }
-
-    true
 }
 
 pub fn get_employees(conn: &SqliteConnection) -> Vec<String> {

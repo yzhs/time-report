@@ -38,7 +38,7 @@ fn get_items() -> Json<Vec<InvoiceItem>> {
 }
 
 #[put("/items/<id>", format = "application/json", data = "<item>")]
-fn set_item(id: i32, item: Json<NewRow>) -> Json<bool> {
+fn set_item(id: i32, item: Json<NewRow>) -> Json<i32> {
     let conn = time_report::establish_connection();
     Json(time_report::update_item(&conn, id, item.into_inner()))
 }
