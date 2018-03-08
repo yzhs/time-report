@@ -10,6 +10,7 @@ Vue.use(Resource)
 Vue.http.options.root = '/api'
 
 require('./assets/normalize.css')
+require('./assets/main.css')
 
 /* eslint-disable no-new */
 new Vue({
