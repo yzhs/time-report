@@ -25,15 +25,16 @@
                  list="employees" spellcheck="false"
                  minlength="2" maxlength="100"
                  pattern=".*[^. ,-]+.*" required
-                 v-model="item.name"/>
+                 v-model="item.name" v-on:change="onItemChange"/>
         </td>
         <td>
           <input type="date" name="day" placeholder="Datum" required
                  :min="globals.mindate" :max="globals.maxdate"
-                 v-model="item.day" />
+                 v-model="item.day"  v-on:change="onItemChange"/>
         </td>
         <td>
-          <select name="week" v-model="item.type_of_week" tabindex="-1">
+          <select name="week" v-model="item.type_of_week" tabindex="-1"
+                  v-on:change="onItemChange">
             <option value="0">A</option>
             <option value="1">B</option>
             <option value="2">C</option>
@@ -43,16 +44,16 @@
         <td>
           <input type="time" name="start" placeholder="von" step="300"
                  :min="globals.mintime" :max="globals.maxtime" required
-                 v-model="item.start"/>
+                 v-model="item.start" v-on:change="onItemChange"/>
           </td>
           <td>
           <input type="time" name="end" placeholder="bis" step="300"
                  :min="globals.mintime" :max="globals.maxtime" required
-                 v-model="item.end"/>
+                 v-model="item.end" v-on:change="onItemChange"/>
         </td>
         <td>
           <input type="text" name="remark" placeholder="Bemerkung"
-                 v-model="item.remark"/>
+                 v-model="item.remark" v-on:change="onItemChange"/>
         </td>
         <td>
           {{item.id}}
@@ -100,6 +101,28 @@ export default {
         this.items.push(obj)
       })
       this.numItems++
+    },
+    onItemChange: function (e) {
+      let row = e.target.parentElement.parentElement
+      let id = row.lastChild.firstChild.textContent.trim() - 0
+      let item = this.items[id - 1]
+      console.log('Changed item #' + id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
+      let updateItem = {
+        id: id,
+        employee_name: item.name,
+        day: item.day,
+        type_of_week: item.type_of_week,
+        start_time: item.start,
+        end_time: item.end,
+        remark: item.remark
+      }
+      this.$http.put('items/' + id, JSON.stringify(updateItem), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => {
+        console.log('Done')
+      })
     }
   },
   beforeMount () {
