@@ -16,15 +16,15 @@ mod test {
     }
 
     #[test]
-    fn test_create_employee() {
+    fn test_insert_employee() {
         let conn = ::establish_connection();
         empty_tables(&conn);
 
-        let id = create_employee(&conn, "Alice A.").unwrap();
-        let id2 = create_employee(&conn, "Bob B.").unwrap();
+        let id = insert_employee(&conn, "Alice A.").unwrap();
+        let id2 = insert_employee(&conn, "Bob B.").unwrap();
         assert_ne!(id, id2);
-        assert_eq!(create_employee(&conn, "Alice A.").unwrap(), id);
-        assert_eq!(create_employee(&conn, "Bob B.").unwrap(), id2);
+        assert_eq!(insert_employee(&conn, "Alice A.").unwrap(), id);
+        assert_eq!(insert_employee(&conn, "Bob B.").unwrap(), id2);
     }
 
     #[test]
@@ -34,7 +34,7 @@ mod test {
 
         let names = vec!["Alice A.", "Bob B.", "Charlie C."];
         for name in &names {
-            create_employee(&conn, name).unwrap();
+            insert_employee(&conn, name).unwrap();
         }
 
         assert_eq!(get_employees(&conn), names);

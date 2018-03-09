@@ -85,7 +85,7 @@ pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
 ///
 /// Insert a new row into the `reports` table with `start_date` set to the first day after the end
 /// of the final date of the previous report and `end_date` set to today.
-pub fn create_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
+pub fn insert_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
     use schema::reports;
 
     // Find last end date for last report
@@ -109,7 +109,7 @@ pub fn create_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
         .expect("Failed to create report");
 }
 
-fn create_employee<S: AsRef<str>>(
+fn insert_employee<S: AsRef<str>>(
     conn: &SqliteConnection,
     name: S,
 ) -> Result<i32, diesel::result::Error> {
@@ -126,7 +126,7 @@ fn create_employee<S: AsRef<str>>(
         .first::<i32>(conn)
 }
 
-fn find_or_create_report(conn: &SqliteConnection) -> i32 {
+fn find_or_insert_report(conn: &SqliteConnection) -> i32 {
     use schema::reports;
 
     match reports::table
@@ -141,7 +141,7 @@ fn find_or_create_report(conn: &SqliteConnection) -> i32 {
                 .values(&values)
                 .execute(conn)
                 .unwrap();
-            find_or_create_report(conn)
+            find_or_insert_report(conn)
         }
     }
 }
@@ -149,7 +149,7 @@ fn find_or_create_report(conn: &SqliteConnection) -> i32 {
 pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     use schema::{items, weeks};
 
-    let employee_id = create_employee(conn, &new_row.name).expect("Failed to find employee");
+    let employee_id = insert_employee(conn, &new_row.name).expect("Failed to find employee");
 
     let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).expect("Invalid date");
     let start_time =
@@ -164,7 +164,7 @@ pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     diesel::replace_into(weeks::table).values(&new_week);
 
     // Get report id
-    let report_id = find_or_create_report(conn);
+    let report_id = find_or_insert_report(conn);
 
     if id == 0 {
         println!(
