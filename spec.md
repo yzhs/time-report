@@ -31,9 +31,8 @@ tables:
   *which contains a school day*, i.e. the week-long holidays are treated like a
   single weekend.
 
-  The necessary date could be scraped from
-  https://www.gymnasium-kreuztal.de/sites/default/files/docs/Wochen/A-D-Wochen_2017_2.pdf
-  or something similar.
+  The necessary dates could be scraped from
+  https://www.gymnasium-kreuztal.de/docs.php?doc=Wochen
 
   Columns:
   * year ∈ ℕ ∩ [2017, current year + 1]
