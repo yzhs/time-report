@@ -38,40 +38,22 @@
   }
   .weekdays {
     display: grid;
-    /*
-    display: block;
     width: 100%;
-    overflow: auto;
     padding: 10px 0;
-    */
     grid-template-columns: repeat(7, 1fr);
-    grid-gap: 1em;
     text-align: center;
   }
   .weekdays .week {
-    width: 14.28571%;
+    width: 50px;
     display: block;
     color: #ffffff;
-    /*
-    float: left;
-    */
     font-size: 16px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0.5em;
   }
   .days {
-    /*
-    width: 100%;
-    height: auto;
-    overflow: auto;
-    */
     background-color: #ffffff;
-    /*
-    position: relative;
-    */
-
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-auto-rows: minmax(50px, auto);
@@ -79,10 +61,6 @@
   .days > .day {
     width: 50px;
     height: 50px;
-    /*
-    display: block;
-    float: left;
-    */
     font-size: 12px;
     text-align: center;
     line-height: 50px;
