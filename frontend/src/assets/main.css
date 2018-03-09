@@ -12,7 +12,7 @@ input#heading {
   padding: 0;
 }
 
-#table {
+table {
   border-collapse: collapse;
   background-color: #eee;
   max-width: 800px;
