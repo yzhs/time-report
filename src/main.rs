@@ -17,13 +17,17 @@ use time_report::reports;
 
 #[get("/")]
 fn index() -> Option<NamedFile> {
-    NamedFile::open(Path::new("frontend/dist/index.html")).ok()
+    NamedFile::open(Path::new(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/frontend/dist/index.html"
+    ))).ok()
 }
 
 /// Serve static files
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("frontend/dist/").join(file)).ok()
+    NamedFile::open(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/frontend/dist/")).join(file))
+        .ok()
 }
 
 // TODO better name
