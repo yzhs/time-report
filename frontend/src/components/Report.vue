@@ -99,7 +99,7 @@ export default {
       document.title = 'Abrechung BetreuerInnen ' + e.target.value
     },
     addItem: function () {
-      this.$http.get('new_item').then(response => {
+      this.$http.get('items/template').then(response => {
         let obj = response.body
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)

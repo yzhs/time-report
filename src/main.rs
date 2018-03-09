@@ -39,16 +39,16 @@ fn get_items() -> Json<Vec<InvoiceItem>> {
     Json(time_report::get_items(&conn))
 }
 
+#[get("/items/template", format = "application/json")]
+fn item_template() -> Json<InvoiceItem> {
+    let conn = time_report::establish_connection();
+    Json(time_report::new_item_template(&conn))
+}
+
 #[put("/items/<id>", format = "application/json", data = "<item>")]
 fn set_item(id: i32, item: Json<NewRow>) -> Json<i32> {
     let conn = time_report::establish_connection();
     Json(time_report::update_item(&conn, id, item.into_inner()))
-}
-
-#[get("/new_item", format = "application/json")]
-fn new_item() -> Json<InvoiceItem> {
-    let conn = time_report::establish_connection();
-    Json(time_report::new_item_template(&conn))
 }
 
 #[get("/employees", format = "application/json")]
@@ -92,13 +92,13 @@ fn main() {
         .mount(
             "/api/",
             routes![
+                item_template,
                 get_reports,
                 get_globals,
                 get_employees,
                 get_items,
                 get_holidays,
                 set_item,
-                new_item,
             ],
         )
         .attach(options)
