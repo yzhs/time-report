@@ -109,6 +109,20 @@ pub fn insert_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
         .expect("Failed to create report");
 }
 
+#[derive(Queryable, Serialize)]
+pub struct Report {
+    pub id: i32,
+    pub title: String,
+    pub start_date: String,
+    pub end_date: String,
+    pub was_pdf_generated: bool,
+}
+
+pub fn get_reports(conn: &SqliteConnection) -> Vec<Report> {
+    use schema::reports;
+    reports::table.load::<Report>(conn).unwrap()
+}
+
 fn insert_employee<S: AsRef<str>>(
     conn: &SqliteConnection,
     name: S,
