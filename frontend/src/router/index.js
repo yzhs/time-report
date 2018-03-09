@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Report from '@/components/Report'
-import Weeks from '@/components/Weeks'
+import Overview from '@/components/Overview'
 
 Vue.use(Router)
 
@@ -14,8 +14,8 @@ export default new Router({
     },
     {
       path: '/',
-      name: 'A-D Wochen',
-      component: Weeks
+      name: 'Übersicht',
+      component: Overview
     }
   ]
 })
