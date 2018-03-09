@@ -63,24 +63,21 @@ pub fn get_items(conn: &SqliteConnection) -> Vec<InvoiceItem> {
 }
 
 pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
-    let items: Vec<InvoiceItem> = get_items(conn);
-    let mut result = InvoiceItem::new();
+    use schema::items_view;
 
-    if items.is_empty() {
-        return result;
-    }
-
-    let last = &items[items.len() - 1];
-    result = result.day(last.day).type_of_week(last.type_of_week);
-    if items.len() == 1 {
-        return result;
-    }
-
-    let last_but_one = &items[items.len() - 2];
-    if last_but_one.day == last.day {
-        result.day(holidays::next_schoolday(last.day))
-    } else {
-        result
+    match items_view::table
+        .order(items_view::day.desc())
+        .first::<InvoiceItem>(conn)
+    {
+        Ok(last) => {
+            let mut result = last.next();
+            result.id = 0;
+            result
+        }
+        Err(e) => {
+            info!("Could not find previous item: {:?}", e);
+            InvoiceItem::new()
+        }
     }
 }
 
