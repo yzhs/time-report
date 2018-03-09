@@ -112,18 +112,12 @@ export default {
     _getPreMonthDays (month, offset) {
       if (offset === 0) {
         return []
-      } else if (month === 1) {
-        return this.getDays(12).slice(-offset)
       } else {
-        return this.getDays(month - 1).slice(-offset)
+        return this.getDays(1).slice(-offset)
       }
     },
     _getNextMonthDays (month, offset) {
-      if (month === 12) {
-        return this.getDays(1).slice(0, offset)
-      } else {
-        return this.getDays(month + 1).slice(0, offset)
-      }
+      return this.getDays(1).slice(0, offset % 7)
     },
     _getRangeList (range, start) {
       var i = start || 1
