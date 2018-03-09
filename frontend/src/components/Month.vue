@@ -82,7 +82,7 @@
 
 <script>
 const MATRIX_MAX = 7 * 6
-const WEEK_DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+const WEEK_DAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
 let bMonthRe = /^1?$|3|5|7|8|10|12/
 
@@ -144,7 +144,7 @@ export default {
     },
     getDaysList () {
       let _needConcatLength = this.getDays(this.month).length + this.firstDayWeek
-      let _initList = this._getPreMonthDays(this.month, this.firstDayWeek)
+      let _initList = this._getPreMonthDays(this.month, (this.firstDayWeek + 6) % 7)
         .map((preMonthday) => {
           return {
             'year': this.month === 1 ? this.year - 1 : this.year,
