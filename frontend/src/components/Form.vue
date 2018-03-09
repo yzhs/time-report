@@ -155,4 +155,8 @@ export default {
 </script>
 
 <style scoped>
+td:nth-child(1) {
+  min-width: 20ex;
+  text-align: left;
+}
 </style>
