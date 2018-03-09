@@ -100,15 +100,6 @@ export default {
     isLeapYear () {
       return ((this.year % 400 === 0) || ((this.year % 4 === 0) && (this.year % 100 !== 0)))
     },
-    selectYears () {
-      return this._getRangeList(2099, 1900)
-    },
-    selectMonths () {
-      return this._getRangeList(12)
-    },
-    dayData () {
-      return [this.year, this.month, this.currentDay].join('-')
-    },
     firstDayWeek () {
       return new Date(this.year, this.month - 1, 1).getDay()
     },
