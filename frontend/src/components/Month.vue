@@ -176,8 +176,8 @@ export default {
         })).concat(
           this._getNextMonthDays(this.month, MATRIX_MAX - _needConcatLength).map((nextMonthDay) => {
             return {
-              'year': this.month === 12 ? this.year + 1 : this.year,
-              'month': this.month === 12 ? 1 : this.month + 1,
+              'year': this.year,
+              'month': this.month + 1,
               'day': nextMonthDay,
               'isNextMonth': true
             }
