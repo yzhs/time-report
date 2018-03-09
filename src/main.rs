@@ -13,6 +13,7 @@ use rocket::response::NamedFile;
 use rocket_contrib::Json;
 
 use time_report::models::*;
+use time_report::reports;
 
 #[get("/")]
 fn index() -> Option<NamedFile> {
@@ -63,9 +64,15 @@ fn get_holidays() -> Json<std::collections::HashMap<String, String>> {
 }
 
 #[get("/reports", format = "application/json")]
-fn get_reports() -> Json<Vec<time_report::Report>> {
+fn get_reports() -> Json<Vec<Report>> {
     let conn = time_report::establish_connection();
-    Json(time_report::get_reports(&conn))
+    Json(reports::get(&conn))
+}
+
+#[post("/reports", format = "application/json", data = "<report>")]
+fn add_report(report: Json<Report>) {
+    let conn = time_report::establish_connection();
+    reports::add(&conn, report.into_inner());
 }
 
 fn main() {

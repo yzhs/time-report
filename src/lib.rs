@@ -22,12 +22,14 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-pub mod schema;
-pub mod models;
-pub mod holidays;
 mod employees;
+pub mod holidays;
+pub mod models;
+pub mod reports;
+pub mod schema;
 
 pub use employees::*;
+use reports::*;
 pub use holidays::get_holidays_as_str as get_holidays;
 
 use std::env;
@@ -81,48 +83,6 @@ pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
     }
 }
 
-/// Create a new report with the given title.
-///
-/// Insert a new row into the `reports` table with `start_date` set to the first day after the end
-/// of the final date of the previous report and `end_date` set to today.
-pub fn insert_report<S: AsRef<str>>(conn: &SqliteConnection, title: S) {
-    use schema::reports;
-
-    // Find last end date for last report
-    let prev_end_date_string = reports::table
-        .select(diesel::dsl::max(reports::end_date))
-        .first::<Option<String>>(conn)
-        .unwrap();
-    let start_date = NaiveDate::parse_from_str(
-        &prev_end_date_string.unwrap_or_else(|| "2017-12-01".into()),
-        DATE_FORMAT,
-    ).expect("Invalid date");
-
-    let new_report = (
-        reports::title.eq(title.as_ref()),
-        reports::start_date.eq(format!("{}", start_date.succ().format(DATE_FORMAT))),
-    );
-
-    diesel::insert_into(reports::table)
-        .values(&new_report)
-        .execute(conn)
-        .expect("Failed to create report");
-}
-
-#[derive(Queryable, Serialize)]
-pub struct Report {
-    pub id: i32,
-    pub title: String,
-    pub start_date: String,
-    pub end_date: String,
-    pub was_pdf_generated: bool,
-}
-
-pub fn get_reports(conn: &SqliteConnection) -> Vec<Report> {
-    use schema::reports;
-    reports::table.load::<Report>(conn).unwrap()
-}
-
 fn insert_employee<S: AsRef<str>>(
     conn: &SqliteConnection,
     name: S,
@@ -138,26 +98,6 @@ fn insert_employee<S: AsRef<str>>(
         .select(employees::id)
         .filter(employees::name.eq(name.as_ref()))
         .first::<i32>(conn)
-}
-
-fn find_or_insert_report(conn: &SqliteConnection) -> i32 {
-    use schema::reports;
-
-    match reports::table
-        .select(reports::id)
-        .filter(diesel::dsl::not(reports::was_pdf_generated))
-        .first::<i32>(conn)
-    {
-        Ok(id) => id,
-        Err(_) => {
-            let values = (reports::title.eq(""), reports::start_date.eq("2017-08-01"));
-            diesel::insert_into(reports::table)
-                .values(&values)
-                .execute(conn)
-                .unwrap();
-            find_or_insert_report(conn)
-        }
-    }
 }
 
 pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {

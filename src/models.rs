@@ -8,6 +8,7 @@ use diesel::{RunQueryDsl, SqliteConnection};
 use super::schema::{items, weeks};
 
 use holidays;
+pub use reports::Report;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 pub const TIME_FORMAT: &str = "%H:%M";
