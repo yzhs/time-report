@@ -5,12 +5,16 @@ import Resource from 'vue-resource'
 import App from './App'
 import router from './router'
 
+import Month from '@/components/Month'
+
 Vue.config.productionTip = false
 Vue.use(Resource)
 Vue.http.options.root = '/api'
 
 require('./assets/normalize.css')
 require('./assets/main.css')
+
+Vue.component('month', Month)
 
 /* eslint-disable no-new */
 new Vue({
