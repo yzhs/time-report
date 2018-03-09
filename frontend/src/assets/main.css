@@ -35,7 +35,7 @@ th {
   background-color: #eee;
 }
 
-tr:nth-child(odd) {
+tr:nth-child(even) {
   background-color: #fff;
 }
 
