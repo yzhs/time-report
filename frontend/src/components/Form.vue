@@ -8,7 +8,7 @@
            title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden"
            v-model="globals.title" v-on:keyup="updateTitle" v-on:change="updateTitle"/>
 
-    <table id="table">
+    <table>
       <thead>
         <tr>
           <th>Name</th>
