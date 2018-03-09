@@ -117,6 +117,9 @@ export default {
       }
     },
     _getNextMonthDays (month, offset) {
+      if (offset % 7 === 6) {
+        return []
+      }
       return this.getDays(1).slice(0, offset % 7)
     },
     _getRangeList (range, start) {
