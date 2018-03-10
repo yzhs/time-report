@@ -58,7 +58,7 @@ fn set_item(id: i32, item: Json<NewRow>) -> Json<i32> {
 #[get("/employees", format = "application/json")]
 fn get_employees() -> Json<Vec<String>> {
     let conn = time_report::db::connect();
-    Json(time_report::get_employees(&conn))
+    Json(time_report::employees::get(&conn))
 }
 
 #[get("/holidays", format = "application/json")]

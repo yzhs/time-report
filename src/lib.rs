@@ -23,13 +23,12 @@ extern crate serde_derive;
 extern crate serde_json;
 
 pub mod db;
-mod employees;
+pub mod employees;
 pub mod holidays;
 pub mod models;
 pub mod reports;
 pub mod schema;
 
-pub use employees::*;
 use reports::*;
 pub use holidays::get_holidays_as_str as get_holidays;
 
@@ -69,27 +68,10 @@ pub fn new_item_template(conn: &SqliteConnection) -> InvoiceItem {
     }
 }
 
-fn insert_employee<S: AsRef<str>>(
-    conn: &SqliteConnection,
-    name: S,
-) -> Result<i32, diesel::result::Error> {
-    use schema::employees;
-
-    diesel::insert_or_ignore_into(employees::table)
-        .values(&employees::name.eq(name.as_ref()))
-        .execute(conn)
-        .expect("Error creating new employee record");
-
-    employees::table
-        .select(employees::id)
-        .filter(employees::name.eq(name.as_ref()))
-        .first::<i32>(conn)
-}
-
 pub fn update_item(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     use schema::{items, weeks};
 
-    let employee_id = insert_employee(conn, &new_row.name).expect("Failed to find employee");
+    let employee_id = employees::insert(conn, &new_row.name).expect("Failed to find employee");
 
     let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).expect("Invalid date");
     let start_time =
