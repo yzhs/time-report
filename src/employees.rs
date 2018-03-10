@@ -37,11 +37,11 @@ mod test {
         let conn = ::db::connect();
         empty_tables(&conn);
 
-        let id = insert_employee(&conn, "Alice A.").unwrap();
-        let id2 = insert_employee(&conn, "Bob B.").unwrap();
+        let id = super::insert(&conn, "Alice A.").unwrap();
+        let id2 = super::insert(&conn, "Bob B.").unwrap();
         assert_ne!(id, id2);
-        assert_eq!(insert_employee(&conn, "Alice A.").unwrap(), id);
-        assert_eq!(insert_employee(&conn, "Bob B.").unwrap(), id2);
+        assert_eq!(super::insert(&conn, "Alice A.").unwrap(), id);
+        assert_eq!(super::insert(&conn, "Bob B.").unwrap(), id2);
     }
 
     #[test]
@@ -51,7 +51,7 @@ mod test {
 
         let names = vec!["Alice A.", "Bob B.", "Charlie C."];
         for name in &names {
-            insert_employee(&conn, name).unwrap();
+            super::insert(&conn, name).unwrap();
         }
 
         assert_eq!(::employees::get(&conn), names);

@@ -40,19 +40,19 @@ fn get_globals() -> Json<Globals> {
 #[get("/items", format = "application/json")]
 fn get_items() -> Json<Vec<InvoiceItem>> {
     let conn = time_report::db::connect();
-    Json(time_report::get_items(&conn))
+    Json(time_report::items::get(&conn))
 }
 
 #[get("/items/template", format = "application/json")]
 fn item_template() -> Json<InvoiceItem> {
     let conn = time_report::db::connect();
-    Json(time_report::new_item_template(&conn))
+    Json(time_report::items::template(&conn))
 }
 
 #[put("/items/<id>", format = "application/json", data = "<item>")]
 fn set_item(id: i32, item: Json<NewRow>) -> Json<i32> {
     let conn = time_report::db::connect();
-    Json(time_report::update_item(&conn, id, item.into_inner()))
+    Json(time_report::items::update(&conn, id, item.into_inner()))
 }
 
 #[get("/employees", format = "application/json")]
