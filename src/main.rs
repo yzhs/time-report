@@ -33,7 +33,7 @@ fn files(file: PathBuf) -> Option<NamedFile> {
 // TODO better name
 #[get("/globals", format = "application/json")]
 fn get_globals() -> Json<Globals> {
-    Json(time_report::get_globals())
+    Json(time_report::globals::get())
 }
 
 // TODO better name
@@ -64,7 +64,7 @@ fn get_employees() -> Json<Vec<String>> {
 #[get("/holidays", format = "application/json")]
 fn get_holidays() -> Json<std::collections::HashMap<String, String>> {
     let conn = time_report::db::connect();
-    Json(time_report::get_holidays(&conn))
+    Json(time_report::holidays::get(&conn))
 }
 
 #[get("/reports", format = "application/json")]

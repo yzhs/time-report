@@ -106,7 +106,7 @@ fn store_holidays(conn: &SqliteConnection, new_holidays: &[Holiday]) {
         .expect("Failed to write holidays to database");
 }
 
-pub fn populate_holidays_table(conn: &SqliteConnection) {
+pub fn populate_table(conn: &SqliteConnection) {
     let year = ::chrono::Local::today().year();
 
     {
@@ -161,7 +161,7 @@ pub fn next_schoolday(mut date: NaiveDate) -> NaiveDate {
     date
 }
 
-pub fn get_holidays_as_str(conn: &SqliteConnection) -> HashMap<String, String> {
+pub fn get(conn: &SqliteConnection) -> HashMap<String, String> {
     use schema::holidays::*;
     use diesel::dsl::max;
 
@@ -174,7 +174,7 @@ pub fn get_holidays_as_str(conn: &SqliteConnection) -> HashMap<String, String> {
         DATE_FORMAT,
     ).unwrap();
     if last_holiday < chrono::Local::today().naive_local() {
-        populate_holidays_table(conn);
+        populate_table(conn);
     }
 
     HashMap::from_iter(table.load::<(String, String)>(conn).unwrap().into_iter())
@@ -187,6 +187,6 @@ mod tests {
     #[test]
     fn test_populate_holidays_table() {
         let conn = ::db::connect();
-        populate_holidays_table(&conn);
+        populate_table(&conn);
     }
 }

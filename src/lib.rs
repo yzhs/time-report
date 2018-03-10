@@ -30,9 +30,9 @@ pub mod models;
 pub mod reports;
 pub mod schema;
 
-use models::Globals;
-pub use holidays::get_holidays_as_str as get_holidays;
-
-pub fn get_globals() -> Globals {
-    Globals::new()
+pub mod globals {
+    use models::Globals;
+    pub fn get() -> Globals {
+        Globals::new()
+    }
 }

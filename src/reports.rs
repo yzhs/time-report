@@ -4,7 +4,6 @@ use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 
 use models::DATE_FORMAT;
-use holidays::get_holidays_as_str as get_holidays;
 use schema::reports;
 
 #[derive(Serialize, Deserialize, Insertable, Queryable)]
