@@ -39,43 +39,43 @@ fn get_globals() -> Json<Globals> {
 // TODO better name
 #[get("/items", format = "application/json")]
 fn get_items() -> Json<Vec<InvoiceItem>> {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     Json(time_report::get_items(&conn))
 }
 
 #[get("/items/template", format = "application/json")]
 fn item_template() -> Json<InvoiceItem> {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     Json(time_report::new_item_template(&conn))
 }
 
 #[put("/items/<id>", format = "application/json", data = "<item>")]
 fn set_item(id: i32, item: Json<NewRow>) -> Json<i32> {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     Json(time_report::update_item(&conn, id, item.into_inner()))
 }
 
 #[get("/employees", format = "application/json")]
 fn get_employees() -> Json<Vec<String>> {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     Json(time_report::get_employees(&conn))
 }
 
 #[get("/holidays", format = "application/json")]
 fn get_holidays() -> Json<std::collections::HashMap<String, String>> {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     Json(time_report::get_holidays(&conn))
 }
 
 #[get("/reports", format = "application/json")]
 fn get_reports() -> Json<Vec<Report>> {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     Json(reports::get(&conn))
 }
 
 #[post("/reports", format = "application/json", data = "<report>")]
 fn add_report(report: Json<Report>) {
-    let conn = time_report::establish_connection();
+    let conn = time_report::db::connect();
     reports::add(&conn, report.into_inner());
 }
 

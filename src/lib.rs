@@ -22,6 +22,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
+pub mod db;
 mod employees;
 pub mod holidays;
 pub mod models;
@@ -32,26 +33,11 @@ pub use employees::*;
 use reports::*;
 pub use holidays::get_holidays_as_str as get_holidays;
 
-use std::env;
-
 use chrono::{NaiveDate, NaiveTime};
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
-use dotenv::dotenv;
 
 use models::*;
-
-pub fn establish_connection() -> SqliteConnection {
-    dotenv().ok();
-
-    let database_url = env::var(if !cfg!(test) {
-        "DATABASE_URL"
-    } else {
-        "TEST_DATABASE_URL"
-    }).expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
-}
 
 pub fn get_globals() -> Globals {
     Globals::new()

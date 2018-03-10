@@ -14,7 +14,7 @@ const SCHOOL_HOLIDAYS_URL: &str = "https://ferien-api.de/api/v1/holidays/NW/";
 
 lazy_static! {
     pub static ref HOLIDAYS: Mutex<HashMap<NaiveDate, String>> = {
-        let conn = ::establish_connection();
+        let conn = ::db::connect();
         Mutex::new(get_holidays(&conn))
     };
 }
@@ -186,7 +186,7 @@ mod tests {
 
     #[test]
     fn test_populate_holidays_table() {
-        let conn = ::establish_connection();
+        let conn = ::db::connect();
         populate_holidays_table(&conn);
     }
 }

@@ -15,7 +15,7 @@ pub const TIME_FORMAT: &str = "%H:%M";
 
 lazy_static!{
     static ref TYPE_OF_WEEK: Mutex<TypeOfWeek> =
-        Mutex::new(TypeOfWeek::new(&::establish_connection()));
+        Mutex::new(TypeOfWeek::new(&::db::connect()));
 }
 
 struct TypeOfWeek {

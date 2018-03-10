@@ -17,7 +17,7 @@ mod test {
 
     #[test]
     fn test_insert_employee() {
-        let conn = ::establish_connection();
+        let conn = ::db::connect();
         empty_tables(&conn);
 
         let id = insert_employee(&conn, "Alice A.").unwrap();
@@ -29,7 +29,7 @@ mod test {
 
     #[test]
     fn test_get_employees() {
-        let conn = ::establish_connection();
+        let conn = ::db::connect();
         empty_tables(&conn);
 
         let names = vec!["Alice A.", "Bob B.", "Charlie C."];
