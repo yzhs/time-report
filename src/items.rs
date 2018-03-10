@@ -53,16 +53,8 @@ pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     let report_id = find_or_insert_report(conn);
 
     if id == 0 {
-        println!(
-            "Creating new item: {} {} {} {} {} {}",
-            new_row.name,
-            new_row.day,
-            new_row.type_of_week,
-            new_row.start_time,
-            new_row.end_time,
-            new_row.remark
-        );
         // Insert new item
+        info!("Creating new item: {:?}", new_row);
         let new_item = (
             items::employee_id.eq(employee_id),
             items::report_id.eq(report_id),
@@ -80,17 +72,8 @@ pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
             .unwrap()
             .expect("Empty table")
     } else {
-        println!(
-            "Updating item #{}: {} {} {} {} {} {}",
-            id,
-            new_row.name,
-            new_row.day,
-            new_row.type_of_week,
-            new_row.start_time,
-            new_row.end_time,
-            new_row.remark
-        );
         // Update existing item
+        info!("Updating item #{}: {:?}", id, new_row);
         let new_item = (
             items::id.eq(id),
             items::employee_id.eq(employee_id),
