@@ -71,6 +71,7 @@ impl InvoiceItem {
     }
 }
 
+/// Get all invoice items from the denormalized `items_view`.
 pub fn get(conn: &SqliteConnection) -> Vec<InvoiceItem> {
     use schema::items_view::dsl::items_view;
     items_view
@@ -78,6 +79,7 @@ pub fn get(conn: &SqliteConnection) -> Vec<InvoiceItem> {
         .expect("Error loading data")
 }
 
+/// Generate a reasonable template for the next invoice item.
 pub fn template(conn: &SqliteConnection) -> InvoiceItem {
     use schema::items_view;
 
@@ -97,6 +99,8 @@ pub fn template(conn: &SqliteConnection) -> InvoiceItem {
     }
 }
 
+/// Update an item with a specific id, or create a new item if `id == 0`.
+// TODO Use Option<i32>?
 pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     use schema::{items, weeks};
 
@@ -109,9 +113,7 @@ pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
     let start_datetime = date.and_time(start_time);
     let end_datetime = date.and_time(end_time);
 
-    // Insert new mapping of week-of-year to type-of-week
     let new_week = NewWeek::new(date, new_row.type_of_week);
-
     diesel::replace_into(weeks::table).values(&new_week);
 
     // Get report id
