@@ -26,7 +26,6 @@ pub mod db;
 pub mod employees;
 pub mod holidays;
 pub mod items;
-pub mod models;
 pub mod reports;
 pub mod schema;
 pub mod weeks;
@@ -53,3 +52,6 @@ pub mod globals {
         Globals::new()
     }
 }
+
+pub const DATE_FORMAT: &str = "%Y-%m-%d";
+pub const TIME_FORMAT: &str = "%H:%M";

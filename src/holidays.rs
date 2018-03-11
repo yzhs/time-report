@@ -6,8 +6,9 @@ use chrono::{self, Datelike, NaiveDate};
 use curl::easy::Easy;
 use diesel::{QueryDsl, RunQueryDsl, SqliteConnection};
 
-use models::DATE_FORMAT;
 use schema::holidays;
+
+use DATE_FORMAT;
 
 const GENERAL_HOLIDAYS_URL: &str = "https://feiertage-api.de/api/?nur_land=NW&jahr=";
 const SCHOOL_HOLIDAYS_URL: &str = "https://ferien-api.de/api/v1/holidays/NW/";

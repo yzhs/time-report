@@ -3,7 +3,7 @@ use diesel;
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 
-use models::DATE_FORMAT;
+use DATE_FORMAT;
 use schema::reports;
 
 #[derive(Serialize, Deserialize, Insertable, Queryable)]

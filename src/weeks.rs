@@ -45,3 +45,22 @@ impl TypeOfWeek {
 pub fn get_type_of_week(day: NaiveDate) -> i32 {
     TYPE_OF_WEEK.lock().unwrap().get(day)
 }
+
+#[derive(Debug, Serialize, Insertable)]
+#[table_name = "weeks"]
+pub struct NewWeek {
+    pub year: i32,
+    pub week_of_year: i32,
+    pub type_of_week: i32,
+}
+
+impl NewWeek {
+    pub fn new(date: NaiveDate, type_of_week: i32) -> Self {
+        let week = date.iso_week();
+        Self {
+            year: week.year(),
+            week_of_year: week.week() as i32,
+            type_of_week,
+        }
+    }
+}

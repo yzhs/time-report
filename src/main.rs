@@ -13,8 +13,7 @@ use rocket::response::NamedFile;
 use rocket_contrib::Json;
 
 use time_report::globals::Globals;
-use time_report::items::InvoiceItem;
-use time_report::models::*;
+use time_report::items::{InvoiceItem, NewRow};
 use time_report::reports::{self, Report};
 
 #[get("/")]

@@ -4,13 +4,40 @@ use diesel::{self, SqliteConnection};
 
 use employees;
 use holidays;
-use models::*;
+use schema::items;
 use reports::*;
-use weeks::get_type_of_week;
+use weeks::{get_type_of_week, NewWeek};
+
+use DATE_FORMAT;
+use TIME_FORMAT;
 
 lazy_static!{
     static ref START_DEFAULT: NaiveTime = NaiveTime::from_hms(13, 0, 0);
     static ref END_DEFAULT: NaiveTime = NaiveTime::from_hms(15, 30, 0);
+}
+
+/// All the data stored in a row of the main table of the frontend.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewRow {
+    pub id: Option<i32>,
+    pub name: String,
+    pub day: String,
+    pub type_of_week: i32,
+    pub start_time: String,
+    pub end_time: String,
+    pub remark: String,
+}
+
+/// Data needed to create a new row in the database.
+#[derive(Debug, Serialize, Deserialize, Insertable)]
+#[table_name = "items"]
+struct NewInvoiceItem {
+    pub id: Option<i32>,
+    pub employee_id: i32,
+    pub report_id: i32,
+    pub start_datetime: String,
+    pub end_datetime: String,
+    pub remark: Option<String>,
 }
 
 /// An row in `items_view`: Who worked on what day, from when to when.
