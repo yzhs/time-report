@@ -3,8 +3,73 @@ use diesel::prelude::*;
 use diesel::{self, SqliteConnection};
 
 use employees;
+use holidays;
 use models::*;
 use reports::*;
+use weeks::get_type_of_week;
+
+lazy_static!{
+    static ref START_DEFAULT: NaiveTime = NaiveTime::from_hms(13, 0, 0);
+    static ref END_DEFAULT: NaiveTime = NaiveTime::from_hms(15, 30, 0);
+}
+
+/// An row in `items_view`: Who worked on what day, from when to when.
+#[derive(Serialize, Queryable)]
+pub struct InvoiceItem {
+    pub id: i32,
+    pub name: String,
+    pub day: NaiveDate,
+    pub type_of_week: i32,
+    pub start: NaiveTime,
+    pub end: NaiveTime,
+    pub remark: String,
+}
+
+impl InvoiceItem {
+    pub fn new() -> Self {
+        InvoiceItem {
+            id: 0,
+            name: "".into(),
+            day: NaiveDate::from_ymd(2017, 8, 1),
+            type_of_week: 0,
+            start: *START_DEFAULT,
+            end: *END_DEFAULT,
+            remark: "".into(),
+        }
+    }
+
+    pub fn name(mut self, name: &str) -> Self {
+        self.name = name.into();
+        self
+    }
+
+    pub fn day(mut self, day: NaiveDate) -> Self {
+        self.day = day;
+        self
+    }
+
+    pub fn type_of_week(mut self, type_of_week: i32) -> Self {
+        self.type_of_week = type_of_week;
+        self
+    }
+
+    pub fn start(mut self, start: NaiveTime) -> Self {
+        self.start = start;
+        self
+    }
+
+    pub fn remark(mut self, remark: &str) -> Self {
+        self.remark = remark.into();
+        self
+    }
+
+    pub fn next(&self) -> Self {
+        let next_schoolday = holidays::next_schoolday(self.day);
+        InvoiceItem::new()
+            .day(next_schoolday)
+            .type_of_week(get_type_of_week(next_schoolday))
+    }
+}
 
 pub fn get(conn: &SqliteConnection) -> Vec<InvoiceItem> {
     use schema::items_view::dsl::items_view;

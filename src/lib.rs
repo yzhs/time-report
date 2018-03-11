@@ -29,9 +29,26 @@ pub mod items;
 pub mod models;
 pub mod reports;
 pub mod schema;
+pub mod weeks;
+
+pub use items::InvoiceItem;
 
 pub mod globals {
-    use models::Globals;
+    #[derive(Serialize)]
+    pub struct Globals {
+        pub mintime: &'static str,
+        pub maxtime: &'static str,
+    }
+
+    impl Globals {
+        pub fn new() -> Self {
+            Self {
+                mintime: "12:30",
+                maxtime: "16:00",
+            }
+        }
+    }
+
     pub fn get() -> Globals {
         Globals::new()
     }
