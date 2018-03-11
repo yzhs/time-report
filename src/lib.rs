@@ -39,17 +39,11 @@ pub mod globals {
         pub maxtime: &'static str,
     }
 
-    impl Globals {
-        pub fn new() -> Self {
-            Self {
-                mintime: "12:30",
-                maxtime: "16:00",
-            }
-        }
-    }
-
     pub fn get() -> Globals {
-        Globals::new()
+        Globals {
+            mintime: "12:30",
+            maxtime: "16:00",
+        }
     }
 }
 
