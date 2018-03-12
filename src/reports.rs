@@ -42,7 +42,14 @@ pub fn create_report_from_title<S: AsRef<str>>(conn: &SqliteConnection, title: S
         .expect("Failed to create report");
 }
 
-pub fn get(conn: &SqliteConnection) -> Vec<Report> {
+pub fn get(conn: &SqliteConnection, id: i32) -> Option<Report> {
+    reports::table
+        .filter(reports::id.eq(id))
+        .first::<Report>(conn)
+        .ok()
+}
+
+pub fn get_all(conn: &SqliteConnection) -> Vec<Report> {
     reports::table.load::<Report>(conn).unwrap()
 }
 

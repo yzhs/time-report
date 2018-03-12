@@ -71,7 +71,7 @@ fn index() -> Option<NamedFile> {
 }
 
 /// Serve static files
-#[get("/<file..>")]
+#[get("/<file..>", rank = 2)]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/frontend/dist/")).join(file))
         .ok()
@@ -116,8 +116,12 @@ fn get_holidays() -> Json<std::collections::HashMap<String, String>> {
 
 #[get("/reports", format = "application/json")]
 fn get_reports() -> Json<Vec<Report>> {
-    let conn = db::connect();
-    Json(reports::get(&conn))
+    Json(reports::get_all(&db::connect()))
+}
+
+#[get("/reports/<id>", format = "application/json")]
+fn get_report(id: i32) -> Option<Json<Report>> {
+    reports::get(&db::connect(), id).map(|x| Json(x))
 }
 
 #[post("/reports", format = "application/json", data = "<report>")]
@@ -138,6 +142,7 @@ fn main() {
         allow_credentials: true,
         ..Default::default()
     };
+
     rocket::ignite()
         .mount("/", routes![index, files])
         .mount(
@@ -145,6 +150,7 @@ fn main() {
             routes![
                 item_template,
                 get_reports,
+                get_report,
                 get_globals,
                 get_employees,
                 get_items,
