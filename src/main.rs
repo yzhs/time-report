@@ -12,12 +12,17 @@ pub extern crate diesel;
 extern crate diesel_infer_schema;
 
 extern crate dotenv;
+#[macro_use]
+extern crate dotenv_codegen;
 
 #[macro_use]
 extern crate lazy_static;
 
 #[macro_use]
 extern crate log;
+
+extern crate r2d2;
+extern crate r2d2_diesel;
 
 extern crate rocket;
 extern crate rocket_contrib;
@@ -77,56 +82,48 @@ fn files(file: PathBuf) -> Option<NamedFile> {
         .ok()
 }
 
-// TODO better name
 #[get("/globals", format = "application/json")]
 fn get_globals() -> Json<Globals> {
     Json(Globals::new())
 }
 
-// TODO better name
 #[get("/items", format = "application/json")]
-fn get_items() -> Json<Vec<InvoiceItem>> {
-    let conn = db::connect();
+fn get_items(conn: db::DbConn) -> Json<Vec<InvoiceItem>> {
     Json(items::get(&conn))
 }
 
 #[get("/items/template", format = "application/json")]
-fn item_template() -> Json<InvoiceItem> {
-    let conn = db::connect();
+fn item_template(conn: db::DbConn) -> Json<InvoiceItem> {
     Json(items::template(&conn))
 }
 
 #[put("/items/<id>", format = "application/json", data = "<item>")]
-fn set_item(id: i32, item: Json<NewRow>) -> Json<i32> {
-    let conn = db::connect();
+fn set_item(conn: db::DbConn, id: i32, item: Json<NewRow>) -> Json<i32> {
     Json(items::update(&conn, id, item.into_inner()))
 }
 
 #[get("/employees", format = "application/json")]
-fn get_employees() -> Json<Vec<String>> {
-    let conn = db::connect();
+fn get_employees(conn: db::DbConn) -> Json<Vec<String>> {
     Json(employees::get(&conn))
 }
 
 #[get("/holidays", format = "application/json")]
-fn get_holidays() -> Json<std::collections::HashMap<String, String>> {
-    let conn = db::connect();
+fn get_holidays(conn: db::DbConn) -> Json<std::collections::HashMap<String, String>> {
     Json(holidays::get(&conn))
 }
 
 #[get("/reports", format = "application/json")]
-fn get_reports() -> Json<Vec<Report>> {
-    Json(reports::get_all(&db::connect()))
+fn get_reports(conn: db::DbConn) -> Json<Vec<Report>> {
+    Json(reports::get_all(&conn))
 }
 
 #[get("/reports/<id>", format = "application/json")]
-fn get_report(id: i32) -> Option<Json<Report>> {
-    reports::get(&db::connect(), id).map(|x| Json(x))
+fn get_report(conn: db::DbConn, id: i32) -> Option<Json<Report>> {
+    reports::get(&conn, id).map(|x| Json(x))
 }
 
 #[post("/reports", format = "application/json", data = "<report>")]
-fn add_report(report: Json<Report>) {
-    let conn = db::connect();
+fn add_report(conn: db::DbConn, report: Json<Report>) {
     reports::add(&conn, report.into_inner());
 }
 
@@ -144,6 +141,7 @@ fn main() {
     };
 
     rocket::ignite()
+        .manage(db::init_pool())
         .mount("/", routes![index, files])
         .mount(
             "/api/",
