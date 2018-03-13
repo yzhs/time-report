@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Übersicht</router-link>
-      <router-link to="/abrechnung">Abrechnung</router-link>
+      <router-link :to="{name: 'overview'}">Übersicht</router-link>
+      <router-link :to="{name: 'report', params: {id: 1}}">Abrechnung</router-link>
     </nav>
     <router-view/>
   </div>
