@@ -57,11 +57,11 @@
                  v-model="item.remark" v-on:change="onItemChange(index)"/>
         </td>
         <td>
-          <button class="add-item" v-on:click="addItem">neue Zeile</button>
         </td>
       </tr>
     </table>
 
+    <button id="add-item" v-on:click="addItem">neue Zeile</button>
     <button id="generate" name="generate">PDF erzeugen</button>
 
     <datalist id="employees">
