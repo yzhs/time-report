@@ -6,7 +6,7 @@
     <input type="text" name="heading" id="heading" placeholder="Zeitraum"
            required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
            title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden"
-           v-model="globals.title" v-on:keyup="updateTitle" v-on:change="updateTitle"/>
+           v-model="report.title" v-on:keyup="updateTitle" v-on:change="updateTitle"/>
 
     <table>
       <thead>
@@ -30,7 +30,7 @@
         </td>
         <td>
           <input type="date" name="day" placeholder="Datum" required
-                 :min="globals.mindate" :max="globals.maxdate"
+                 :min="report.mindate" :max="report.maxdate"
                  v-model="item.day"  v-on:change="onItemChange(index)"/>
         </td>
         <td>
@@ -76,15 +76,16 @@ function formatDate (date) {
 }
 
 export default {
+  params: {
+    id: 1
+  },
   data () {
     let now = new Date()
     let maxdate = formatDate(now)
-    let halfAYearAgo = new Date()
-    halfAYearAgo.setMonth(now.getMonth() - 12)
-    let mindate = formatDate(halfAYearAgo)
 
     return {
-      globals: {mindate: mindate, maxdate: maxdate, mintime: '12:30', maxtime: '16:00'},
+      globals: {mintime: '12:30', maxtime: '16:00'},
+      report: {id: 1, title: '', mindate: '2017-08-01', maxdate: maxdate},
       numItems: 0,
       employees: [],
       items: []
@@ -129,6 +130,9 @@ export default {
     }
   },
   beforeMount () {
+    this.$http.get('reports/' + this.report.id).then(response => {
+      this.report = response.body
+    })
     this.$http.get('items').then(response => {
       response.body.map(element => {
         element.start = element.start.substr(0, 5)
