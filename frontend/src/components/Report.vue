@@ -154,6 +154,15 @@ export default {
 </script>
 
 <style scoped>
+button {
+  font-size: 150%;
+  color: white;
+  background-color: #369;
+  color: white;
+  margin: 1em;
+  padding: 0.3em;
+}
+
 td:nth-child(1) {
   min-width: 20ex;
   text-align: left;
