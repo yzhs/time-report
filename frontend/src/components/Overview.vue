@@ -17,11 +17,11 @@
             </td>
             <td>
               <input type="date" name="start_date" v-model="report.start_date"
-                     required :mindate="mindate" :maxdate="maxdate">
+                     required :min="mindate" :max="maxdate">
             </td>
             <td>
               <input type="date" name="end_date" v-model="report.end_date"
-                     required :mindate="mindate" :maxdate="maxdate">
+                     required :min="mindate" :max="maxdate">
             </td>
             <td>
               <router-link :to="{name: 'report', params: {id: report.id}}">Bearbeiten</router-link>
