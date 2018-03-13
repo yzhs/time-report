@@ -18,7 +18,7 @@ export default {
     }
   },
   beforeMount () {
-    this.$http.get('http://localhost:8000/api/reports').then(response => {
+    this.$http.get('reports').then(response => {
       response.body.forEach(element => {
         this.reports.push(element)
       })

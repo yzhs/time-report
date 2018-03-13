@@ -7,7 +7,7 @@ import router from './router'
 
 Vue.config.productionTip = false
 Vue.use(Resource)
-Vue.http.options.root = '/api'
+Vue.http.options.root = 'http://localhost:8000/api'
 
 require('./assets/normalize.css')
 require('./assets/main.css')
