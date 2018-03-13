@@ -8,13 +8,13 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/abrechnung',
-      name: 'Abrechnung',
+      path: '/abrechnung/:id',
+      name: 'report',
       component: Report
     },
     {
       path: '/',
-      name: 'Übersicht',
+      name: 'overview',
       component: Overview
     }
   ]
