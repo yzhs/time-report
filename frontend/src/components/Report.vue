@@ -19,46 +19,48 @@
           <th>Bemerkung</th>
         </tr>
       </thead>
-      <tr v-for="(item, index) in items" :key="item.id">
-        <td>
-          <input type="text" name="name" placeholder="Vorname Nachname"
-                 list="employees" spellcheck="false"
-                 minlength="2" maxlength="100"
-                 pattern=".*[^. ,-]+.*" required
-                 v-model="item.name" v-on:change="onItemChange(index)"/>
-        </td>
-        <td>
-          <input type="date" name="day" placeholder="Datum" required
-                 :min="report.mindate" :max="report.maxdate"
-                 v-model="item.day"  v-on:change="onItemChange(index)"/>
-        </td>
-        <td>
-          <select name="week" v-model.number="item.type_of_week" tabindex="-1"
-                  v-on:change="onItemChange(index)">
-            <option value="0">A</option>
-            <option value="1">B</option>
-            <option value="2">C</option>
-            <option value="3">D</option>
-          </select>
-        </td>
-        <td>
-          <input type="time" name="start" placeholder="von" step="300"
-                 :min="globals.mintime" :max="globals.maxtime" required
-                 v-model="item.start" v-on:change="onItemChange(index)"/>
+      <tbody>
+        <tr v-for="(item, index) in items" :key="item.id">
+          <td>
+            <input type="text" name="name" placeholder="Vorname Nachname"
+                  list="employees" spellcheck="false"
+                  minlength="2" maxlength="100"
+                  pattern=".*[^. ,-]+.*" required
+                  v-model="item.name" v-on:change="onItemChange(index)"/>
           </td>
           <td>
-          <input type="time" name="end" placeholder="bis" step="300"
-                 :min="globals.mintime" :max="globals.maxtime" required
-                 v-model="item.end" v-on:change="onItemChange(index)"/>
-        </td>
-        <td>
-          <input type="text" name="remark" placeholder="Bemerkung"
-                 v-model="item.remark" v-on:change="onItemChange(index)"/>
-        </td>
-        <td>
-          <span style="height:2em;" class="id">{{item.id}}</span>
-        </td>
-      </tr>
+            <input type="date" name="day" placeholder="Datum" required
+                  :min="report.mindate" :max="report.maxdate"
+                  v-model="item.day"  v-on:change="onItemChange(index)"/>
+          </td>
+          <td>
+            <select name="week" v-model.number="item.type_of_week" tabindex="-1"
+                    v-on:change="onItemChange(index)">
+              <option value="0">A</option>
+              <option value="1">B</option>
+              <option value="2">C</option>
+              <option value="3">D</option>
+            </select>
+          </td>
+          <td>
+            <input type="time" name="start" placeholder="von" step="300"
+                  :min="globals.mintime" :max="globals.maxtime" required
+                  v-model="item.start" v-on:change="onItemChange(index)"/>
+            </td>
+            <td>
+            <input type="time" name="end" placeholder="bis" step="300"
+                  :min="globals.mintime" :max="globals.maxtime" required
+                  v-model="item.end" v-on:change="onItemChange(index)"/>
+          </td>
+          <td>
+            <input type="text" name="remark" placeholder="Bemerkung"
+                  v-model="item.remark" v-on:change="onItemChange(index)"/>
+          </td>
+          <td>
+            <span style="height:2em;" class="id">{{item.id}}</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
 
     <button id="add-item" v-on:click="addItem">neue Zeile</button>
