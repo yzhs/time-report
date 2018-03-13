@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <nav>
+      <router-link to="/">Übersicht</router-link>
+      <router-link to="/abrechnung">Abrechnung</router-link>
+    </nav>
     <router-view/>
   </div>
 </template>
@@ -18,5 +22,16 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+nav > a {
+  background: lightgrey;
+  padding: 1em;
+  color: #369;
+}
+
+nav > a.router-link-exact-active {
+  background: #369;
+  color: white;
 }
 </style>
