@@ -10,9 +10,19 @@
         </thead>
         <tbody>
           <tr class="report" v-for="report in reports" :key="report.id">
-            <td><input type="text" name="title" v-model="report.title"></td>
-            <td><input type="date" name="start_date" v-model="report.start_date"></td>
-            <td><input type="date" name="end_date" v-model="report.end_date"></td>
+            <td>
+              <input type="text" name="title" v-model="report.title"
+                     required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
+                     title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden">
+            </td>
+            <td>
+              <input type="date" name="start_date" v-model="report.start_date"
+                     required :mindate="mindate" :maxdate="maxdate">
+            </td>
+            <td>
+              <input type="date" name="end_date" v-model="report.end_date"
+                     required :mindate="mindate" :maxdate="maxdate">
+            </td>
             <td>
               <router-link :to="{name: 'report', params: {id: report.id}}">Bearbeiten</router-link>
             </td>
@@ -25,9 +35,15 @@
 </template>
 
 <script>
+function formatDate (date) {
+  return date.toISOString().split('T')[0]
+}
+
 export default {
   data () {
     return {
+      mindate: '2017-08-01',
+      maxdate: formatDate(new Date()),
       reports: []
     }
   },
