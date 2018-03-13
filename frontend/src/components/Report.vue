@@ -111,14 +111,9 @@ export default {
     onItemChange: function (index) {
       let item = this.items[index]
       console.log('Changed item #' + item.id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
-      let updateItem = {
-        id: item.in_db ? item.id : 0,
-        name: item.name,
-        day: item.day,
-        type_of_week: item.type_of_week,
-        start_time: item.start,
-        end_time: item.end,
-        remark: item.remark
+      let updateItem = Object.assign({}, item)
+      if (!item.in_db) {
+        updateItem.id = 0
       }
       this.$http.put('items/' + updateItem.id, JSON.stringify(updateItem), {
         headers: {
