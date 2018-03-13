@@ -21,7 +21,6 @@
       </thead>
       <tr v-for="(item, index) in items" :key="item.id">
         <td>
-          <span style="height:2em;" class="id">{{item.id}}</span>
           <input type="text" name="name" placeholder="Vorname Nachname"
                  list="employees" spellcheck="false"
                  minlength="2" maxlength="100"
@@ -57,6 +56,7 @@
                  v-model="item.remark" v-on:change="onItemChange(index)"/>
         </td>
         <td>
+          <span style="height:2em;" class="id">{{item.id}}</span>
         </td>
       </tr>
     </table>
