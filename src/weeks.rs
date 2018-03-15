@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::iter::FromIterator;
 use std::sync::Mutex;
 
-use chrono::{Datelike, NaiveDate};
-use diesel::{RunQueryDsl, SqliteConnection};
+use chrono::{Datelike, Local, NaiveDate};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 
 use super::schema::weeks;
 
@@ -68,11 +68,42 @@ impl NewWeek {
 pub fn populate_table(conn: &SqliteConnection) {
     use holidays;
 
-    let today = ::chrono::Local::today();
+    const MIN_YEAR: i32 = 2017;
 
-    let most_recent_year = 2016;
+    let today = Local::today();
 
-    for year in most_recent_year + 1..today.year() {
+    let most_recent_year = {
+        use schema::weeks::*;
+        table
+            .select(year)
+            .order(year.desc())
+            .first::<i32>(conn)
+            .unwrap_or(MIN_YEAR - 1)
+    };
+
+    let mut new_weeks = vec![];
+
+    for year in most_recent_year + 1..today.year() + 1 {
         let first_day = holidays::first_day_of_school(conn, year);
+        let last_day = holidays::last_day_of_school(conn, year);
+
+        let mut type_of_week = 0;
+
+        let mut prev_week = first_day.iso_week().week() - 1;
+        let mut day = first_day;
+        while day <= last_day {
+            let week = day.iso_week().week();
+            if week != prev_week {
+                prev_week = week;
+                new_weeks.push(NewWeek::new(day, type_of_week));
+                type_of_week = (type_of_week + 1) % 4;
+            }
+            day = holidays::next_schoolday(day);
+        }
     }
+
+    ::diesel::insert_into(weeks::table)
+        .values(&new_weeks)
+        .execute(conn)
+        .expect("Failed to insert weeks");
 }
