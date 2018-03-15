@@ -42,7 +42,7 @@ function formatDate (date) {
 export default {
   data () {
     return {
-      mindate: '2017-08-01',
+      mindate: '2017-07-01',
       maxdate: formatDate(new Date()),
       reports: []
     }
