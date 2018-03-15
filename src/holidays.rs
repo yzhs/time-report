@@ -158,9 +158,9 @@ fn add_holidays_for(conn: &SqliteConnection, year: i32) {
 }
 
 pub fn populate_table(conn: &SqliteConnection) {
-    let year = ::chrono::Local::today().year();
-
-    add_holidays_for(conn, year);
+    for year in 2017..::chrono::Local::today().year() + 1 {
+        add_holidays_for(conn, year);
+    }
 }
 
 /// Load the entire holidays table.
