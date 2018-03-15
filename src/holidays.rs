@@ -213,16 +213,50 @@ pub fn get(conn: &SqliteConnection) -> HashMap<String, String> {
     HashMap::from_iter(table.load::<(String, String)>(conn).unwrap().into_iter())
 }
 
+/// The first day of the school year starting in the summer of `year`.
+pub fn first_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
+    use diesel::ExpressionMethods;
+    use schema::holidays::*;
+
+    let date_string = table
+        .select(date)
+        .filter(date.lt(format!("{}-01-01", yr + 1)))
+        .filter(date.ge(format!("{}-01-01", yr)))
+        .filter(title.eq("Sommerferien"))
+        .order(date.desc())
+        .first::<String>(conn)
+        .expect("Query error");
+
+    let last_holiday = NaiveDate::parse_from_str(&date_string, DATE_FORMAT).expect("Invalid date");
+    next_schoolday(last_holiday)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_populate_holidays_table() {
+    fn setup() -> SqliteConnection {
         let conn = ::db::connect();
         ::diesel::delete(::schema::holidays::table)
             .execute(&conn)
             .unwrap();
         populate_table(&conn);
+        conn
+    }
+
+    #[test]
+    fn test_populate_holidays_table() {
+        setup();
+    }
+
+    #[test]
+    fn test_first_schoolday() {
+        let conn = setup();
+        println!("{:?}", super::get(&conn));
+
+        assert_eq!(
+            first_day_of_school(&conn, 2017),
+            NaiveDate::from_ymd(2017, 8, 31)
+        );
     }
 }
