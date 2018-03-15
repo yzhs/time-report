@@ -251,7 +251,11 @@ pub fn first_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
         .filter(title.eq("Sommerferien"))
         .order(date.desc())
         .first::<String>(conn)
-        .expect("Query error");
+        .expect(&format!(
+            "No matching date between {}-01-01 and {}-01-01",
+            yr + 1,
+            yr
+        ));
 
     let last_holiday = NaiveDate::parse_from_str(&date_string, DATE_FORMAT).expect("Invalid date");
     next_schoolday(last_holiday)
