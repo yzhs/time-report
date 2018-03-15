@@ -1,5 +1,8 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::{self, Read, Write};
 use std::iter::FromIterator;
+use std::path::Path;
 use std::sync::Mutex;
 
 use chrono::{self, Datelike, NaiveDate};
@@ -107,28 +110,54 @@ fn store_holidays(conn: &SqliteConnection, new_holidays: &[Holiday]) {
         .expect("Failed to write holidays to database");
 }
 
-pub fn populate_table(conn: &SqliteConnection) {
-    let year = ::chrono::Local::today().year();
+/// Get the contents of a file as a String.
+fn read_file<P: AsRef<Path>>(path: P) -> Result<String, io::Error> {
+    let mut content = String::new();
+    let mut f = File::open(path)?;
+    f.read_to_string(&mut content)
+        .expect("Failed to read from file");
+    Ok(content)
+}
 
+fn read_or_download(base_url: &str, base_path: &str, year: i32) -> String {
+    let url = format!("{}{}", base_url, year);
+    let path = format!("{}{}.json", base_path, year);
+    match read_file(&path) {
+        Ok(content) => {
+            info!("Successfully read JSON from {}", path);
+            content
+        }
+        Err(e) => {
+            info!("Failed to read file: {}", e);
+            let content = fetch_url(url);
+            let mut f = File::create(path).expect("Could not create file");
+            f.write_all(content.as_bytes())
+                .expect("Could not write to file");
+            content
+        }
+    }
+}
+
+fn add_holidays_for(conn: &SqliteConnection, year: i32) {
     {
-        let json = if !cfg!(test) {
-            fetch_url(format!("{}{}", GENERAL_HOLIDAYS_URL, year))
-        } else {
-            include_str!("../feiertage-nrw-2018.json").into()
-        };
+        let json = read_or_download(GENERAL_HOLIDAYS_URL, "../feiertage-nrw-", year);
         let new_holidays = read_general_holidays(json);
         store_holidays(conn, &new_holidays);
     }
 
-    let json = if !cfg!(test) {
-        fetch_url(format!("{}{}", SCHOOL_HOLIDAYS_URL, year))
-    } else {
-        include_str!("../ferien-nrw-2018.json").into()
-    };
-    let new_school_holidays = read_school_holidays(json);
-    store_holidays(conn, &new_school_holidays);
+    {
+        let json = read_or_download(SCHOOL_HOLIDAYS_URL, "../ferien-nrw", year);
+        let new_school_holidays = read_school_holidays(json);
+        store_holidays(conn, &new_school_holidays);
+    }
 
     *HOLIDAYS.lock().unwrap() = get_holidays(conn);
+}
+
+pub fn populate_table(conn: &SqliteConnection) {
+    let year = ::chrono::Local::today().year();
+
+    add_holidays_for(conn, year);
 }
 
 /// Load the entire holidays table.
