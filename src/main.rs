@@ -68,6 +68,9 @@ fn main() {
     use rocket::http::Method;
     use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
+    let conn = db::connect();
+    holidays::populate_table(&conn);
+
     let (allowed_origins, _failed_origins) = AllowedOrigins::some(&["http://localhost:8080"]);
     let options = rocket_cors::Cors {
         allowed_origins,
