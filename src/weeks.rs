@@ -64,3 +64,15 @@ impl NewWeek {
         }
     }
 }
+
+pub fn populate_table(conn: &SqliteConnection) {
+    use holidays;
+
+    let today = ::chrono::Local::today();
+
+    let most_recent_year = 2016;
+
+    for year in most_recent_year + 1..today.year() {
+        let first_day = holidays::first_day_of_school(conn, year);
+    }
+}

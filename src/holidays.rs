@@ -166,7 +166,25 @@ fn add_holidays_for(conn: &SqliteConnection, year: i32) {
 }
 
 pub fn populate_table(conn: &SqliteConnection) {
-    for year in 2017..::chrono::Local::today().year() + 1 {
+    const MIN_YEAR: i32 = 2017;
+    let next_year = ::chrono::Local::today().year() + 1;
+
+    let most_recent_year = {
+        use schema::holidays::*;
+        table
+            .select(date)
+            .filter(title.eq("Sommerferien"))
+            .order(date.desc())
+            .first::<String>(conn)
+            .map(|day| {
+                NaiveDate::parse_from_str(&day, DATE_FORMAT)
+                    .expect("Invalid date format")
+                    .year()
+            })
+            .unwrap_or(MIN_YEAR)
+    };
+
+    for year in most_recent_year..next_year {
         add_holidays_for(conn, year);
     }
 }

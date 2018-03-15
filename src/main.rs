@@ -85,6 +85,7 @@ fn main() {
 
     let conn = db::connect();
     holidays::populate_table(&conn);
+    weeks::populate_table(&conn);
 
     rocket.launch();
 }
