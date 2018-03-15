@@ -156,6 +156,10 @@ export default {
 </script>
 
 <style scoped>
+#heading {
+  width: 23em;
+}
+
 button {
   font-size: 150%;
   color: white;
