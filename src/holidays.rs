@@ -261,6 +261,40 @@ pub fn first_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
     next_schoolday(last_holiday)
 }
 
+/// The last day of the school year *starting in the summer of `year`*.
+pub fn last_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
+    use schema::holidays::*;
+    use chrono::{Duration, Weekday};
+
+    let date_string = table
+        .select(date)
+        .filter(date.lt(format!("{}-01-01", yr + 2)))
+        .filter(date.ge(format!("{}-01-01", yr + 1)))
+        .filter(title.eq("Sommerferien"))
+        .order(date.asc())
+        .first::<String>(conn)
+        .expect("Query error");
+
+    let one_day = Duration::days(1);
+    let two_days = Duration::days(2);
+    let three_days = Duration::days(3);
+
+    let mut day = NaiveDate::parse_from_str(&date_string, DATE_FORMAT).expect("Invalid date");
+    for _ in 0..7 {
+        let offset = match day.weekday() {
+            Weekday::Mon => three_days,
+            Weekday::Sun => two_days,
+            _ => one_day,
+        };
+        day = day.checked_sub_signed(offset).expect("Date out of bounds");
+        if !is_holiday(day) {
+            return day;
+        }
+    }
+
+    unreachable!();
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
