@@ -217,6 +217,9 @@ mod tests {
     #[test]
     fn test_populate_holidays_table() {
         let conn = ::db::connect();
+        ::diesel::delete(::schema::holidays::table)
+            .execute(&conn)
+            .unwrap();
         populate_table(&conn);
     }
 }
