@@ -44,6 +44,6 @@ pub fn init_pool() -> Pool {
 }
 
 pub fn connect() -> SqliteConnection {
-    SqliteConnection::establish(&DATABASE_URL)
+    SqliteConnection::establish(DATABASE_URL)
         .expect(&format!("Error connecting to {}", DATABASE_URL))
 }

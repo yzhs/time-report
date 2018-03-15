@@ -40,7 +40,7 @@ fn item_template(conn: db::DbConn) -> Json<InvoiceItem> {
 
 #[put("/items/<id>", format = "application/json", data = "<item>")]
 fn set_item(conn: db::DbConn, id: i32, item: Json<NewRow>) -> Json<i32> {
-    Json(items::update(&conn, id, item.into_inner()))
+    Json(items::update(&conn, id, &item.into_inner()))
 }
 
 #[get("/employees", format = "application/json")]
@@ -60,12 +60,12 @@ fn get_reports(conn: db::DbConn) -> Json<Vec<Report>> {
 
 #[get("/reports/<id>", format = "application/json")]
 fn get_report(conn: db::DbConn, id: i32) -> Option<Json<Report>> {
-    reports::get(&conn, id).map(|x| Json(x))
+    reports::get(&conn, id).map(Json)
 }
 
 #[post("/reports", format = "application/json", data = "<report>")]
 fn add_report(conn: db::DbConn, report: Json<Report>) {
-    reports::add(&conn, report.into_inner());
+    reports::add(&conn, &report.into_inner());
 }
 
 pub fn routes() -> Vec<::rocket::Route> {

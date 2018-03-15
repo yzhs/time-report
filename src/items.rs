@@ -128,7 +128,7 @@ pub fn template(conn: &SqliteConnection) -> InvoiceItem {
 
 /// Update an item with a specific id, or create a new item if `id == 0`.
 // TODO Use Option<i32>?
-pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
+pub fn update(conn: &SqliteConnection, id: i32, new_row: &NewRow) -> i32 {
     use schema::{items, weeks};
 
     let employee_id = employees::insert(conn, &new_row.name).expect("Failed to find employee");
@@ -154,7 +154,7 @@ pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
             items::report_id.eq(report_id),
             items::start_datetime.eq(format!("{}", start_datetime)),
             items::end_datetime.eq(format!("{}", end_datetime)),
-            items::remark.eq(new_row.remark),
+            items::remark.eq(&new_row.remark),
         );
         diesel::insert_into(items::table)
             .values(&new_item)
@@ -174,7 +174,7 @@ pub fn update(conn: &SqliteConnection, id: i32, new_row: NewRow) -> i32 {
             items::report_id.eq(report_id),
             items::start_datetime.eq(format!("{}", start_datetime)),
             items::end_datetime.eq(format!("{}", end_datetime)),
-            items::remark.eq(new_row.remark),
+            items::remark.eq(&new_row.remark),
         );
         diesel::replace_into(items::table)
             .values(&new_item)

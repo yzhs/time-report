@@ -71,9 +71,9 @@ pub fn find_or_insert_report(conn: &SqliteConnection) -> i32 {
     }
 }
 
-pub fn add(conn: &SqliteConnection, report: Report) {
+pub fn add(conn: &SqliteConnection, report: &Report) {
     diesel::insert_into(reports::table)
-        .values(&report)
+        .values(report)
         .execute(conn)
         .unwrap();
 }
