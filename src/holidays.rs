@@ -124,7 +124,7 @@ fn read_file<P: AsRef<Path>>(path: P) -> Result<String, io::Error> {
 
 fn read_or_download(base_url: &str, base_path: &str, year: i32) -> String {
     let url = format!("{}{}", base_url, year);
-    let path = format!("{}{}.json", base_path, year);
+    let path = format!("{}-{}.json", base_path, year);
     match read_file(&path) {
         Ok(content) => {
             info!("Successfully read JSON from {}", path);
@@ -143,13 +143,21 @@ fn read_or_download(base_url: &str, base_path: &str, year: i32) -> String {
 
 fn add_holidays_for(conn: &SqliteConnection, year: i32) {
     {
-        let json = read_or_download(GENERAL_HOLIDAYS_URL, "../feiertage-nrw-", year);
+        let json = read_or_download(
+            GENERAL_HOLIDAYS_URL,
+            concat!(env!("CARGO_MANIFEST_DIR"), "/feiertage-nrw"),
+            year,
+        );
         let new_holidays = read_general_holidays(json);
         store_holidays(conn, &new_holidays);
     }
 
     {
-        let json = read_or_download(SCHOOL_HOLIDAYS_URL, "../ferien-nrw", year);
+        let json = read_or_download(
+            SCHOOL_HOLIDAYS_URL,
+            concat!(env!("CARGO_MANIFEST_DIR"), "/ferien-nrw"),
+            year,
+        );
         let new_school_holidays = read_school_holidays(json);
         store_holidays(conn, &new_school_holidays);
     }
