@@ -7,7 +7,7 @@ use std::sync::Mutex;
 
 use chrono::{self, Datelike, NaiveDate};
 use curl::easy::Easy;
-use diesel::{QueryDsl, RunQueryDsl, SqliteConnection};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 
 use schema::holidays;
 
@@ -241,7 +241,6 @@ pub fn get(conn: &SqliteConnection) -> HashMap<String, String> {
 
 /// The first day of the school year starting in the summer of `year`.
 pub fn first_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
-    use diesel::ExpressionMethods;
     use schema::holidays::*;
 
     let date_string = table
