@@ -90,9 +90,12 @@ fn read_school_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
 
         let mut dt = start_date;
         while dt <= end_date {
+            let mut title: String = name.get(..1).unwrap().to_uppercase();
+            title.push_str(name.get(1..).unwrap());
+
             result.push(Holiday {
                 date: format!("{}", dt.format(DATE_FORMAT)),
-                title: name.clone(),
+                title,
             });
 
             dt = dt.succ();
