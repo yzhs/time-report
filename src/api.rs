@@ -1,3 +1,8 @@
+// Disable warnings caused by Rocket macros.
+#![cfg_attr(feature = "clippy", allow(let_unit_value, needless_pass_by_value))]
+// `DbConn` has to be passed by value because `Response` is not implemented for `&DbConn`.
+#![cfg_attr(feature = "clippy", allow(unit_arg))]
+
 use std::collections::HashMap;
 
 use rocket_contrib::Json;
