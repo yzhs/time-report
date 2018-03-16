@@ -130,6 +130,8 @@ export default {
       if (!item.in_db) {
         updateItem.id = 0
       }
+      updateItem.start_time = item.start
+      updateItem.end_time = item.end
       this.$http.put('items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader).then(response => {
         console.log('Done', item.in_db ? 'updating' : 'inserting')
         if (!item.in_db) {
