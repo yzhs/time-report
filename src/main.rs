@@ -6,6 +6,9 @@ extern crate chrono;
 
 extern crate curl;
 
+// Parse the data from a CSV file
+extern crate csv;
+
 #[macro_use]
 pub extern crate diesel;
 #[macro_use]
@@ -33,18 +36,26 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
+// Create a secure temporary directory to handle the LaTeX side of things.
+extern crate tempdir;
+
+// Compute duration based on start and end time
+extern crate time;
+
+
 use std::path::{Path, PathBuf};
 
 use rocket::response::NamedFile;
 
 mod api;
-pub mod db;
-pub mod employees;
-pub mod holidays;
-pub mod items;
-pub mod reports;
-pub mod schema;
-pub mod weeks;
+mod generate_pdf;
+mod db;
+mod employees;
+mod holidays;
+mod items;
+mod reports;
+mod schema;
+mod weeks;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 pub const TIME_FORMAT: &str = "%H:%M";

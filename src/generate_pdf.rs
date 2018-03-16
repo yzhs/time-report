@@ -1,25 +1,10 @@
-// Logging
-#[macro_use]
-extern crate log;
-
-// Parse the data from a CSV file
-extern crate csv;
-
-// Compute duration based on start and end time
-extern crate time;
-
-// Argument parsing
-extern crate argonaut;
-
-// Create a secure temporary directory to handle the LaTeX side of things.
-extern crate tempdir;
-
-use std::env;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::Path;
 use std::process;
 
+use csv;
+use time;
 use tempdir::TempDir;
 
 const NUM_WORKERS: usize = 100;
@@ -301,7 +286,7 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
     }
 
     let pdf = file_path.with_extension("pdf");
-    std::fs::copy(pdf, input.with_extension("pdf"))?;
+    fs::copy(pdf, input.with_extension("pdf"))?;
 
     dir.close()?;
 
