@@ -86,10 +86,10 @@ impl Worker {
 
     pub fn last_name(&self) -> String {
         let name = &self.name;
-        if name.contains(",") {
-                name.split(",").next()
+        if name.contains(',') {
+                name.split(',').next()
             } else {
-                name.split(" ").last()
+                name.split(' ').last()
             }
             .unwrap()
             .to_string()
@@ -320,17 +320,14 @@ fn main() {
     let mut csv_file = String::new();
 
     {
-        let foo = vec![
+        let arg_def = vec![
             ArgDef::positional("csv-file", &mut csv_file).help("The CSV file containing the data."),
             help_arg("Compile a PDF from the data contained in the given CSV file.").short("h"),
             version_arg(),
         ];
 
-        match argonaut::parse("generate-pdf", &args, foo) {
+        match argonaut::parse("generate-pdf", &args, arg_def) {
             Ok(_error_code) => {}
-            //Err(ParseError::Interrupted(_)) => {
-            //    process::exit(-1);
-            //},
             Err(_) => {
                 process::exit(1);
             }
