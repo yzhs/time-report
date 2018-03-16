@@ -293,7 +293,7 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
     Ok(())
 }
 
-fn process_csv_file<P: AsRef<Path>>(csv_file: P) {
-    let data = read_csv_file(csv_file).unwrap();
+pub fn process_csv_file<P: AsRef<Path>>(csv_file: P) {
+    let data = read_csv_file(csv_file.as_ref()).unwrap();
     generate_pdf(csv_file, &data).unwrap();
 }

@@ -42,15 +42,14 @@ extern crate tempdir;
 // Compute duration based on start and end time
 extern crate time;
 
-
 use std::path::{Path, PathBuf};
 
 use rocket::response::NamedFile;
 
 mod api;
-mod generate_pdf;
 mod db;
 mod employees;
+mod generate_pdf;
 mod holidays;
 mod items;
 mod reports;
