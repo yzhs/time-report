@@ -6,7 +6,7 @@
     <input type="text" name="heading" id="heading" placeholder="Zeitraum"
            required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
            title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden"
-           v-model="report.title" v-on:keyup="updateTitle" v-on:change="updateTitle"/>
+           v-model="report.title" v-on:keyup="updateTitle" v-on:change="titleChanged"/>
 
     <table>
       <thead>
@@ -76,6 +76,11 @@
 function formatDate (date) {
   return date.toISOString().split('T')[0]
 }
+let useJsonHeader = {
+  headers: {
+    'Content-Type': 'application/json'
+  }
+}
 
 export default {
   params: {
@@ -100,6 +105,13 @@ export default {
     },
     updateTitle: function (e) {
       document.title = 'Abrechung BetreuerInnen ' + e.target.value
+    },
+    titleChanged: function (e) {
+      this.id = this.report.id
+      this.updateTitle(e)
+      this.$http.put('reports/' + this.id, JSON.stringify(this.report), useJsonHeader).then(response => {
+        console.log('Updated report #' + this.id + ':', this.report)
+      })
     },
     addItem: function () {
       this.$http.get('items/template').then(response => {
