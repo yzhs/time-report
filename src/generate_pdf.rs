@@ -1,7 +1,6 @@
 // Logging
 #[macro_use]
 extern crate log;
-extern crate colog;
 
 // Parse the data from a CSV file
 extern crate csv;
@@ -15,16 +14,13 @@ extern crate argonaut;
 // Create a secure temporary directory to handle the LaTeX side of things.
 extern crate tempdir;
 
-
 use std::env;
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::Path;
 use std::process;
 
-use argonaut::{ArgDef, help_arg, version_arg};
 use tempdir::TempDir;
-
 
 const NUM_WORKERS: usize = 100;
 
@@ -314,26 +310,7 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
     Ok(())
 }
 
-fn main() {
-    let args: Vec<_> = env::args().skip(1).collect();
-    colog::init();
-    let mut csv_file = String::new();
-
-    {
-        let arg_def = vec![
-            ArgDef::positional("csv-file", &mut csv_file).help("The CSV file containing the data."),
-            help_arg("Compile a PDF from the data contained in the given CSV file.").short("h"),
-            version_arg(),
-        ];
-
-        match argonaut::parse("generate-pdf", &args, arg_def) {
-            Ok(_error_code) => {}
-            Err(_) => {
-                process::exit(1);
-            }
-        };
-    }
-
-    let workers = read_csv_file(&csv_file).unwrap();
-    generate_pdf(csv_file, &workers).unwrap();
+fn process_csv_file<P: AsRef<Path>>(csv_file: P) {
+    let data = read_csv_file(csv_file).unwrap();
+    generate_pdf(csv_file, &data).unwrap();
 }
