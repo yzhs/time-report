@@ -26,9 +26,8 @@ const NUM_WORKERS: usize = 100;
 
 const TABLE_HEADER: [&str; 5] = ["Name", "Datum", "von", "bis", "Woche/Bemerkung"];
 
-
-/// Represents a row in the table containing the date a particular person worked on, how many hours
-/// and minutes they worked, and a free-text comment filed.
+/// Represents a row in the table containing the date a particular person worked on, how many
+/// hours and minutes they worked, and a free-text comment filed.
 ///
 /// Each of these structures is a row in the generated table, but not every row in the table
 /// represents a Line struct.
@@ -72,9 +71,10 @@ impl Worker {
         }
 
         result.push_str("    \\midrule\n    \\bfseries{{Summe}} && ");
-        result.push_str(&format!("\\bfseries{{{}}} & \\bfseries{{{}}}\\\\\n",
-                                 self.hours,
-                                 self.minutes));
+        result.push_str(&format!(
+            "\\bfseries{{{}}} & \\bfseries{{{}}}\\\\\n",
+            self.hours, self.minutes
+        ));
         result.push_str("  \\end{person}\n\n");
 
         result
@@ -83,24 +83,23 @@ impl Worker {
     pub fn last_name(&self) -> String {
         let name = &self.name;
         if name.contains(',') {
-                name.split(',').next()
-            } else {
-                name.split(' ').last()
-            }
-            .unwrap()
+            name.split(',').next()
+        } else {
+            name.split(' ').last()
+        }.unwrap()
             .to_string()
     }
 }
 
-
-
 impl Line {
     pub fn to_latex(&self) -> String {
-        format!("    & {} & {} & {} & {}\\\\\n",
-                self.date.replace(".", ".\\,"),
-                self.hours,
-                self.minutes,
-                self.remark)
+        format!(
+            "    & {} & {} & {} & {}\\\\\n",
+            self.date.replace(".", ".\\,"),
+            self.hours,
+            self.minutes,
+            self.remark
+        )
     }
 
     pub fn check_data(&self) {
@@ -114,8 +113,10 @@ impl Line {
         } else if !"ABCD".contains(remark[0]) {
             warn!("Remark does not start with the week (A-D): {:?}", self);
         } else if remark.len() > 1 && remark[1] != ' ' {
-            warn!("Remark field does not separate week from comment: {:?}",
-                  self);
+            warn!(
+                "Remark field does not separate week from comment: {:?}",
+                self
+            );
         }
 
         // TODO check date
@@ -143,8 +144,6 @@ fn check_start_and_end(start: &time::Tm, end: &time::Tm) {
     }
 }
 
-
-
 /// Read a given CSV file a list of `Line`s.
 fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
     let mut reader = csv::Reader::from_file(path)?
@@ -152,54 +151,53 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
         .flexible(true);
 
     let headers = try!(reader.headers());
-    let rows: Vec<(String, Line)> =
-        if headers == TABLE_HEADER {
-            info!("Using the automatic duration column set in default order");
+    let rows: Vec<(String, Line)> = if headers == TABLE_HEADER {
+        info!("Using the automatic duration column set in default order");
 
-            // name, date, start, end, remark
-            type Row = (String, String, String, String, Vec<String>);
-            let row_to_line = |row: Row| {
-                let start = time::strptime(&row.2, "%H:%M").expect("Invalid start time");
-                let end = time::strptime(&row.3, "%H:%M").expect("Invalid end time");
-                check_start_and_end(&start, &end);
+        // name, date, start, end, remark
+        type Row = (String, String, String, String, Vec<String>);
+        let row_to_line = |row: Row| {
+            let start = time::strptime(&row.2, "%H:%M").expect("Invalid start time");
+            let end = time::strptime(&row.3, "%H:%M").expect("Invalid end time");
+            check_start_and_end(&start, &end);
 
-                let duration = end - start;
-                let hours = duration.num_hours();
-                let minutes = duration.num_minutes() % 60;
+            let duration = end - start;
+            let hours = duration.num_hours();
+            let minutes = duration.num_minutes() % 60;
 
-                let line = Line {
-                    date: row.1,
-                    hours: hours as u16,
-                    minutes: minutes as u16,
-                    remark: row.4.join(" "),
-                };
-                line.check_data();
-                (row.0, line)
+            let line = Line {
+                date: row.1,
+                hours: hours as u16,
+                minutes: minutes as u16,
+                remark: row.4.join(" "),
             };
-
-            let rows: Vec<Row> = try!(reader.decode().collect());
-            rows.into_iter().map(row_to_line).collect()
-        } else if headers == ["Name", "Datum", "Stunden", "Minuten", "Woche/Bemerkung"] {
-            info!("Using the manual duration column set in default order");
-
-            // name, date, hours, minutes, remark
-            type RowManual = (String, String, u16, u16, Vec<String>);
-            let row_to_line = |row: RowManual| {
-                let line = Line {
-                    date: row.1,
-                    hours: row.2 as u16,
-                    minutes: row.3 as u16,
-                    remark: row.4.join(" "),
-                };
-                line.check_data();
-                (row.0, line)
-            };
-
-            let rows: Vec<RowManual> = try!(reader.decode().collect());
-            rows.into_iter().map(row_to_line).collect()
-        } else {
-            panic!("Invalid headers: {:?}", headers);
+            line.check_data();
+            (row.0, line)
         };
+
+        let rows: Vec<Row> = try!(reader.decode().collect());
+        rows.into_iter().map(row_to_line).collect()
+    } else if headers == ["Name", "Datum", "Stunden", "Minuten", "Woche/Bemerkung"] {
+        info!("Using the manual duration column set in default order");
+
+        // name, date, hours, minutes, remark
+        type RowManual = (String, String, u16, u16, Vec<String>);
+        let row_to_line = |row: RowManual| {
+            let line = Line {
+                date: row.1,
+                hours: row.2 as u16,
+                minutes: row.3 as u16,
+                remark: row.4.join(" "),
+            };
+            line.check_data();
+            (row.0, line)
+        };
+
+        let rows: Vec<RowManual> = try!(reader.decode().collect());
+        rows.into_iter().map(row_to_line).collect()
+    } else {
+        panic!("Invalid headers: {:?}", headers);
+    };
 
     // Collect the data for each of the workers
     use std::collections::HashMap;
@@ -217,10 +215,10 @@ fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
     let mut result: Vec<_> = workers
         .into_iter()
         .map(|(_, mut person)| {
-                 person.hours += person.minutes / 60;
-                 person.minutes %= 60;
-                 person
-             })
+            person.hours += person.minutes / 60;
+            person.minutes %= 60;
+            person
+        })
         .collect();
 
     // Sort the list by name
