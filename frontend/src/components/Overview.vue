@@ -96,6 +96,10 @@ input {
   border: 0;
 }
 
+input.title {
+  min-width: 20em;
+}
+
 button {
   border-radius: 0;
   color: white;
