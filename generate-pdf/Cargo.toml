@@ -1,0 +1,14 @@
+[package]
+authors = ["Colin Benner <colin@yzhs.de>"]
+name = "generate-pdf"
+version = "0.1.0"
+
+[dependencies]
+colog = "0.1.1"
+csv = "0.15.0"
+log = "0.3.7"
+tempdir = "0.3.5"
+time = "0.1.37"
+
+[dependencies.argonaut]
+git = "https://github.com/Machtan/argonaut-rs"
