@@ -68,6 +68,14 @@ fn get_report(conn: db::DbConn, id: i32) -> Option<Json<Report>> {
     reports::get(&conn, id).map(Json)
 }
 
+#[put("/reports/<id>", format = "application/json", data = "<report>")]
+fn put_report(conn: db::DbConn, id: i32, report: Json<Report>) -> Option<Json<()>> {
+    let mut report = report.into_inner();
+    report.id = id;
+    reports::update(&conn, &report);
+    Some(Json(()))
+}
+
 #[post("/reports", format = "application/json", data = "<report>")]
 fn add_report(conn: db::DbConn, report: Json<Report>) {
     reports::add(&conn, &report.into_inner());
@@ -78,6 +86,7 @@ pub fn routes() -> Vec<::rocket::Route> {
         item_template,
         get_reports,
         get_report,
+        put_report,
         get_globals,
         get_employees,
         get_items,

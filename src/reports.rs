@@ -77,3 +77,15 @@ pub fn add(conn: &SqliteConnection, report: &Report) {
         .execute(conn)
         .unwrap();
 }
+
+pub fn update(conn: &SqliteConnection, report: &Report) {
+    diesel::update(reports::table)
+        .filter(reports::id.eq(report.id))
+        .set((
+            reports::title.eq(&report.title),
+            reports::start_date.eq(&report.start_date),
+            reports::end_date.eq(&report.end_date),
+        ))
+        .execute(conn)
+        .expect("Failed to update report");
+}
