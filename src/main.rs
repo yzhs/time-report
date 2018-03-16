@@ -150,67 +150,68 @@ fn check_start_and_end(start: &time::Tm, end: &time::Tm) {
 
 
 /// Read a given CSV file a list of `Line`s.
-#[allow(unreachable_code)] // TODO better solution?
 fn read_csv_file<P: AsRef<Path>>(path: P) -> csv::Result<Vec<Worker>> {
     let mut reader = csv::Reader::from_file(path)?
         .has_headers(true)
         .flexible(true);
 
     let headers = try!(reader.headers());
-    let rows = if headers == TABLE_HEADER {
-        info!("Using the automatic duration column set in default order");
+    let rows: Vec<(String, Line)> =
+        if headers == TABLE_HEADER {
+            info!("Using the automatic duration column set in default order");
 
-        // name, date, start, end, remark
-        type Row = (String, String, String, String, Vec<String>);
-        let row_to_line = |row: Row| {
-            let start = time::strptime(&row.2, "%H:%M").expect("Invalid start time");
-            let end = time::strptime(&row.3, "%H:%M").expect("Invalid end time");
-            check_start_and_end(&start, &end);
+            // name, date, start, end, remark
+            type Row = (String, String, String, String, Vec<String>);
+            let row_to_line = |row: Row| {
+                let start = time::strptime(&row.2, "%H:%M").expect("Invalid start time");
+                let end = time::strptime(&row.3, "%H:%M").expect("Invalid end time");
+                check_start_and_end(&start, &end);
 
-            let duration = end - start;
-            let hours = duration.num_hours();
-            let minutes = duration.num_minutes() % 60;
+                let duration = end - start;
+                let hours = duration.num_hours();
+                let minutes = duration.num_minutes() % 60;
 
-            let line = Line {
-                date: row.1,
-                hours: hours as u16,
-                minutes: minutes as u16,
-                remark: row.4.join(" "),
+                let line = Line {
+                    date: row.1,
+                    hours: hours as u16,
+                    minutes: minutes as u16,
+                    remark: row.4.join(" "),
+                };
+                line.check_data();
+                (row.0, line)
             };
-            line.check_data();
-            (row.0, line)
-        };
 
-        let rows: Vec<Row> = try!(reader.decode().collect());
-        rows.into_iter().map(row_to_line).collect()
-    } else if headers == ["Name", "Datum", "Stunden", "Minuten", "Woche/Bemerkung"] {
-        info!("Using the manual duration column set in default order");
+            let rows: Vec<Row> = try!(reader.decode().collect());
+            rows.into_iter().map(row_to_line).collect()
+        } else if headers == ["Name", "Datum", "Stunden", "Minuten", "Woche/Bemerkung"] {
+            info!("Using the manual duration column set in default order");
 
-        // name, date, hours, minutes, remark
-        type RowManual = (String, String, u16, u16, Vec<String>);
-        let row_to_line = |row: RowManual| {
-            let line = Line {
-                date: row.1,
-                hours: row.2 as u16,
-                minutes: row.3 as u16,
-                remark: row.4.join(" "),
+            // name, date, hours, minutes, remark
+            type RowManual = (String, String, u16, u16, Vec<String>);
+            let row_to_line = |row: RowManual| {
+                let line = Line {
+                    date: row.1,
+                    hours: row.2 as u16,
+                    minutes: row.3 as u16,
+                    remark: row.4.join(" "),
+                };
+                line.check_data();
+                (row.0, line)
             };
-            line.check_data();
-            (row.0, line)
-        };
 
-        let rows: Vec<RowManual> = try!(reader.decode().collect());
-        rows.into_iter().map(row_to_line).collect()
-    } else {
-        panic!("Invalid headers: {:?}", headers);
-        vec![]
-    };
+            let rows: Vec<RowManual> = try!(reader.decode().collect());
+            rows.into_iter().map(row_to_line).collect()
+        } else {
+            panic!("Invalid headers: {:?}", headers);
+        };
 
     // Collect the data for each of the workers
     use std::collections::HashMap;
     let mut workers = HashMap::with_capacity(NUM_WORKERS);
     for (name, line) in rows {
-        let mut person = workers.entry(name.clone()).or_insert(Worker::new(name));
+        let mut person = workers
+            .entry(name.clone())
+            .or_insert_with(|| Worker::new(name));
         person.hours += line.hours as u32;
         person.minutes += line.minutes as u32;
         person.lines.push(line);
