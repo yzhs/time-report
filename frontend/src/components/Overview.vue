@@ -9,19 +9,20 @@
           <th>bis</th>
         </thead>
         <tbody>
-          <tr class="report" v-for="report in reports" :key="report.id">
+          <tr class="report" v-for="(report, index) in reports" :key="report.id">
             <td>
-              <input type="text" name="title" v-model="report.title"
+              <input type="text" class="title" name="title" v-model="report.title"
                      required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
-                     title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden">
+                     title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden"
+                     v-on:change="updateReport(index)">
             </td>
             <td>
               <input type="date" name="start_date" v-model="report.start_date"
-                     required :min="mindate" :max="maxdate">
+                     required :min="mindate" :max="maxdate" v-on:change="updateReport(index)">
             </td>
             <td>
               <input type="date" name="end_date" v-model="report.end_date"
-                     required :min="mindate" :max="maxdate">
+                     required :min="mindate" :max="maxdate" v-on:change="updateReport(index)">
             </td>
             <td>
               <router-link :to="{name: 'report', params: {id: report.id}}">Bearbeiten</router-link>
@@ -37,6 +38,12 @@
 <script>
 function formatDate (date) {
   return date.toISOString().split('T')[0]
+}
+
+let useJsonHeader = {
+  headers: {
+    'Content-Type': 'application/json'
+  }
 }
 
 export default {
@@ -56,6 +63,13 @@ export default {
     })
   },
   methods: {
+    updateReport: function (i) {
+      let report = this.reports[i]
+      let id = report.id
+      this.$http.put('reports/' + id, JSON.stringify(report), useJsonHeader).then(response => {
+        console.log('Updated report #' + id + ':', JSON.stringify(report))
+      })
+    },
     newReport () {
       let lastReport = this.reports[this.reports.length - 1]
       let reportTemplate = {
