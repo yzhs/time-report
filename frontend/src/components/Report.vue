@@ -130,11 +130,7 @@ export default {
       if (!item.in_db) {
         updateItem.id = 0
       }
-      this.$http.put('items/' + updateItem.id, JSON.stringify(updateItem), {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => {
+      this.$http.put('items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader).then(response => {
         console.log('Done', item.in_db ? 'updating' : 'inserting')
         if (!item.in_db) {
           item.in_db = true
