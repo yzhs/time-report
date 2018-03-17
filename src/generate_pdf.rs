@@ -10,6 +10,9 @@ use tempdir::TempDir;
 
 use items::InvoiceItem;
 use reports::{self, Report};
+use DATE_FORMAT;
+use TIME_FORMAT;
+
 const NUM_WORKERS: usize = 100;
 
 const TABLE_HEADER: [&str; 5] = ["Name", "Datum", "von", "bis", "Woche/Bemerkung"];
@@ -304,16 +307,44 @@ pub struct FullReport {
 #[derive(Debug)]
 pub struct MyError;
 
+const TYPE_OF_WEEK: [&str; 4] = ["A", "B", "C", "D"];
+
 impl FullReport {
     fn from_id(conn: &SqliteConnection, id: i32) -> Result<FullReport, MyError> {
         let metadata = reports::get(conn, id).ok_or(MyError)?;
         let items = vec![];
         Ok(FullReport { metadata, items })
     }
+
+    fn write_to_csv(&self) -> ::csv::Result<()> {
+        let mut path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("csv")
+            .join(&self.metadata.title);
+        path.set_extension("csv");
+
+        let mut writer = ::csv::Writer::from_file(path).expect("Failed to create CSV writer");
+
+        for item in &self.items {
+            let row = (
+                &item.name,
+                format!("{}", item.day.format(DATE_FORMAT)),
+                &TYPE_OF_WEEK[item.type_of_week as usize],
+                format!("{}", item.start.format(TIME_FORMAT)),
+                format!("{} {}", item.end.format(TIME_FORMAT), &item.remark),
+            );
+            writer.encode(row)?;
+        }
+
+        Ok(())
+    }
 }
 
 pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
     let full_report = FullReport::from_id(conn, id).expect("Failed to load report data");
+
+    full_report
+        .write_to_csv()
+        .expect("Failed to write CSV file");
 
     None
 }
