@@ -25,6 +25,7 @@ export default {
 }
 
 nav > a {
+  text-decoration: none;
   background: lightgrey;
   padding: 1em;
   color: #369;

@@ -115,6 +115,7 @@ button {
 }
 
 .edit {
+  text-decoration: none;
   white-space: nowrap;
   color: #369;
 }
