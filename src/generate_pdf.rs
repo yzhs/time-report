@@ -103,13 +103,13 @@ impl FullReport {
         Ok(FullReport { metadata, items })
     }
 
-    fn write_to_csv(&self) -> ::csv::Result<()> {
+    fn write_csv(&self) -> csv::Result<()> {
         let mut path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("csv")
             .join(&self.metadata.title);
         path.set_extension("csv");
 
-        let mut writer = ::csv::Writer::from_file(path).expect("Failed to create CSV writer");
+        let mut writer = csv::Writer::from_file(path).expect("Failed to create CSV writer");
 
         for item in &self.items {
             let row = (
@@ -129,9 +129,7 @@ impl FullReport {
 pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
     let full_report = FullReport::from_id(conn, id).expect("Failed to load report data");
 
-    full_report
-        .write_to_csv()
-        .expect("Failed to write CSV file");
+    full_report.write_csv().expect("Failed to write CSV file");
 
     None
 }
