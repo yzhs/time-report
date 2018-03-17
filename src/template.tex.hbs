@@ -1,0 +1,47 @@
+\documentclass[a4paper]{article}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs} % Nicer vertical lines
+\usepackage{tabularx} % paragraphs in tables
+\usepackage{fullpage} % Use the entire page
+\usepackage{fontspec} % Allow the use of unicode
+\usepackage{array} % Provide b column type for bottom alignment
+
+%\renewcommand{\arraystretch}{1.2}
+
+\newcommand*{\headerfor}[1]{%
+  \bfseries{#1} & \textsc{Datum} & \textsc{Stunden} & \textsc{Minuten} &
+  \textsc{Woche/Bemerkung}\\
+  \midrule
+}
+\newenvironment{person}[1]{%
+  \begin{tabular*}{0.96\linewidth}{b{0.3\textwidth}rrrp{0.28\textwidth}}
+    \headerfor{#1}
+}{%
+  \end{tabular*}\vspace{1cm}
+}
+
+\title{Abrechnung BetreuerInnen {{title}}
+
+\vspace{-1cm}}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+{{#each employee}}
+\begin{person}{ {{name}} }
+
+  {{#each items}}
+  {{date}} % TODO Replace '.' with '.\,'
+  & {{hours}} & {{minutes}} & {{remark}}\\
+  {{/each}
+
+  \midrule
+  \bfseries{{Summe}} && \bfseries{ {{hours}} } & \bfseries{ {{minutes}} }\\
+\end{person}
+{{/each}}
+
+
+
+\end{document}
