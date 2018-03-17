@@ -181,6 +181,7 @@ button {
   color: white;
   margin: 1em;
   padding: 0.3em;
+  border-radius: 0;
 }
 
 td:nth-child(1) {
