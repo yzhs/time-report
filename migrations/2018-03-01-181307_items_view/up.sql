@@ -1,6 +1,7 @@
 CREATE VIEW items_view AS
 SELECT
 	items.id AS id,
+	employee_id,
 	report_id,
 	employees.name AS name,
 	date(start_datetime) AS day,

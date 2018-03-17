@@ -44,6 +44,7 @@ struct NewInvoiceItem {
 #[derive(Serialize, Queryable)]
 pub struct InvoiceItem {
     pub id: i32,
+    pub employee_id: i32,
     pub report_id: i32,
     pub name: String,
     pub day: NaiveDate,
@@ -57,6 +58,7 @@ impl InvoiceItem {
     pub fn new() -> Self {
         InvoiceItem {
             id: 0,
+            employee_id: 0,
             report_id: 0,
             name: "".into(),
             day: NaiveDate::from_ymd(2017, 8, 1),
