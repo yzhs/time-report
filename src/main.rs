@@ -67,7 +67,10 @@ fn index() -> Option<NamedFile> {
     ))).ok()
 }
 
-/// Serve static files
+/// Serve static files.
+///
+/// Use rank so as not to conflict with the API endpoints, which also gmatch the pattern of this
+/// route. Essentially, that makes this route a fallback.
 #[get("/<file..>", rank = 2)]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/frontend/dist/")).join(file))
