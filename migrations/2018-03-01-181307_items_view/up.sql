@@ -1,5 +1,7 @@
 CREATE VIEW items_view AS
-SELECT items.id AS id,
+SELECT
+	items.id AS id,
+	report_id,
 	employees.name AS name,
 	date(start_datetime) AS day,
 	type_of_week,
@@ -9,6 +11,7 @@ SELECT items.id AS id,
 FROM items
 JOIN employees
 JOIN weeks
-ON items.employee_id = employees.id AND
+ON
+	items.employee_id = employees.id AND
 	cast(strftime('%Y', start_datetime) AS integer) = weeks.year AND
 	cast(strftime('%W', start_datetime) AS integer) = weeks.week_of_year
