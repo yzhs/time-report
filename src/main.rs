@@ -39,9 +39,6 @@ extern crate serde_json;
 // Create a secure temporary directory to handle the LaTeX side of things.
 extern crate tempdir;
 
-// Compute duration based on start and end time
-extern crate time;
-
 use std::path::{Path, PathBuf};
 
 use rocket::http::Method;
