@@ -93,7 +93,7 @@ pub fn update(conn: &SqliteConnection, report: &Report) {
 #[derive(Serialize)]
 struct EmployeeItem {
     date: String,
-    type_of_week: i32,
+    type_of_week: String,
     hours: String,
     minutes: String,
     remark: String,
@@ -138,7 +138,8 @@ impl PerEmployeeData {
 
                 EmployeeItem {
                     date,
-                    type_of_week: item.type_of_week,
+                    type_of_week: ::generate_pdf::TYPE_OF_WEEK[item.type_of_week as usize]
+                        .to_string(),
                     hours,
                     minutes,
                     remark: item.remark,

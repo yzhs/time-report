@@ -13,6 +13,8 @@ use reports::{self, Report};
 use DATE_FORMAT;
 use TIME_FORMAT;
 
+pub const TYPE_OF_WEEK: [&str; 4] = ["A", "B", "C", "D"];
+
 /// Represents a row in the table containing the date a particular person worked on, how many
 /// hours and minutes they worked, and a free-text comment filed.
 ///
@@ -109,8 +111,6 @@ impl RawReportData {
     }
 
     fn write_csv(&self) -> csv::Result<()> {
-        const TYPE_OF_WEEK: [&str; 4] = ["A", "B", "C", "D"];
-
         let mut path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("csv")
             .join(&self.metadata.title);
