@@ -44,6 +44,7 @@ struct NewInvoiceItem {
 #[derive(Serialize, Queryable)]
 pub struct InvoiceItem {
     pub id: i32,
+    pub report_id: i32,
     pub name: String,
     pub day: NaiveDate,
     pub type_of_week: i32,
@@ -56,6 +57,7 @@ impl InvoiceItem {
     pub fn new() -> Self {
         InvoiceItem {
             id: 0,
+            report_id: 0,
             name: "".into(),
             day: NaiveDate::from_ymd(2017, 8, 1),
             type_of_week: 0,
@@ -99,9 +101,10 @@ impl InvoiceItem {
 }
 
 /// Get all invoice items from the denormalized `items_view`.
-pub fn get(conn: &SqliteConnection) -> Vec<InvoiceItem> {
-    use schema::items_view::dsl::items_view;
-    items_view
+pub fn get(conn: &SqliteConnection, report_id: i32) -> Vec<InvoiceItem> {
+    use schema::items_view;
+    items_view::table
+        .filter(items_view::report_id.eq(report_id))
         .load::<InvoiceItem>(conn)
         .expect("Error loading data")
 }

@@ -35,9 +35,9 @@ fn get_globals() -> Json<Globals> {
     Json(Globals::new())
 }
 
-#[get("/items", format = "application/json")]
-fn get_items(conn: db::DbConn) -> Json<Vec<InvoiceItem>> {
-    Json(items::get(&conn))
+#[get("/items/<report_id>", format = "application/json")]
+fn get_items(conn: db::DbConn, report_id: i32) -> Json<Vec<InvoiceItem>> {
+    Json(items::get(&conn, report_id))
 }
 
 #[get("/items/template", format = "application/json")]

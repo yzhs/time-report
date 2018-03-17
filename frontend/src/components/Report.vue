@@ -145,7 +145,7 @@ export default {
     this.$http.get('reports/' + this.report.id).then(response => {
       this.report = response.body
     })
-    this.$http.get('items').then(response => {
+    this.$http.get('items/' + this.report.id).then(response => {
       response.body.map(element => {
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)
