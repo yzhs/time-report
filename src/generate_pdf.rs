@@ -29,16 +29,16 @@ pub struct Line {
 /// Data related to one person:  Their name, how long they worked in the accounting period and the
 /// specific data of when the worked.  Each of these structures is rendered as one table.
 #[derive(Debug)]
-pub struct Worker {
+pub struct Employee {
     name: String, // TODO separate last name?
     hours: u32,
     minutes: u32,
     lines: Vec<Line>,
 }
 
-impl Worker {
-    pub fn new(name: String) -> Worker {
-        Worker {
+impl Employee {
+    pub fn new(name: String) -> Employee {
+        Employee {
             name,
             hours: 0,
             minutes: 0,
@@ -96,24 +96,21 @@ impl Line {
     }
 }
 
-pub struct FullReport {
+pub struct RawReportData {
     metadata: Report,
     items: Vec<InvoiceItem>,
 }
 
-#[derive(Debug)]
-pub struct MyError;
-
-const TYPE_OF_WEEK: [&str; 4] = ["A", "B", "C", "D"];
-
-impl FullReport {
-    fn from_id(conn: &SqliteConnection, id: i32) -> Result<FullReport, MyError> {
-        let metadata = reports::get(conn, id).ok_or(MyError)?;
+impl RawReportData {
+    fn from_id(conn: &SqliteConnection, id: i32) -> Result<RawReportData, ()> {
+        let metadata = reports::get(conn, id).ok_or(())?;
         let items = vec![];
-        Ok(FullReport { metadata, items })
+        Ok(RawReportData { metadata, items })
     }
 
     fn write_csv(&self) -> csv::Result<()> {
+        const TYPE_OF_WEEK: [&str; 4] = ["A", "B", "C", "D"];
+
         let mut path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("csv")
             .join(&self.metadata.title);
@@ -180,7 +177,7 @@ fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathB
 }
 
 pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
-    let full_report = FullReport::from_id(conn, id).expect("Failed to load report data");
+    let full_report = RawReportData::from_id(conn, id).expect("Failed to load report data");
 
     full_report.write_csv().expect("Failed to write CSV file");
 
