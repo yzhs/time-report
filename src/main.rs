@@ -44,7 +44,9 @@ extern crate time;
 
 use std::path::{Path, PathBuf};
 
+use rocket::http::Method;
 use rocket::response::NamedFile;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 pub mod api;
 pub mod db;
@@ -78,9 +80,6 @@ fn files(file: PathBuf) -> Option<NamedFile> {
 }
 
 fn main() {
-    use rocket::http::Method;
-    use rocket_cors::{AllowedHeaders, AllowedOrigins};
-
     let (allowed_origins, _failed_origins) = AllowedOrigins::some(&["http://localhost:8080"]);
     let options = rocket_cors::Cors {
         allowed_origins,
