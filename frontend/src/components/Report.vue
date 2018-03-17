@@ -56,9 +56,6 @@
             <input type="text" name="remark" placeholder="Bemerkung"
                   v-model="item.remark" v-on:change="onItemChange(index)"/>
           </td>
-          <td>
-            <span style="height:2em;" class="id">{{item.id}}</span>
-          </td>
         </tr>
       </tbody>
     </table>
