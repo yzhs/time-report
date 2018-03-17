@@ -64,7 +64,7 @@
     </table>
 
     <button id="add-item" v-on:click="addItem">neue Zeile</button>
-    <button id="generate" name="generate">PDF erzeugen</button>
+    <button id="generate" name="generate" v-on:click="generatePdf">PDF erzeugen</button>
 
     <datalist id="employees">
       <option v-for="employee in employees" :key="employee">{{employee}}</option>
@@ -139,6 +139,10 @@ export default {
           item.id = response.body
         }
       })
+    },
+    generatePdf () {
+      let link = 'http://localhost:8000/api/reports/' + this.report.id + '/pdf'
+      window.open(link, '_blank')
     }
   },
   beforeMount () {
