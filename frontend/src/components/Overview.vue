@@ -25,7 +25,13 @@
                      required :min="mindate" :max="maxdate" v-on:change="updateReport(index)">
             </td>
             <td>
-              <router-link :to="{name: 'report', params: {id: report.id}}">Bearbeiten</router-link>
+              <router-link class="edit" :to="{name: 'report', params: {id: report.id}}">
+                Bearbeiten
+              </router-link>
+            </td>
+            <td>
+              <a class="edit" href="#" v-if="report.was_pdf_generated" v-on:click="downloadPdf">PDF speichern</a>
+              <a class="edit" href="#" v-else v-on:click="downloadPdf">PDF erzeugen</a>
             </td>
           </tr>
         </tbody>
@@ -106,5 +112,10 @@ button {
   background: #369;
   padding: 0.5em;
   margin: 1em;
+}
+
+.edit {
+  white-space: nowrap;
+  color: #369;
 }
 </style>

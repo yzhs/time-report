@@ -18,11 +18,12 @@ table {
   max-width: 800px;
   margin: 0 auto;
   box-shadow: 0 0 10px #aaa;
+  column-gap: 2ex;
 }
 
 td {
   border: 0;
-  padding: 0;
+  padding: 0 1ex;
 }
 
 th {
@@ -40,7 +41,7 @@ input[type="time"] {
   font-size: inherit;
   background-color: inherit;
   height: 3ex;
-  padding: 1ex 2ex;
+  padding: 1ex 0;
   border: none;
   border-radius: 5px;
 }
