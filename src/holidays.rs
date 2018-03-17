@@ -272,7 +272,7 @@ pub fn last_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
         .filter(title.eq("Sommerferien"))
         .order(date.asc())
         .first::<String>(conn)
-        .expect("Query error");
+        .expect(&format!("Query error for year {}", yr));
 
     let one_day = Duration::days(1);
     let two_days = Duration::days(2);
