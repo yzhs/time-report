@@ -1,5 +1,6 @@
-use std::fs::{self, File};
-use std::io::{self, Write};
+use std::fs::File;
+use std::io::Write;
+use std::ops::Add;
 use std::path::{Path, PathBuf};
 use std::process;
 
@@ -124,6 +125,49 @@ impl FullReport {
 
         Ok(())
     }
+
+    fn generate_latex(&self) -> String {
+        unimplemented!()
+    }
+
+    fn write_latex(&self) -> Option<(TempDir, PathBuf)> {
+        let latex = self.generate_latex();
+
+        let dir = TempDir::new("generate-pdf").expect("Failed to create temporary directory");
+
+        let path = dir.path().join(self.metadata.title.clone().add(".tex"));
+
+        let mut file = File::create(&path).expect("Failed to create LaTeX file");
+        file.write_all(latex.as_bytes())
+            .expect("Failed to write LaTeX to file");
+
+        Some((dir, path))
+    }
+}
+
+fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathBuf> {
+    // Limit scope of tempdir_path_string so we can close temp_dir later
+    {
+        let tempdir_path_string = temp_dir.path().to_str().unwrap();
+        let file_path_string = file_path.as_ref().to_str().unwrap();
+        process::Command::new("xelatex")
+            .arg("-output-directory")
+            .arg(tempdir_path_string)
+            .arg(file_path_string)
+            .output()
+            .expect("Executing LaTeX failed");
+        // TODO handle LaTeX errors
+    }
+
+    let pdf = file_path.as_ref().with_extension("pdf");
+    // TODO figure out where to put the generated PDF
+    //fs::copy(pdf, file_path.with_extension("pdf")).expect("Failed to copy PDF file");
+
+    temp_dir
+        .close()
+        .expect("Failed to close temporary directory");
+
+    Some(pdf)
 }
 
 pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
@@ -131,8 +175,9 @@ pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
 
     full_report.write_csv().expect("Failed to write CSV file");
 
-    None
-}
+    let (temp_dir, tex_path) = full_report
+        .write_latex()
+        .expect("Failed to write LaTeX file");
 
     render_latex(temp_dir, tex_path)
 }
