@@ -89,3 +89,110 @@ pub fn update(conn: &SqliteConnection, report: &Report) {
         .execute(conn)
         .expect("Failed to update report");
 }
+
+#[derive(Serialize)]
+struct EmployeeItem {
+    date: String,
+    type_of_week: i32,
+    hours: String,
+    minutes: String,
+    remark: String,
+}
+
+#[derive(Serialize)]
+struct PerEmployeeData {
+    name: String,
+    hours: i32,
+    minutes: i32,
+    items: Vec<EmployeeItem>,
+}
+
+impl PerEmployeeData {
+    fn compile(conn: &SqliteConnection, id: i32) -> Self {
+        use chrono::Duration;
+
+        use schema::employees;
+        use schema::items_view;
+
+        let name = employees::table
+            .select(employees::name)
+            .filter(employees::id.eq(id))
+            .first(conn)
+            .unwrap();
+
+        let mut total_time = Duration::zero();
+
+        let items = items_view::table
+            .filter(items_view::employee_id.eq(id))
+            .load::<::items::InvoiceItem>(conn)
+            .unwrap()
+            .into_iter()
+            .map(|item| {
+                let date = format!("{}", item.day.format(DATE_FORMAT));
+
+                let duration = item.end.signed_duration_since(item.start);
+                total_time = total_time + duration;
+
+                let hours = format!("{}", duration.num_hours());
+                let minutes = format!("{}", duration.num_minutes() % 60);
+
+                EmployeeItem {
+                    date,
+                    type_of_week: item.type_of_week,
+                    hours,
+                    minutes,
+                    remark: item.remark,
+                }
+            })
+            .collect();
+
+        let hours = total_time.num_hours() as i32;
+        let minutes = (total_time.num_minutes() % 60) as i32;
+
+        PerEmployeeData {
+            name,
+            hours,
+            minutes,
+            items,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct PerEmployeeReport {
+    title: String,
+    employees: Vec<PerEmployeeData>,
+}
+
+impl PerEmployeeReport {
+    pub fn generate(conn: &SqliteConnection, id: i32) -> Self {
+        use schema::reports;
+        use schema::items_view;
+
+        let report_title = reports::table
+            .select(reports::title)
+            .filter(reports::id.eq(id))
+            .first(conn)
+            .expect("Could not find report");
+
+        let employee_ids = items_view::table
+            .select(items_view::employee_id)
+            .group_by(items_view::employee_id)
+            .load::<i32>(conn)
+            .unwrap();
+        info!(
+            "The current report contains data concerning {:?}",
+            employee_ids
+        );
+
+        let employees = employee_ids
+            .into_iter()
+            .map(|id| PerEmployeeData::compile(conn, id))
+            .collect();
+
+        Self {
+            title: report_title,
+            employees,
+        }
+    }
+}
