@@ -20,22 +20,19 @@
   \end{tabular*}\vspace{1cm}
 }
 
-\title{Abrechnung BetreuerInnen {{title}}
-
-\vspace{-1cm}}
+\title{Abrechnung BetreuerInnen {{title}}\vspace{-1cm}}
 \author{}
 \date{\today}
 
 \begin{document}
 \maketitle
 
-{{#each employee}}
+{{#each employees}}
 \begin{person}{ {{name}} }
 
   {{#each items}}
-  {{date}} % TODO Replace '.' with '.\,'
-  & {{hours}} & {{minutes}} & {{remark}}\\
-  {{/each}
+  & {{date}} & {{hours}} & {{minutes}} & {{type_of_week}} {{remark}}\\
+  {{/each}}
 
   \midrule
   \bfseries{{Summe}} && \bfseries{ {{hours}} } & \bfseries{ {{minutes}} }\\
