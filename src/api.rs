@@ -82,7 +82,7 @@ fn add_report(conn: db::DbConn, report: Json<Report>) {
     reports::add(&conn, &report.into_inner());
 }
 
-#[get("/reports/<id>/generate")]
+#[get("/reports/<id>/pdf")]
 fn generate_pdf_report(conn: db::DbConn, id: i32) -> Option<NamedFile> {
     let pdf_file = ::generate_pdf::generate(&conn, id).expect("Failed to generate report");
     NamedFile::open(pdf_file).ok()
