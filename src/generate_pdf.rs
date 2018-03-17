@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::Write;
 use std::ops::Add;
 use std::path::{Path, PathBuf};
@@ -180,14 +180,18 @@ fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathB
     }
 
     let pdf = file_path.as_ref().with_extension("pdf");
-    // TODO figure out where to put the generated PDF
-    //fs::copy(pdf, file_path.with_extension("pdf")).expect("Failed to copy PDF file");
+
+    let output_path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("pdf")
+        .join(pdf.file_name().unwrap());
+
+    fs::copy(&pdf, &output_path).expect("Failed to copy PDF file");
 
     temp_dir
         .close()
         .expect("Failed to close temporary directory");
 
-    Some(pdf)
+    Some(output_path)
 }
 
 pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
