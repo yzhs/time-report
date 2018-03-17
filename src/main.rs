@@ -46,15 +46,15 @@ use std::path::{Path, PathBuf};
 
 use rocket::response::NamedFile;
 
-mod api;
-mod db;
-mod employees;
-mod generate_pdf;
-mod holidays;
-mod items;
-mod reports;
-mod schema;
-mod weeks;
+pub mod api;
+pub mod db;
+pub mod employees;
+pub mod generate_pdf;
+pub mod holidays;
+pub mod items;
+pub mod reports;
+pub mod schema;
+pub mod weeks;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 pub const TIME_FORMAT: &str = "%H:%M";
