@@ -83,7 +83,7 @@ pub fn populate_table(conn: &SqliteConnection) {
 
     let mut new_weeks = vec![];
 
-    for year in most_recent_year + 1..today.year() + 1 {
+    for year in most_recent_year + 1..=today.year() {
         let first_day = holidays::first_day_of_school(conn, year);
         let last_day = holidays::last_day_of_school(conn, year);
 
