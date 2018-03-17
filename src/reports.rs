@@ -128,7 +128,7 @@ impl PerEmployeeData {
             .unwrap()
             .into_iter()
             .map(|item| {
-                let date = format!("{}", item.day.format(DATE_FORMAT));
+                let date = format!("{}", item.day.format("%d.\\,%m.\\,%y"));
 
                 let duration = item.end.signed_duration_since(item.start);
                 total_time = total_time + duration;
