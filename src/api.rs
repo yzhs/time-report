@@ -4,7 +4,6 @@
 #![cfg_attr(feature = "clippy", allow(unit_arg))]
 
 use std::collections::HashMap;
-use std::path::Path;
 
 use rocket::response::NamedFile;
 use rocket_contrib::Json;
@@ -84,9 +83,9 @@ fn add_report(conn: db::DbConn, report: Json<Report>) {
 }
 
 #[get("/reports/<id>/generate")]
-fn generate_pdf_report(id: i32) -> Option<NamedFile> {
-    ::generate_pdf::process_csv_file("temp.csv");
-    NamedFile::open(Path::new(env!("CARGO_MANIFEST_DIR")).join("temp.pdf")).ok()
+fn generate_pdf_report(conn: db::DbConn, id: i32) -> Option<NamedFile> {
+    let pdf_file = ::generate_pdf::generate(&conn, id).expect("Failed to generate report");
+    NamedFile::open(pdf_file).ok()
 }
 
 pub fn routes() -> Vec<::rocket::Route> {

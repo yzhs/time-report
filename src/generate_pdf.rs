@@ -1,12 +1,15 @@
 use std::fs::{self, File};
 use std::io::{self, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process;
 
 use csv;
+use diesel::SqliteConnection;
 use time;
 use tempdir::TempDir;
 
+use items::InvoiceItem;
+use reports::{self, Report};
 const NUM_WORKERS: usize = 100;
 
 const TABLE_HEADER: [&str; 5] = ["Name", "Datum", "von", "bis", "Woche/Bemerkung"];
@@ -291,6 +294,28 @@ pub fn generate_pdf<P: AsRef<Path>>(input: P, workers: &[Worker]) -> Result<(), 
     dir.close()?;
 
     Ok(())
+}
+
+pub struct FullReport {
+    metadata: Report,
+    items: Vec<InvoiceItem>,
+}
+
+#[derive(Debug)]
+pub struct MyError;
+
+impl FullReport {
+    fn from_id(conn: &SqliteConnection, id: i32) -> Result<FullReport, MyError> {
+        let metadata = reports::get(conn, id).ok_or(MyError)?;
+        let items = vec![];
+        Ok(FullReport { metadata, items })
+    }
+}
+
+pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
+    let full_report = FullReport::from_id(conn, id).expect("Failed to load report data");
+
+    None
 }
 
 pub fn process_csv_file<P: AsRef<Path>>(csv_file: P) {
