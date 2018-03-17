@@ -46,6 +46,15 @@ impl Worker {
         }
     }
 
+    // XXX This assumes that the last sequence of non-space characters is the family name (or
+    // something similar). This works pretty well for German names, but fails for e.g. Spanish
+    // names where a person has the one of the last names of each of their parents.
+    //
+    // It should, however, be good enough for our purposes, which is just to sort a list of
+    // employees by name. Should more accurate sorting be necessary, we could either provide
+    // separate fields for first and last names (which only works for people who *have* a last
+    // name), or we could use Calibre's approach: In addition to the name, store a version of the
+    // name used for sorting.
     pub fn last_name(&self) -> String {
         let name = &self.name;
         if name.contains(',') {
