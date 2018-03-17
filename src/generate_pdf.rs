@@ -133,7 +133,21 @@ impl RawReportData {
     }
 
     fn generate_latex(&self) -> String {
-        unimplemented!()
+        use handlebars::{Handlebars, RenderContext, RenderError};
+
+        let mut handlebars = Handlebars::new();
+        handlebars
+            .register_template_string("latex", include_str!("template.tex.hbs"))
+            .expect("Failed to register template");
+
+        // TODO When updating to Handlebars 1, uncomment this:
+        //handlebars.set_strict_mode(true);
+
+        let params = reports::PerEmployeeReport::generate(&::db::connect(), self.metadata.id);
+
+        handlebars
+            .render("latex", &params)
+            .expect("Failed to render template")
     }
 
     fn write_latex(&self) -> Option<(TempDir, PathBuf)> {

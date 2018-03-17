@@ -18,6 +18,8 @@ extern crate dotenv;
 #[macro_use]
 extern crate dotenv_codegen;
 
+extern crate handlebars;
+
 #[macro_use]
 extern crate lazy_static;
 
