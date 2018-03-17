@@ -184,7 +184,7 @@ pub fn populate_table(conn: &SqliteConnection) {
             .unwrap_or(MIN_YEAR)
     };
 
-    for year in most_recent_year..next_year {
+    for year in most_recent_year..=next_year {
         add_holidays_for(conn, year);
     }
 }
