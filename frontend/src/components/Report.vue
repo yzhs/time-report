@@ -108,7 +108,7 @@ export default {
       })
     },
     addItem: function () {
-      this.$http.get('items/template').then(response => {
+      this.$http.get('reports/' + this.report.id + '/items/template').then(response => {
         let obj = response.body
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)
@@ -126,7 +126,7 @@ export default {
       }
       updateItem.start_time = item.start
       updateItem.end_time = item.end
-      this.$http.put('items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader).then(response => {
+      this.$http.put('reports/' + this.report.id + '/items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader).then(response => {
         console.log('Done', item.in_db ? 'updating' : 'inserting')
         if (!item.in_db) {
           item.in_db = true
@@ -143,7 +143,7 @@ export default {
     this.$http.get('reports/' + this.report.id).then(response => {
       this.report = response.body
     })
-    this.$http.get('items/' + this.report.id).then(response => {
+    this.$http.get('reports/' + this.report.id + '/items').then(response => {
       response.body.map(element => {
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)

@@ -112,10 +112,11 @@ pub fn get(conn: &SqliteConnection, report_id: i32) -> Vec<InvoiceItem> {
 }
 
 /// Generate a reasonable template for the next invoice item.
-pub fn template(conn: &SqliteConnection) -> InvoiceItem {
+pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
     use schema::items_view;
 
     match items_view::table
+        .filter(items_view::report_id.eq(report_id))
         .order(items_view::day.desc())
         .first::<InvoiceItem>(conn)
     {
@@ -133,7 +134,7 @@ pub fn template(conn: &SqliteConnection) -> InvoiceItem {
 
 /// Update an item with a specific id, or create a new item if `id == 0`.
 // TODO Use Option<i32>?
-pub fn update(conn: &SqliteConnection, id: i32, new_row: &NewRow) -> i32 {
+pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow) -> i32 {
     use schema::{items, weeks};
 
     let employee_id = employees::insert(conn, &new_row.name).expect("Failed to find employee");
@@ -147,9 +148,6 @@ pub fn update(conn: &SqliteConnection, id: i32, new_row: &NewRow) -> i32 {
 
     let new_week = NewWeek::new(date, new_row.type_of_week);
     diesel::replace_into(weeks::table).values(&new_week);
-
-    // Get report id
-    let report_id = find_or_insert_report(conn);
 
     if id == 0 {
         // Insert new item

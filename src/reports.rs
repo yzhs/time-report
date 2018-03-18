@@ -53,24 +53,6 @@ pub fn get_all(conn: &SqliteConnection) -> Vec<Report> {
     reports::table.load::<Report>(conn).unwrap()
 }
 
-pub fn find_or_insert_report(conn: &SqliteConnection) -> i32 {
-    match reports::table
-        .select(reports::id)
-        .filter(diesel::dsl::not(reports::was_pdf_generated))
-        .first::<i32>(conn)
-    {
-        Ok(id) => id,
-        Err(_) => {
-            let values = (reports::title.eq(""), reports::start_date.eq("2017-08-01"));
-            diesel::insert_into(reports::table)
-                .values(&values)
-                .execute(conn)
-                .unwrap();
-            find_or_insert_report(conn)
-        }
-    }
-}
-
 pub fn add(conn: &SqliteConnection, report: &Report) {
     diesel::insert_into(reports::table)
         .values(report)

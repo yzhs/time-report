@@ -34,19 +34,19 @@ fn get_globals() -> Json<Globals> {
     Json(Globals::new())
 }
 
-#[get("/items/<report_id>", format = "application/json")]
+#[get("/reports/<report_id>/items", format = "application/json")]
 fn get_items(conn: db::DbConn, report_id: i32) -> Json<Vec<InvoiceItem>> {
     Json(items::get(&conn, report_id))
 }
 
-#[get("/items/template", format = "application/json")]
-fn item_template(conn: db::DbConn) -> Json<InvoiceItem> {
-    Json(items::template(&conn))
+#[get("/reports/<report_id>/items/template", format = "application/json")]
+fn item_template(conn: db::DbConn, report_id: i32) -> Json<InvoiceItem> {
+    Json(items::template(&conn, report_id))
 }
 
-#[put("/items/<id>", format = "application/json", data = "<item>")]
-fn set_item(conn: db::DbConn, id: i32, item: Json<NewRow>) -> Json<i32> {
-    Json(items::update(&conn, id, &item.into_inner()))
+#[put("/reports/<report_id>/items/<id>", format = "application/json", data = "<item>")]
+fn set_item(conn: db::DbConn, report_id: i32, id: i32, item: Json<NewRow>) -> Json<i32> {
+    Json(items::update(&conn, report_id, id, &item.into_inner()))
 }
 
 #[get("/employees", format = "application/json")]
