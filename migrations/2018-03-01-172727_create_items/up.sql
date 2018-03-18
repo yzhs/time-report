@@ -4,7 +4,7 @@ CREATE TABLE items (
 	employee_id integer NOT NULL REFERENCES employees(id),
 
 
-	start_datetime text NOT NULL CHECK(
+	start_datetime text NOT NULL CHECK (
 		date(start_datetime) >= '2017-08-01' AND
 		time(start_datetime) >= '11:00'
 	),
