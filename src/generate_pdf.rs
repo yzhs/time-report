@@ -203,5 +203,9 @@ pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
         .write_latex()
         .expect("Failed to write LaTeX file");
 
-    render_latex(temp_dir, tex_path)
+    let pdf_path = render_latex(temp_dir, tex_path);
+
+    reports::set_pdf_generated(conn, id);
+
+    pdf_path
 }

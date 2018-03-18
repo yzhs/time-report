@@ -197,3 +197,10 @@ impl PerEmployeeReport {
         }
     }
 }
+
+pub fn set_pdf_generated(conn: &SqliteConnection, id: i32) {
+    diesel::update(reports::table.filter(reports::id.eq(id)))
+        .set(reports::was_pdf_generated.eq(true))
+        .execute(conn)
+        .expect("Failed to update was_pdf_generated");
+}
