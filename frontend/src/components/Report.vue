@@ -80,16 +80,14 @@ let useJsonHeader = {
 }
 
 export default {
-  params: {
-    id: 1
-  },
   data () {
     let now = new Date()
     let maxdate = formatDate(now)
+    let id = this.$route.params.id
 
     return {
       globals: {mintime: '12:30', maxtime: '16:00'},
-      report: {id: 1, title: '', mindate: '2017-08-01', maxdate: maxdate},
+      report: {id: id, title: '', mindate: '2017-08-01', maxdate: maxdate},
       numItems: 0,
       employees: [],
       items: []
@@ -104,10 +102,9 @@ export default {
       document.title = 'Abrechung BetreuerInnen ' + e.target.value
     },
     titleChanged: function (e) {
-      this.id = this.report.id
       this.updateTitle(e)
-      this.$http.put('reports/' + this.id, JSON.stringify(this.report), useJsonHeader).then(response => {
-        console.log('Updated report #' + this.id + ':', this.report)
+      this.$http.put('reports/' + this.report.id, JSON.stringify(this.report), useJsonHeader).then(response => {
+        console.log('Updated report #' + this.report.id + ':', this.report)
       })
     },
     addItem: function () {
