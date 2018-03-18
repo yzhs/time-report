@@ -2,7 +2,6 @@
   <div id="app">
     <nav>
       <router-link :to="{name: 'overview'}">Übersicht</router-link>
-      <router-link :to="{name: 'report', params: {id: 1}}">Abrechnung</router-link>
     </nav>
     <router-view/>
   </div>
