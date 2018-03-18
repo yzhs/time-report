@@ -37,7 +37,7 @@
         </tbody>
       </table>
 
-      <button name="new-report" v-on:click="newReport">Neue Abrechnung</button>
+      <button v-if="numReports === 0 || reports[numReports - 1].was_pdf_generated" name="new-report" v-on:click="newReport">Neue Abrechnung</button>
   </div>
 </template>
 
@@ -60,6 +60,11 @@ export default {
       reports: []
     }
   },
+  computed: {
+    numReports () {
+      return this.reports.length
+    }
+  },
   beforeMount () {
     this.$http.get('reports').then(response => {
       response.body.forEach(element => {
@@ -77,7 +82,7 @@ export default {
       })
     },
     newReport () {
-      let lastReport = this.reports[this.reports.length - 1]
+      let lastReport = this.reports[this.numReports - 1]
       let reportTemplate = {
         id: lastReport.id + 1,
         title: '',
@@ -86,6 +91,7 @@ export default {
         was_pdf_generated: false,
         in_db: false
       }
+      console.log('Creating new report:', reportTemplate)
       this.reports.push(reportTemplate)
     }
   }
