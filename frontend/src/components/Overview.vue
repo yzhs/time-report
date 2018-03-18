@@ -30,8 +30,8 @@
               </router-link>
             </td>
             <td>
-              <a class="edit" href="#" v-if="report.was_pdf_generated" v-on:click="downloadPdf">PDF speichern</a>
-              <a class="edit" href="#" v-else v-on:click="downloadPdf">PDF erzeugen</a>
+              <a class="edit" href="#" v-if="report.was_pdf_generated" v-on:click="downloadPdf(index)">PDF speichern</a>
+              <a class="edit" href="#" v-else v-on:click="downloadPdf(index)">PDF erzeugen</a>
             </td>
           </tr>
         </tbody>
@@ -93,6 +93,12 @@ export default {
       }
       console.log('Creating new report:', reportTemplate)
       this.reports.push(reportTemplate)
+    },
+    downloadPdf (index) {
+      let id = this.reports[index].id
+      console.log('Downloading report #' + id)
+      let link = 'http://localhost:8000/api/reports/' + id + '/pdf'
+      window.open(link, '_blank')
     }
   }
 }
