@@ -5,7 +5,6 @@ use diesel::{self, SqliteConnection};
 use employees;
 use holidays;
 use schema::items;
-use reports::*;
 use weeks::{get_type_of_week, NewWeek};
 
 use DATE_FORMAT;
