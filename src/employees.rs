@@ -11,8 +11,24 @@ pub fn insert<S: AsRef<str>>(
 ) -> Result<i32, diesel::result::Error> {
     use schema::employees;
 
+    let reversed_name = {
+        let words: Vec<_> = name.as_ref().split(' ').collect();
+        let len = words.len();
+        let mut tmp = words[len - 1].to_string();
+        tmp.push_str(", ");
+        for word in &words[..len - 1] {
+            tmp.push_str(word);
+        }
+        tmp
+    };
+
+    let values = (
+        employees::name.eq(name.as_ref()),
+        employees::name_sort.eq(reversed_name),
+    );
+
     diesel::insert_or_ignore_into(employees::table)
-        .values(&employees::name.eq(name.as_ref()))
+        .values(&values)
         .execute(conn)
         .expect("Error creating new employee record");
 
