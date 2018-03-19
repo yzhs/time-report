@@ -95,9 +95,9 @@ export default {
       this.reports.push(reportTemplate)
     },
     downloadPdf (index) {
-      let id = this.reports[index].id
-      console.log('Downloading report #' + id)
-      let link = 'http://localhost:8000/api/reports/' + id + '/pdf'
+      let report = this.reports[index]
+      console.log('Downloading report #' + report.id)
+      let link = 'http://localhost:8000/api/reports/' + report.id + '/pdf/' + report.title + '.pdf'
       window.open(link, '_blank')
     }
   }
