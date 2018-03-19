@@ -39,7 +39,7 @@ impl RawReportData {
         for item in &self.items {
             let row = (
                 &item.name,
-                format!("{}", item.day.format(DATE_FORMAT)),
+                format!("{}", item.day.format("%d.%m.%y")),
                 &TYPE_OF_WEEK[item.type_of_week as usize],
                 format!("{}", item.start.format(TIME_FORMAT)),
                 format!("{}", item.end.format(TIME_FORMAT)),
