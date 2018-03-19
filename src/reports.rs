@@ -7,7 +7,7 @@ use DATE_FORMAT;
 use errors::*;
 use schema::reports;
 
-#[derive(Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
 #[table_name = "reports"]
 pub struct Report {
     pub id: i32,
@@ -56,14 +56,15 @@ pub fn get_all(conn: &SqliteConnection) -> Vec<Report> {
     reports::table.load::<Report>(conn).unwrap()
 }
 
-pub fn add(conn: &SqliteConnection, report: &Report) {
+pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
     diesel::insert_into(reports::table)
         .values(report)
         .execute(conn)
-        .unwrap();
+        .map(|_| ())
+        .chain_err(|| format!("Failed to insert new report: {:?}", report))
 }
 
-pub fn update(conn: &SqliteConnection, report: &Report) {
+pub fn update(conn: &SqliteConnection, report: &Report) -> Result<()> {
     diesel::update(reports::table)
         .filter(reports::id.eq(report.id))
         .set((
@@ -72,7 +73,8 @@ pub fn update(conn: &SqliteConnection, report: &Report) {
             reports::end_date.eq(&report.end_date),
         ))
         .execute(conn)
-        .expect("Failed to update report");
+        .map(|_| ())
+        .chain_err(|| format!("Failed to update report: {:?}", report))
 }
 
 #[derive(Serialize)]

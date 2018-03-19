@@ -9,7 +9,7 @@ use rocket::response::NamedFile;
 use rocket_contrib::Json;
 
 use db;
-use errors;
+use errors::*;
 use employees;
 use items::{self, InvoiceItem, NewRow};
 use holidays;
@@ -36,7 +36,7 @@ fn get_globals() -> Json<Globals> {
 }
 
 #[get("/reports/<report_id>/items", format = "application/json")]
-fn get_items(conn: db::DbConn, report_id: i32) -> errors::Result<Json<Vec<InvoiceItem>>> {
+fn get_items(conn: db::DbConn, report_id: i32) -> Result<Json<Vec<InvoiceItem>>> {
     items::get(&conn, report_id).map(Json)
 }
 
@@ -46,12 +46,7 @@ fn item_template(conn: db::DbConn, report_id: i32) -> Json<InvoiceItem> {
 }
 
 #[put("/reports/<report_id>/items/<id>", format = "application/json", data = "<item>")]
-fn set_item(
-    conn: db::DbConn,
-    report_id: i32,
-    id: i32,
-    item: Json<NewRow>,
-) -> errors::Result<Json<i32>> {
+fn set_item(conn: db::DbConn, report_id: i32, id: i32, item: Json<NewRow>) -> Result<Json<i32>> {
     items::update(&conn, report_id, id, &item.into_inner()).map(Json)
 }
 
@@ -76,22 +71,21 @@ fn get_report(conn: db::DbConn, id: i32) -> Option<Json<Report>> {
 }
 
 #[put("/reports/<id>", format = "application/json", data = "<report>")]
-fn put_report(conn: db::DbConn, id: i32, report: Json<Report>) -> Option<Json<()>> {
+fn put_report(conn: db::DbConn, id: i32, report: Json<Report>) -> Result<()> {
     let mut report = report.into_inner();
     report.id = id;
-    reports::update(&conn, &report);
-    Some(Json(()))
+    reports::update(&conn, &report)
 }
 
 #[post("/reports", format = "application/json", data = "<report>")]
-fn add_report(conn: db::DbConn, report: Json<Report>) {
-    reports::add(&conn, &report.into_inner());
+fn add_report(conn: db::DbConn, report: Json<Report>) -> Result<()> {
+    reports::add(&conn, &report.into_inner())
 }
 
 #[get("/reports/<id>/pdf/<_filename>")]
-fn generate_pdf_report(conn: db::DbConn, id: i32, _filename: String) -> Option<NamedFile> {
-    let pdf_file = ::generate_pdf::generate(&conn, id).expect("Failed to generate report");
-    NamedFile::open(pdf_file).ok()
+fn generate_pdf_report(conn: db::DbConn, id: i32, _filename: String) -> Result<NamedFile> {
+    let pdf_file = ::generate_pdf::generate(&conn, id)?;
+    NamedFile::open(&pdf_file).chain_err(|| format!("Failed to open file {:?}", pdf_file))
 }
 
 pub fn routes() -> Vec<::rocket::Route> {

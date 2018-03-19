@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process;
 
 use csv;
-use errors;
+use errors::*;
 use diesel::SqliteConnection;
 use tempdir::TempDir;
 
@@ -22,13 +22,13 @@ pub struct RawReportData {
 }
 
 impl RawReportData {
-    fn from_id(conn: &SqliteConnection, id: i32) -> errors::Result<RawReportData> {
+    fn from_id(conn: &SqliteConnection, id: i32) -> Result<RawReportData> {
         let metadata = reports::get(conn, id).unwrap();
         let items = items::get(conn, id)?;
         Ok(RawReportData { metadata, items })
     }
 
-    fn write_csv(&self) -> csv::Result<()> {
+    fn write_csv(&self) -> Result<()> {
         let mut path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("csv")
             .join(&self.metadata.title);
@@ -45,7 +45,9 @@ impl RawReportData {
                 format!("{}", item.end.format(TIME_FORMAT)),
                 &item.remark,
             );
-            writer.encode(row)?;
+            writer
+                .encode(&row)
+                .chain_err(|| format!("Failed to format CSV row: {:?}", row))?;
         }
 
         Ok(())
@@ -84,7 +86,7 @@ impl RawReportData {
     }
 }
 
-fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathBuf> {
+fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Result<PathBuf> {
     // Limit scope of tempdir_path_string so we can close temp_dir later
     {
         let tempdir_path_string = temp_dir.path().to_str().unwrap();
@@ -95,7 +97,7 @@ fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathB
             .arg(tempdir_path_string)
             .arg(file_path_string)
             .output()
-            .expect("Executing LaTeX failed");
+            .chain_err(|| "Executing XeLaTeX failed")?;
         // TODO handle LaTeX errors
     }
 
@@ -109,23 +111,23 @@ fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathB
 
     temp_dir
         .close()
-        .expect("Failed to close temporary directory");
+        .chain_err(|| "Failed to close temporary directory")?;
 
-    Some(output_path)
+    Ok(output_path)
 }
 
-pub fn generate(conn: &SqliteConnection, id: i32) -> Option<PathBuf> {
+pub fn generate(conn: &SqliteConnection, id: i32) -> Result<PathBuf> {
     let full_report = RawReportData::from_id(conn, id).expect("Failed to load report data");
 
-    full_report.write_csv().expect("Failed to write CSV file");
+    full_report.write_csv()?;
 
     let (temp_dir, tex_path) = full_report
         .write_latex()
         .expect("Failed to write LaTeX file");
 
-    let pdf_path = render_latex(temp_dir, tex_path);
+    let pdf_path = render_latex(temp_dir, tex_path)?;
 
     reports::set_pdf_generated(conn, id);
 
-    pdf_path
+    Ok(pdf_path)
 }
