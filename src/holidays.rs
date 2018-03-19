@@ -126,12 +126,9 @@ fn read_or_download(base_url: &str, base_path: &str, year: i32) -> String {
     let url = format!("{}{}", base_url, year);
     let path = format!("{}-{}.json", base_path, year);
     match read_file(&path) {
-        Ok(content) => {
-            info!("Successfully read JSON from {}", path);
-            content
-        }
+        Ok(content) => content,
         Err(e) => {
-            info!("Failed to read file: {}", e);
+            warn!("Failed to read file: {}", e);
             let content = fetch_url(url);
             let mut f = File::create(path).expect("Could not create file");
             f.write_all(content.as_bytes())

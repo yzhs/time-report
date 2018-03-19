@@ -167,10 +167,6 @@ impl PerEmployeeReport {
             .order(items_view::name_sort.asc())
             .load::<i32>(conn)
             .unwrap();
-        info!(
-            "The current report contains data concerning {:?}",
-            employee_ids
-        );
 
         let employees = employee_ids
             .into_iter()

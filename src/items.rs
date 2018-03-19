@@ -127,7 +127,8 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
             result
         }
         Err(e) => {
-            info!("Could not find previous item: {:?}", e);
+            warn!("Could not find previous item: {:?}", e);
+            info!("Using InvoiceItem::new() as a template");
             InvoiceItem::new()
         }
     }
