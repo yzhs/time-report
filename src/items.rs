@@ -3,6 +3,7 @@ use diesel::prelude::*;
 use diesel::{self, SqliteConnection};
 
 use employees;
+use errors::*;
 use holidays;
 use schema::items;
 use weeks::{get_type_of_week, NewWeek};
@@ -104,12 +105,17 @@ impl InvoiceItem {
 }
 
 /// Get all invoice items from the denormalized `items_view`.
-pub fn get(conn: &SqliteConnection, report_id: i32) -> Vec<InvoiceItem> {
+pub fn get(conn: &SqliteConnection, report_id: i32) -> Result<Vec<InvoiceItem>> {
     use schema::items_view;
     items_view::table
         .filter(items_view::report_id.eq(report_id))
         .load::<InvoiceItem>(conn)
-        .expect("Error loading data")
+        .chain_err(|| {
+            format!(
+                "Failed to query db for items with report_id = {}",
+                report_id
+            )
+        })
 }
 
 /// Generate a reasonable template for the next invoice item.
@@ -136,15 +142,17 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
 
 /// Update an item with a specific id, or create a new item if `id == 0`.
 // TODO Use Option<i32>?
-pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow) -> i32 {
+pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow) -> Result<i32> {
     use schema::{items, weeks};
 
-    let employee_id = employees::insert(conn, &new_row.name).expect("Failed to find employee");
+    let employee_id = employees::insert(conn, &new_row.name)
+        .chain_err(|| format!("Failed to insert employee: {}", new_row.name))?;
 
-    let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).expect("Invalid date");
+    let date = NaiveDate::parse_from_str(&new_row.day, DATE_FORMAT).chain_err(|| "Invalid date")?;
     let start_time =
-        NaiveTime::parse_from_str(&new_row.start_time, TIME_FORMAT).expect("Invalid time");
-    let end_time = NaiveTime::parse_from_str(&new_row.end_time, TIME_FORMAT).expect("Invalid time");
+        NaiveTime::parse_from_str(&new_row.start_time, TIME_FORMAT).chain_err(|| "Invalid time")?;
+    let end_time =
+        NaiveTime::parse_from_str(&new_row.end_time, TIME_FORMAT).chain_err(|| "Invalid time")?;
     let start_datetime = date.and_time(start_time);
     let end_datetime = date.and_time(end_time);
 
@@ -164,12 +172,12 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
         diesel::insert_into(items::table)
             .values(&new_item)
             .execute(conn)
-            .unwrap();
+            .chain_err(|| format!("Failed to insert into items table: {:?}", new_item))?;
         items::table
             .select(diesel::dsl::max(items::id))
             .first::<Option<_>>(conn)
             .unwrap()
-            .expect("Empty table")
+            .chain_err(|| "items_view empty")
     } else {
         // Update existing item
         info!("Updating item #{}: {:?}", id, new_row);
@@ -184,7 +192,7 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
         diesel::replace_into(items::table)
             .values(&new_item)
             .execute(conn)
-            .unwrap();
-        id
+            .chain_err(|| format!("Failed to replace item {:?}", new_item))?;
+        Ok(id)
     }
 }

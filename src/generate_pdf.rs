@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process;
 
 use csv;
+use errors;
 use diesel::SqliteConnection;
 use tempdir::TempDir;
 
@@ -21,9 +22,9 @@ pub struct RawReportData {
 }
 
 impl RawReportData {
-    fn from_id(conn: &SqliteConnection, id: i32) -> Result<RawReportData, ()> {
-        let metadata = reports::get(conn, id).ok_or(())?;
-        let items = items::get(conn, id);
+    fn from_id(conn: &SqliteConnection, id: i32) -> errors::Result<RawReportData> {
+        let metadata = reports::get(conn, id).unwrap();
+        let items = items::get(conn, id)?;
         Ok(RawReportData { metadata, items })
     }
 

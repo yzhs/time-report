@@ -9,6 +9,7 @@ use rocket::response::NamedFile;
 use rocket_contrib::Json;
 
 use db;
+use errors;
 use employees;
 use items::{self, InvoiceItem, NewRow};
 use holidays;
@@ -35,8 +36,8 @@ fn get_globals() -> Json<Globals> {
 }
 
 #[get("/reports/<report_id>/items", format = "application/json")]
-fn get_items(conn: db::DbConn, report_id: i32) -> Json<Vec<InvoiceItem>> {
-    Json(items::get(&conn, report_id))
+fn get_items(conn: db::DbConn, report_id: i32) -> errors::Result<Json<Vec<InvoiceItem>>> {
+    items::get(&conn, report_id).map(Json)
 }
 
 #[get("/reports/<report_id>/items/template", format = "application/json")]
@@ -45,8 +46,13 @@ fn item_template(conn: db::DbConn, report_id: i32) -> Json<InvoiceItem> {
 }
 
 #[put("/reports/<report_id>/items/<id>", format = "application/json", data = "<item>")]
-fn set_item(conn: db::DbConn, report_id: i32, id: i32, item: Json<NewRow>) -> Json<i32> {
-    Json(items::update(&conn, report_id, id, &item.into_inner()))
+fn set_item(
+    conn: db::DbConn,
+    report_id: i32,
+    id: i32,
+    item: Json<NewRow>,
+) -> errors::Result<Json<i32>> {
+    items::update(&conn, report_id, id, &item.into_inner()).map(Json)
 }
 
 #[get("/employees", format = "application/json")]
