@@ -51,7 +51,7 @@ impl RawReportData {
     }
 
     fn generate_latex(&self) -> String {
-        use handlebars::{Handlebars, RenderContext, RenderError};
+        use handlebars::Handlebars;
 
         let mut handlebars = Handlebars::new();
         handlebars
