@@ -5,9 +5,8 @@ use std::sync::Mutex;
 use chrono::{Datelike, Local, NaiveDate};
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 
-use super::schema::weeks;
-
-pub use reports::Report;
+use errors::*;
+use schema::weeks;
 
 lazy_static!{
     static ref TYPE_OF_WEEK: Mutex<TypeOfWeek> =
@@ -65,7 +64,7 @@ impl NewWeek {
     }
 }
 
-pub fn populate_table(conn: &SqliteConnection) {
+pub fn populate_table(conn: &SqliteConnection) -> Result<()> {
     use holidays;
 
     const MIN_YEAR: i32 = 2017;
@@ -105,5 +104,7 @@ pub fn populate_table(conn: &SqliteConnection) {
     ::diesel::insert_into(weeks::table)
         .values(&new_weeks)
         .execute(conn)
-        .expect("Failed to insert weeks");
+        .chain_err(|| "Failed to insert weeks")?;
+
+    Ok(())
 }

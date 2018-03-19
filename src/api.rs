@@ -61,12 +61,12 @@ fn get_holidays(conn: db::DbConn) -> Json<HashMap<String, String>> {
 }
 
 #[get("/reports", format = "application/json")]
-fn get_reports(conn: db::DbConn) -> Json<Vec<Report>> {
-    Json(reports::get_all(&conn))
+fn get_reports(conn: db::DbConn) -> Result<Json<Vec<Report>>> {
+    reports::get_all(&conn).map(Json)
 }
 
 #[get("/reports/<id>", format = "application/json")]
-fn get_report(conn: db::DbConn, id: i32) -> Option<Json<Report>> {
+fn get_report(conn: db::DbConn, id: i32) -> Result<Json<Report>> {
     reports::get(&conn, id).map(Json)
 }
 

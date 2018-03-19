@@ -23,7 +23,7 @@ pub struct RawReportData {
 
 impl RawReportData {
     fn from_id(conn: &SqliteConnection, id: i32) -> Result<RawReportData> {
-        let metadata = reports::get(conn, id).unwrap();
+        let metadata = reports::get(conn, id)?;
         let items = items::get(conn, id)?;
         Ok(RawReportData { metadata, items })
     }
@@ -117,7 +117,7 @@ fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Result<PathB
 }
 
 pub fn generate(conn: &SqliteConnection, id: i32) -> Result<PathBuf> {
-    let full_report = RawReportData::from_id(conn, id).expect("Failed to load report data");
+    let full_report = RawReportData::from_id(conn, id)?;
 
     full_report.write_csv()?;
 

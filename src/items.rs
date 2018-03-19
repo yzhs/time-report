@@ -141,7 +141,6 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
 }
 
 /// Update an item with a specific id, or create a new item if `id == 0`.
-// TODO Use Option<i32>?
 pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow) -> Result<i32> {
     use schema::{items, weeks};
 
@@ -156,9 +155,16 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
     let start_datetime = date.and_time(start_time);
     let end_datetime = date.and_time(end_time);
 
+    // TODO Do we actually need this?
+    // TODO Move into weeks.rs?
+    // TODO Update all following weeks?
     let new_week = NewWeek::new(date, new_row.type_of_week);
-    diesel::replace_into(weeks::table).values(&new_week);
+    diesel::replace_into(weeks::table)
+        .values(&new_week)
+        .execute(conn)
+        .chain_err(|| "Failed to replace week values")?;
 
+    // TODO Can we merge both branches?
     if id == 0 {
         // Insert new item
         info!("Creating new item: {:?}", new_row);
@@ -176,7 +182,7 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
         items::table
             .select(diesel::dsl::max(items::id))
             .first::<Option<_>>(conn)
-            .unwrap()
+            .chain_err(|| "Query failed")?
             .chain_err(|| "items_view empty")
     } else {
         // Update existing item

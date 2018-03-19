@@ -45,15 +45,17 @@ pub fn create_report_from_title<S: AsRef<str>>(conn: &SqliteConnection, title: S
     Ok(())
 }
 
-pub fn get(conn: &SqliteConnection, id: i32) -> Option<Report> {
+pub fn get(conn: &SqliteConnection, id: i32) -> Result<Report> {
     reports::table
         .filter(reports::id.eq(id))
         .first::<Report>(conn)
-        .ok()
+        .chain_err(|| format!("Failed to get report #{}", id))
 }
 
-pub fn get_all(conn: &SqliteConnection) -> Vec<Report> {
-    reports::table.load::<Report>(conn).unwrap()
+pub fn get_all(conn: &SqliteConnection) -> Result<Vec<Report>> {
+    reports::table
+        .load::<Report>(conn)
+        .chain_err(|| "Could not load reports table")
 }
 
 pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
@@ -95,7 +97,7 @@ struct PerEmployeeData {
 }
 
 impl PerEmployeeData {
-    fn compile(conn: &SqliteConnection, report_id: i32, id: i32) -> Self {
+    fn compile(conn: &SqliteConnection, report_id: i32, id: i32) -> Result<Self> {
         use chrono::Duration;
 
         use schema::employees;
@@ -105,7 +107,7 @@ impl PerEmployeeData {
             .select(employees::name)
             .filter(employees::id.eq(id))
             .first(conn)
-            .unwrap();
+            .chain_err(|| "Failed to find employee's name")?;
 
         let mut total_time = Duration::zero();
 
@@ -114,7 +116,7 @@ impl PerEmployeeData {
             .filter(items_view::employee_id.eq(id))
             .order(items_view::day.asc())
             .load::<::items::InvoiceItem>(conn)
-            .unwrap()
+            .chain_err(|| "Failed to query items_view")?
             .into_iter()
             .map(|item| {
                 let date = format!("{}", item.day.format("%d.\\,%m.\\,%y"));
@@ -139,12 +141,12 @@ impl PerEmployeeData {
         let hours = total_time.num_hours() as i32;
         let minutes = (total_time.num_minutes() % 60) as i32;
 
-        PerEmployeeData {
+        Ok(PerEmployeeData {
             name,
             hours,
             minutes,
             items,
-        }
+        })
     }
 }
 
@@ -175,7 +177,7 @@ impl PerEmployeeReport {
 
         let employees = employee_ids
             .into_iter()
-            .map(|id| PerEmployeeData::compile(conn, report_id, id))
+            .map(|id| PerEmployeeData::compile(conn, report_id, id).unwrap())
             .collect();
 
         Self {
