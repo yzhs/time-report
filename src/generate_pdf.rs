@@ -8,7 +8,7 @@ use csv;
 use diesel::SqliteConnection;
 use tempdir::TempDir;
 
-use items::InvoiceItem;
+use items::{self, InvoiceItem};
 use reports::{self, Report};
 use DATE_FORMAT;
 use TIME_FORMAT;
@@ -23,7 +23,7 @@ pub struct RawReportData {
 impl RawReportData {
     fn from_id(conn: &SqliteConnection, id: i32) -> Result<RawReportData, ()> {
         let metadata = reports::get(conn, id).ok_or(())?;
-        let items = vec![];
+        let items = items::get(conn, id);
         Ok(RawReportData { metadata, items })
     }
 
