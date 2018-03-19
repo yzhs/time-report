@@ -41,7 +41,8 @@ impl RawReportData {
                 format!("{}", item.day.format(DATE_FORMAT)),
                 &TYPE_OF_WEEK[item.type_of_week as usize],
                 format!("{}", item.start.format(TIME_FORMAT)),
-                format!("{} {}", item.end.format(TIME_FORMAT), &item.remark),
+                format!("{}", item.end.format(TIME_FORMAT)),
+                &item.remark,
             );
             writer.encode(row)?;
         }
@@ -87,6 +88,7 @@ fn render_latex<P: AsRef<Path>>(temp_dir: TempDir, file_path: P) -> Option<PathB
     {
         let tempdir_path_string = temp_dir.path().to_str().unwrap();
         let file_path_string = file_path.as_ref().to_str().unwrap();
+
         process::Command::new("xelatex")
             .arg("-output-directory")
             .arg(tempdir_path_string)
