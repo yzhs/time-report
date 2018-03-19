@@ -4,6 +4,7 @@ SELECT
 	employee_id,
 	report_id,
 	employees.name AS name,
+	name_sort,
 	date(start_datetime) AS day,
 	type_of_week,
 	time(start_datetime) AS start,

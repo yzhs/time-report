@@ -107,6 +107,7 @@ impl PerEmployeeData {
         let items = items_view::table
             .filter(items_view::report_id.eq(report_id))
             .filter(items_view::employee_id.eq(id))
+            .order(items_view::day.asc())
             .load::<::items::InvoiceItem>(conn)
             .unwrap()
             .into_iter()
@@ -163,6 +164,7 @@ impl PerEmployeeReport {
             .filter(items_view::report_id.eq(report_id))
             .select(items_view::employee_id)
             .group_by(items_view::employee_id)
+            .order(items_view::name_sort.asc())
             .load::<i32>(conn)
             .unwrap();
         info!(
