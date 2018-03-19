@@ -90,7 +90,7 @@ struct PerEmployeeData {
 }
 
 impl PerEmployeeData {
-    fn compile(conn: &SqliteConnection, id: i32) -> Self {
+    fn compile(conn: &SqliteConnection, report_id: i32, id: i32) -> Self {
         use chrono::Duration;
 
         use schema::employees;
@@ -105,6 +105,7 @@ impl PerEmployeeData {
         let mut total_time = Duration::zero();
 
         let items = items_view::table
+            .filter(items_view::report_id.eq(report_id))
             .filter(items_view::employee_id.eq(id))
             .load::<::items::InvoiceItem>(conn)
             .unwrap()
@@ -148,17 +149,18 @@ pub struct PerEmployeeReport {
 }
 
 impl PerEmployeeReport {
-    pub fn generate(conn: &SqliteConnection, id: i32) -> Self {
+    pub fn generate(conn: &SqliteConnection, report_id: i32) -> Self {
         use schema::reports;
         use schema::items_view;
 
         let report_title = reports::table
             .select(reports::title)
-            .filter(reports::id.eq(id))
+            .filter(reports::id.eq(report_id))
             .first(conn)
             .expect("Could not find report");
 
         let employee_ids = items_view::table
+            .filter(items_view::report_id.eq(report_id))
             .select(items_view::employee_id)
             .group_by(items_view::employee_id)
             .load::<i32>(conn)
@@ -170,7 +172,7 @@ impl PerEmployeeReport {
 
         let employees = employee_ids
             .into_iter()
-            .map(|id| PerEmployeeData::compile(conn, id))
+            .map(|id| PerEmployeeData::compile(conn, report_id, id))
             .collect();
 
         Self {
