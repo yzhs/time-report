@@ -3,7 +3,10 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 /// Get all employees from the database.
 pub fn get(conn: &SqliteConnection) -> Vec<String> {
     use schema::employees::*;
-    table.select(name).load::<String>(conn).unwrap()
+    table
+        .select(name)
+        .load::<String>(conn)
+        .expect("Query failed")
 }
 
 /// Insert a new employee into the database.
