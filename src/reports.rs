@@ -1,9 +1,7 @@
-use chrono::NaiveDate;
 use diesel;
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 
-use DATE_FORMAT;
 use errors::*;
 use schema::reports;
 
@@ -19,34 +17,6 @@ pub struct Report {
 }
 
 /// Get data for the report with the given id.
-/// Create a new report with the given title.
-///
-/// Insert a new row into the `reports` table with `start_date` set to the first day after the end
-/// of the final date of the previous report and `end_date` set to today.
-pub fn create_report_from_title<S: AsRef<str>>(conn: &SqliteConnection, title: S) -> Result<()> {
-    // Find last end date for last report
-    let prev_end_date_string = reports::table
-        .select(diesel::dsl::max(reports::end_date))
-        .first::<Option<String>>(conn)
-        .chain_err(|| "failed to find most recend end date of the previous reports")?;
-    let start_date = NaiveDate::parse_from_str(
-        &prev_end_date_string.unwrap_or_else(|| "2017-12-01".into()),
-        DATE_FORMAT,
-    ).chain_err(|| "Invalid date")?;
-
-    let new_report = (
-        reports::title.eq(title.as_ref()),
-        reports::start_date.eq(format!("{}", start_date.succ().format(DATE_FORMAT))),
-    );
-
-    diesel::insert_into(reports::table)
-        .values(&new_report)
-        .execute(conn)
-        .chain_err(|| format!("Failed to create report from title: {}", title.as_ref()))?;
-
-    Ok(())
-}
-
 pub fn get(conn: &SqliteConnection, id: i32) -> Result<Report> {
     reports::table
         .filter(reports::id.eq(id))

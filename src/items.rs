@@ -71,36 +71,12 @@ impl InvoiceItem {
         }
     }
 
-    pub fn name(mut self, name: &str) -> Self {
-        self.name = name.into();
-        self
-    }
-
-    pub fn day(mut self, day: NaiveDate) -> Self {
-        self.day = day;
-        self
-    }
-
-    pub fn type_of_week(mut self, type_of_week: i32) -> Self {
-        self.type_of_week = type_of_week;
-        self
-    }
-
-    pub fn start(mut self, start: NaiveTime) -> Self {
-        self.start = start;
-        self
-    }
-
-    pub fn remark(mut self, remark: &str) -> Self {
-        self.remark = remark.into();
-        self
-    }
-
     pub fn next(&self) -> Self {
         let next_schoolday = holidays::next_schoolday(self.day);
-        InvoiceItem::new()
-            .day(next_schoolday)
-            .type_of_week(get_type_of_week(next_schoolday))
+        let mut item = InvoiceItem::new();
+        item.day = next_schoolday;
+        item.type_of_week = get_type_of_week(next_schoolday);
+        item
     }
 }
 
