@@ -1,10 +1,16 @@
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 
+/// Get all employees from the database.
 pub fn get(conn: &SqliteConnection) -> Vec<String> {
     use schema::employees::*;
     table.select(name).load::<String>(conn).unwrap()
 }
 
+/// Insert a new employee into the database.
+///
+/// Create the `name_sort` column from the `name` by assuming that the last word of the full name
+/// is the last name. That is not true in general but should be enough for our purposes: sorting a
+/// list of employees by name in an invoice.
 pub fn insert<S: AsRef<str>>(
     conn: &SqliteConnection,
     name: S,

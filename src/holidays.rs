@@ -17,7 +17,8 @@ const GENERAL_HOLIDAYS_URL: &str = "https://feiertage-api.de/api/?nur_land=NW&ja
 const SCHOOL_HOLIDAYS_URL: &str = "https://ferien-api.de/api/v1/holidays/NW/";
 
 lazy_static! {
-    pub static ref HOLIDAYS: Mutex<HashMap<NaiveDate, String>> = {
+    /// In-memory copy of the `holidays` table for quick access.
+    static ref HOLIDAYS: Mutex<HashMap<NaiveDate, String>> = {
         let conn = ::db::connect();
         Mutex::new(get_holidays(&conn))
     };
@@ -47,6 +48,7 @@ struct SchoolHoliday {
     name: String,
 }
 
+/// Download data from a given URL and return the response as a String.
 fn fetch_url<S: AsRef<str>>(url: S) -> String {
     let mut dst = Vec::new();
     {
@@ -105,6 +107,7 @@ fn read_school_holidays<S: AsRef<str>>(json: S) -> Vec<Holiday> {
     result
 }
 
+/// Write some holidays into the `holidays` table.
 fn store_holidays(conn: &SqliteConnection, new_holidays: &[Holiday]) {
     use schema::holidays;
     ::diesel::replace_into(holidays::table)
@@ -122,6 +125,11 @@ fn read_file<P: AsRef<Path>>(path: P) -> Result<String, io::Error> {
     Ok(content)
 }
 
+/// Read data from a local JSON file or download it from the given URL.
+///
+/// Effectively, maintain a cache of the holiday data as a JSON file, retrieving it from the API
+/// as necessary. The purpose of this is to limit the number of requests to the API as much as
+/// possible.
 fn read_or_download(base_url: &str, base_path: &str, year: i32) -> String {
     let url = format!("{}{}", base_url, year);
     let path = format!("{}-{}.json", base_path, year);
@@ -138,6 +146,14 @@ fn read_or_download(base_url: &str, base_path: &str, year: i32) -> String {
     }
 }
 
+/// Get holidays listed as belonging to a certain year.
+///
+/// Note that the school holidays API includes the winter holidays in the year they start, but not
+/// in the year they end. To get all school holidays of 2018, you would have to retrieve both
+/// the data for 2018 *and 2017*, because the 2017/2018 winter holidays are not part of the 2018
+/// data set.
+///
+/// *This function does not retrieve the data for the winter holidays at the start of a year.
 fn add_holidays_for(conn: &SqliteConnection, year: i32) {
     {
         let json = read_or_download(
@@ -162,6 +178,7 @@ fn add_holidays_for(conn: &SqliteConnection, year: i32) {
     *HOLIDAYS.lock().unwrap() = get_holidays(conn);
 }
 
+/// Download holidays for the years up to and including all of next year.
 pub fn populate_table(conn: &SqliteConnection) {
     const MIN_YEAR: i32 = 2017;
     let next_year = ::chrono::Local::today().year() + 1;
@@ -204,10 +221,15 @@ fn get_holidays(conn: &SqliteConnection) -> HashMap<NaiveDate, String> {
     )
 }
 
+/// Check whether the given day is either a school or general holiday.
 pub fn is_holiday(date: NaiveDate) -> bool {
     HOLIDAYS.lock().unwrap().contains_key(&date)
 }
 
+/// The next day of school.
+///
+/// Return the next day of school after `date`, i.e. the next day that is neither a school or
+/// other holiday, nor on a weekend.
 pub fn next_schoolday(mut date: NaiveDate) -> NaiveDate {
     use chrono::Weekday;
     date = date.succ();
@@ -217,6 +239,9 @@ pub fn next_schoolday(mut date: NaiveDate) -> NaiveDate {
     date
 }
 
+/// Map of all holidays in the database.
+///
+/// Return a map of all holidays mapping dates formatted as a string to the name of the holiday.
 pub fn get(conn: &SqliteConnection) -> HashMap<String, String> {
     use schema::holidays::*;
     use diesel::dsl::max;
@@ -236,40 +261,44 @@ pub fn get(conn: &SqliteConnection) -> HashMap<String, String> {
     HashMap::from_iter(table.load::<(String, String)>(conn).unwrap().into_iter())
 }
 
-/// The first day of the school year starting in the summer of `year`.
-pub fn first_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
+/// The first day of a school year.
+///
+/// Return the first day of the school year starting in the summer of `year`.
+pub fn first_day_of_school(conn: &SqliteConnection, year: i32) -> NaiveDate {
     use schema::holidays::*;
 
     let date_string = table
         .select(date)
-        .filter(date.lt(format!("{}-01-01", yr + 1)))
-        .filter(date.ge(format!("{}-01-01", yr)))
+        .filter(date.lt(format!("{}-01-01", year + 1)))
+        .filter(date.ge(format!("{}-01-01", year)))
         .filter(title.eq("Sommerferien"))
         .order(date.desc())
         .first::<String>(conn)
         .expect(&format!(
             "No matching date between {}-01-01 and {}-01-01",
-            yr + 1,
-            yr
+            year,
+            year + 1
         ));
 
     let last_holiday = NaiveDate::parse_from_str(&date_string, DATE_FORMAT).expect("Invalid date");
     next_schoolday(last_holiday)
 }
 
-/// The last day of the school year *starting in the summer of `year`*.
-pub fn last_day_of_school(conn: &SqliteConnection, yr: i32) -> NaiveDate {
+/// Last day of a school year.
+///
+/// Return the last day of the school year *starting* in the summer of `year`.
+pub fn last_day_of_school(conn: &SqliteConnection, year: i32) -> NaiveDate {
     use schema::holidays::*;
     use chrono::{Duration, Weekday};
 
     let date_string = table
         .select(date)
-        .filter(date.lt(format!("{}-01-01", yr + 2)))
-        .filter(date.ge(format!("{}-01-01", yr + 1)))
+        .filter(date.lt(format!("{}-01-01", year + 2)))
+        .filter(date.ge(format!("{}-01-01", year + 1)))
         .filter(title.eq("Sommerferien"))
         .order(date.asc())
         .first::<String>(conn)
-        .expect(&format!("Query error for year {}", yr));
+        .expect(&format!("Query error for year {}", year));
 
     let one_day = Duration::days(1);
     let two_days = Duration::days(2);

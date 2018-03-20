@@ -7,6 +7,7 @@ use DATE_FORMAT;
 use errors::*;
 use schema::reports;
 
+/// Represent a row in the `reports` table.
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
 #[table_name = "reports"]
 pub struct Report {
@@ -17,6 +18,7 @@ pub struct Report {
     pub was_pdf_generated: bool,
 }
 
+/// Get data for the report with the given id.
 /// Create a new report with the given title.
 ///
 /// Insert a new row into the `reports` table with `start_date` set to the first day after the end
@@ -52,12 +54,14 @@ pub fn get(conn: &SqliteConnection, id: i32) -> Result<Report> {
         .chain_err(|| format!("Failed to get report #{}", id))
 }
 
+/// Get *all* reports from the database.
 pub fn get_all(conn: &SqliteConnection) -> Result<Vec<Report>> {
     reports::table
         .load::<Report>(conn)
         .chain_err(|| "Could not load reports table")
 }
 
+/// Insert a new report into the database.
 pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
     diesel::insert_into(reports::table)
         .values(report)
@@ -66,6 +70,7 @@ pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
         .chain_err(|| format!("Failed to insert new report: {:?}", report))
 }
 
+/// Replace a report in the database.
 pub fn update(conn: &SqliteConnection, report: &Report) -> Result<()> {
     diesel::update(reports::table)
         .filter(reports::id.eq(report.id))
@@ -79,15 +84,29 @@ pub fn update(conn: &SqliteConnection, report: &Report) -> Result<()> {
         .chain_err(|| format!("Failed to update report: {:?}", report))
 }
 
+/// One item in the report.
+///
+/// It belongs to a specific employee. It represents one row in the final PDF report, which is why
+/// it only contains strings, and is only used for writing the formatted data to a file.
 #[derive(Serialize)]
 struct EmployeeItem {
+    /// When the employee worked
     date: String,
+
+    /// What type of week was this day in?
     type_of_week: String,
+
+    /// How many full hours did they work?
     hours: String,
+
+    /// How many minutes did they work? (< 60)
     minutes: String,
+
+    /// Whatever remark, e.g. stand-in for so-and-so.
     remark: String,
 }
 
+/// Section in the report with all the data for one employee.
 #[derive(Serialize)]
 struct PerEmployeeData {
     name: String,
@@ -97,6 +116,7 @@ struct PerEmployeeData {
 }
 
 impl PerEmployeeData {
+    /// Get all data for a specific repord and a specific employee.
     fn compile(conn: &SqliteConnection, report_id: i32, id: i32) -> Result<Self> {
         use chrono::Duration;
 
@@ -150,6 +170,9 @@ impl PerEmployeeData {
     }
 }
 
+/// All the data that goes generating the PDF report.
+///
+/// This is used to supply the data to the template.
 #[derive(Serialize)]
 pub struct PerEmployeeReport {
     title: String,
@@ -157,6 +180,8 @@ pub struct PerEmployeeReport {
 }
 
 impl PerEmployeeReport {
+    /// Read all data for a report from the database.
+    // TODO error handling
     pub fn generate(conn: &SqliteConnection, report_id: i32) -> Self {
         use schema::reports;
         use schema::items_view;
@@ -187,6 +212,8 @@ impl PerEmployeeReport {
     }
 }
 
+/// For the report with a given id, set `was_pdf_generated` to true.
+// TODO error handling?
 pub fn set_pdf_generated(conn: &SqliteConnection, id: i32) {
     diesel::update(reports::table.filter(reports::id.eq(id)))
         .set(reports::was_pdf_generated.eq(true))

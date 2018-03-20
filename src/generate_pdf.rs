@@ -22,6 +22,7 @@ pub struct RawReportData {
 }
 
 impl RawReportData {
+    /// Retrieve all data belonging to a report from the database.
     fn from_id(conn: &SqliteConnection, id: i32) -> Result<RawReportData> {
         let metadata = reports::get(conn, id)?;
         let items = items::get(conn, id)?;

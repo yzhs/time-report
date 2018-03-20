@@ -13,11 +13,13 @@ lazy_static!{
         Mutex::new(TypeOfWeek::new(&::db::connect()));
 }
 
+/// Map (year, week-of-year) to type-of-week.
 struct TypeOfWeek {
     map: HashMap<(i32, i32), i32>,
 }
 
 impl TypeOfWeek {
+    /// Retrieve the `weeks` table from the database and store it as a labelled set in memory.
     pub fn new(conn: &SqliteConnection) -> Self {
         let map = HashMap::from_iter(
             weeks::table
@@ -29,6 +31,7 @@ impl TypeOfWeek {
         Self { map }
     }
 
+    /// What type is the week a day is in?
     pub fn get(&self, day: NaiveDate) -> i32 {
         let year = day.year();
         let week_of_year = day.iso_week().week() as i32;
@@ -41,10 +44,12 @@ impl TypeOfWeek {
     }
 }
 
+/// What is the type of the week a given day belongs to?
 pub fn get_type_of_week(day: NaiveDate) -> i32 {
     TYPE_OF_WEEK.lock().unwrap().get(day)
 }
 
+/// Structure for inserting data into the `weeks` table.
 #[derive(Debug, Serialize, Insertable)]
 #[table_name = "weeks"]
 pub struct NewWeek {
@@ -64,6 +69,7 @@ impl NewWeek {
     }
 }
 
+/// Compute type of week up to and including the school year starting in the summer of this year.
 pub fn populate_table(conn: &SqliteConnection) -> Result<()> {
     use holidays;
 
