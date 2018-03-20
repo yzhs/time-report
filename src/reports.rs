@@ -4,6 +4,7 @@ use diesel::sqlite::SqliteConnection;
 
 use errors::*;
 use schema::reports;
+use weeks::TYPE_OF_WEEK_NAME;
 
 /// Represent a row in the `reports` table.
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
@@ -119,8 +120,7 @@ impl PerEmployeeData {
 
                 EmployeeItem {
                     date,
-                    type_of_week: ::generate_pdf::TYPE_OF_WEEK[item.type_of_week as usize]
-                        .to_string(),
+                    type_of_week: TYPE_OF_WEEK_NAME[item.type_of_week as usize].to_string(),
                     hours,
                     minutes,
                     remark: item.remark,

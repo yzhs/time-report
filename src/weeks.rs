@@ -13,6 +13,9 @@ lazy_static!{
         Mutex::new(TypeOfWeek::new(&::db::connect()));
 }
 
+/// Names for the different types of weeks.
+pub const TYPE_OF_WEEK_NAME: [&str; 4] = ["A", "B", "C", "D"];
+
 /// Map (year, week-of-year) to type-of-week.
 struct TypeOfWeek {
     map: HashMap<(i32, i32), i32>,

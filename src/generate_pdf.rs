@@ -9,12 +9,10 @@ use errors::*;
 use diesel::SqliteConnection;
 use tempdir::TempDir;
 
+use TIME_FORMAT;
 use items::{self, InvoiceItem};
 use reports::{self, Report};
-use DATE_FORMAT;
-use TIME_FORMAT;
-
-pub const TYPE_OF_WEEK: [&str; 4] = ["A", "B", "C", "D"];
+use weeks::TYPE_OF_WEEK_NAME;
 
 pub struct RawReportData {
     metadata: Report,
@@ -41,7 +39,7 @@ impl RawReportData {
             let row = (
                 &item.name,
                 format!("{}", item.day.format("%d.%m.%y")),
-                &TYPE_OF_WEEK[item.type_of_week as usize],
+                &TYPE_OF_WEEK_NAME[item.type_of_week as usize],
                 format!("{}", item.start.format(TIME_FORMAT)),
                 format!("{}", item.end.format(TIME_FORMAT)),
                 &item.remark,
