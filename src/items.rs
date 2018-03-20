@@ -83,6 +83,9 @@ impl InvoiceItem {
 /// Get all invoice items from the denormalized `items_view`.
 pub fn get(conn: &SqliteConnection, report_id: i32) -> Result<Vec<InvoiceItem>> {
     use schema::items_view;
+
+    assert!(report_id >= 0);
+
     items_view::table
         .filter(items_view::report_id.eq(report_id))
         .load::<InvoiceItem>(conn)
@@ -97,6 +100,8 @@ pub fn get(conn: &SqliteConnection, report_id: i32) -> Result<Vec<InvoiceItem>> 
 /// Generate a reasonable template for the next invoice item.
 pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
     use schema::items_view;
+
+    assert!(report_id >= 0);
 
     match items_view::table
         .filter(items_view::report_id.eq(report_id))
@@ -119,6 +124,9 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
 /// Update an item with a specific id, or create a new item if `id == 0`.
 pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow) -> Result<i32> {
     use schema::{items, weeks};
+
+    assert!(report_id >= 0);
+    assert!(id >= 0);
 
     let employee_id = employees::insert(conn, &new_row.name)
         .chain_err(|| format!("Failed to insert employee: {}", new_row.name))?;

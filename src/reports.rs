@@ -19,6 +19,8 @@ pub struct Report {
 
 /// Get data for the report with the given id.
 pub fn get(conn: &SqliteConnection, id: i32) -> Result<Report> {
+    assert!(id >= 0);
+
     reports::table
         .filter(reports::id.eq(id))
         .first::<Report>(conn)
@@ -34,6 +36,8 @@ pub fn get_all(conn: &SqliteConnection) -> Result<Vec<Report>> {
 
 /// Insert a new report into the database.
 pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
+    assert!(report.id >= 0);
+
     diesel::insert_into(reports::table)
         .values(report)
         .execute(conn)
@@ -43,6 +47,8 @@ pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
 
 /// Replace a report in the database.
 pub fn update(conn: &SqliteConnection, report: &Report) -> Result<()> {
+    assert!(report.id >= 0);
+
     diesel::update(reports::table)
         .filter(reports::id.eq(report.id))
         .set((
@@ -93,6 +99,9 @@ impl PerEmployeeData {
 
         use schema::employees;
         use schema::items_view;
+
+        assert!(id >= 0);
+        assert!(report_id >= 0);
 
         let name = employees::table
             .select(employees::name)
@@ -156,6 +165,8 @@ impl PerEmployeeReport {
         use schema::reports;
         use schema::items_view;
 
+        assert!(report_id >= 0);
+
         let report_title = reports::table
             .select(reports::title)
             .filter(reports::id.eq(report_id))
@@ -185,6 +196,8 @@ impl PerEmployeeReport {
 /// For the report with a given id, set `was_pdf_generated` to true.
 // TODO error handling?
 pub fn set_pdf_generated(conn: &SqliteConnection, id: i32) {
+    assert!(id >= 0);
+
     diesel::update(reports::table.filter(reports::id.eq(id)))
         .set(reports::was_pdf_generated.eq(true))
         .execute(conn)

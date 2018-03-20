@@ -41,8 +41,8 @@ impl TypeOfWeek {
         if self.map.contains_key(&(year, week_of_year)) {
             self.map[&(year, week_of_year)]
         } else {
-            // TODO take a guess
-            0
+            // TODO Populate table
+            unimplemented!()
         }
     }
 }
