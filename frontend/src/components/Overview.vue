@@ -60,9 +60,9 @@ export class Report {
 }
 
 export default Vue.extend({
-  data () {
-    let mindate: String = '2017-07-01'
-    let maxdate: String = formatDate(new Date())
+  data (): {mindate: String, maxdate: String, reports: Report[]} {
+    let mindate = '2017-07-01'
+    let maxdate = formatDate(new Date())
     let reports: Report[] = []
 
     return { mindate, maxdate, reports }
