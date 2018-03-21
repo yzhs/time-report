@@ -10,9 +10,9 @@
 <script lang="ts">
 import Vue from 'vue'
 
-export default class App extends Vue {
-  name = 'App'
-}
+export default Vue.extend({
+  name: 'App'
+})
 </script>
 
 <style>
