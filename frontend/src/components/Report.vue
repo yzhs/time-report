@@ -126,7 +126,7 @@ export default Vue.extend({
     addItem () {
       axios.get('reports/' + this.report.id + '/items/template')
           .then((response: any) => {
-        let obj = response.body
+        let obj = response.data
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)
         obj.in_db = false
@@ -149,7 +149,7 @@ export default Vue.extend({
         console.log('Done', item.in_db ? 'updating' : 'inserting')
         if (!item.in_db) {
           item.in_db = true
-          item.id = response.body
+          item.id = response.data
         }
       })
     },
@@ -162,10 +162,10 @@ export default Vue.extend({
 
   beforeMount () {
     axios.get('reports/' + this.report.id).then((response: any) => {
-      this.report = response.body
+      this.report = response.data
     })
     axios.get('reports/' + this.report.id + '/items').then((response: any) => {
-      response.body.map((element: Item) => {
+      response.data.map((element: Item) => {
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)
         element.in_db = true
@@ -178,7 +178,7 @@ export default Vue.extend({
     })
 
     axios.get('employees').then((response: any) => {
-      this.employees = response.body
+      this.employees = response.data
     })
   }
 })

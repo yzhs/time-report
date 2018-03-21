@@ -105,7 +105,7 @@ export default Vue.extend({
 
   beforeMount () {
     axios.get('reports').then((response: any) => {
-      response.body.forEach((element: any) => {
+      response.data.forEach((element: any) => {
         element.in_db = true
         this.reports.push(element)
       })
