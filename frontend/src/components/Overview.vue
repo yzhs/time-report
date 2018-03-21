@@ -37,12 +37,15 @@
         </tbody>
       </table>
 
-      <button v-if="numReports === 0 || reports[numReports - 1].was_pdf_generated" name="new-report" v-on:click="newReport">Neue Abrechnung</button>
+      <button v-if="numReports() === 0 || reports[numReports() - 1].was_pdf_generated" name="new-report" v-on:click="newReport">Neue Abrechnung</button>
   </div>
 </template>
 
-<script>
-function formatDate (date) {
+<script lang="ts">
+import Vue from 'vue'
+import axios from 'axios'
+
+function formatDate (date: Date) {
   return date.toISOString().split('T')[0]
 }
 
@@ -52,37 +55,34 @@ let useJsonHeader = {
   }
 }
 
-export default {
+export class Report {
+  constructor(public id: number, public title: String, public start_date: String, public end_date: String) {}
+}
+
+export default Vue.extend({
   data () {
-    return {
-      mindate: '2017-07-01',
-      maxdate: formatDate(new Date()),
-      reports: []
-    }
+    let mindate: String = '2017-07-01'
+    let maxdate: String = formatDate(new Date())
+    let reports: Report[] = []
+
+    return { mindate, maxdate, reports }
   },
-  computed: {
-    numReports () {
-      return this.reports.length
-    }
-  },
-  beforeMount () {
-    this.$http.get('reports').then(response => {
-      response.body.forEach(element => {
-        element.in_db = true
-        this.reports.push(element)
-      })
-    })
-  },
+
   methods: {
-    updateReport: function (i) {
+    numReports (): number {
+      return this.reports.length
+    },
+
+    updateReport (i: number) {
       let report = this.reports[i]
       let id = report.id
-      this.$http.put('reports/' + id, JSON.stringify(report), useJsonHeader).then(response => {
+      axios.put('reports/' + id, JSON.stringify(report), useJsonHeader).then((response: any) => {
         console.log('Updated report #' + id + ':', JSON.stringify(report))
       })
     },
+
     newReport () {
-      let lastReport = this.reports[this.numReports - 1]
+      let lastReport = this.reports[this.numReports() - 1]
       let reportTemplate = {
         id: lastReport.id + 1,
         title: '',
@@ -94,14 +94,24 @@ export default {
       console.log('Creating new report:', reportTemplate)
       this.reports.push(reportTemplate)
     },
-    downloadPdf (index) {
+
+    downloadPdf (index: number) {
       let report = this.reports[index]
       console.log('Downloading report #' + report.id)
       let link = 'http://localhost:8000/api/reports/' + report.id + '/pdf/' + report.title + '.pdf'
       window.open(link, '_blank')
     }
+  },
+
+  beforeMount () {
+    axios.get('reports').then((response: any) => {
+      response.body.forEach((element: any) => {
+        element.in_db = true
+        this.reports.push(element)
+      })
+    })
   }
-}
+})
 </script>
 
 <style>

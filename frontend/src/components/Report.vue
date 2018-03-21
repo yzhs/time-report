@@ -44,12 +44,12 @@
           </td>
           <td>
             <input type="time" name="start" placeholder="von" step="300"
-                  :min="globals.mintime" :max="globals.maxtime" required
+                  :min="mintime" :max="maxtime" required
                   v-model="item.start" v-on:change="onItemChange(index)"/>
             </td>
             <td>
             <input type="time" name="end" placeholder="bis" step="300"
-                  :min="globals.mintime" :max="globals.maxtime" required
+                  :min="mintime" :max="maxtime" required
                   v-model="item.end" v-on:change="onItemChange(index)"/>
           </td>
           <td>
@@ -69,8 +69,11 @@
   </div>
 </template>
 
-<script>
-function formatDate (date) {
+<script lang="ts">
+import Vue from 'vue'
+import axios from 'axios'
+
+function formatDate (date: Date) {
   return date.toISOString().split('T')[0]
 }
 let useJsonHeader = {
@@ -79,36 +82,50 @@ let useJsonHeader = {
   }
 }
 
-export default {
+export class Item {
+  in_db: boolean = false
+  constructor(public id: number, public name: string, public day: string,
+              public type_of_week: number, public start: string,
+              public end: string, public remark: string) {}
+}
+
+export default Vue.extend({
   data () {
-    let now = new Date()
-    let maxdate = formatDate(now)
-    let id = this.$route.params.id
+    let id: number = 1
+    let maxdate: String = formatDate(new Date())
 
     return {
-      globals: {mintime: '12:30', maxtime: '16:00'},
-      report: {id: id, title: '', mindate: '2017-08-01', maxdate: maxdate},
-      numItems: 0,
-      employees: [],
-      items: []
+      id,
+      mintime: '12:30' as String,
+      maxtime: '16:00' as String,
+      report: {id, title: '', mindate: '2017-08-01', maxdate},
+      numItems: 0 as number,
+      employees: [] as String[],
+      items: [] as Item[]
     }
   },
+
   methods: {
-    isComplete: function (id) {
-      let item = this.items[id - 1]
+    isComplete (i: number): boolean {
+      let item: Item = this.items[i - 1]
       return item.name !== ''
     },
-    updateTitle: function (e) {
-      document.title = 'Abrechung BetreuerInnen ' + e.target.value
+
+    updateTitle (e: Event) {
+      document.title = 'Abrechung BetreuerInnen ' + (e.target as any).value
     },
-    titleChanged: function (e) {
+
+    titleChanged (e: Event) {
       this.updateTitle(e)
-      this.$http.put('reports/' + this.report.id, JSON.stringify(this.report), useJsonHeader).then(response => {
+      axios.put('reports/' + this.report.id, JSON.stringify(this.report), useJsonHeader)
+          .then((response: any) => {
         console.log('Updated report #' + this.report.id + ':', this.report)
       })
     },
-    addItem: function () {
-      this.$http.get('reports/' + this.report.id + '/items/template').then(response => {
+
+    addItem () {
+      axios.get('reports/' + this.report.id + '/items/template')
+          .then((response: any) => {
         let obj = response.body
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)
@@ -117,16 +134,18 @@ export default {
       })
       this.numItems++
     },
-    onItemChange: function (index) {
+
+    onItemChange (index: number) {
       let item = this.items[index]
       console.log('Changed item #' + item.id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
-      let updateItem = Object.assign({}, item)
+      let updateItem = item as any
       if (!item.in_db) {
         updateItem.id = 0
       }
       updateItem.start_time = item.start
       updateItem.end_time = item.end
-      this.$http.put('reports/' + this.report.id + '/items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader).then(response => {
+      axios.put('reports/' + this.report.id + '/items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader)
+          .then((response: any) => {
         console.log('Done', item.in_db ? 'updating' : 'inserting')
         if (!item.in_db) {
           item.in_db = true
@@ -134,17 +153,19 @@ export default {
         }
       })
     },
+
     generatePdf () {
       let link = 'http://localhost:8000/api/reports/' + this.report.id + '/pdf'
       window.open(link, '_blank')
     }
   },
+
   beforeMount () {
-    this.$http.get('reports/' + this.report.id).then(response => {
+    axios.get('reports/' + this.report.id).then((response: any) => {
       this.report = response.body
     })
-    this.$http.get('reports/' + this.report.id + '/items').then(response => {
-      response.body.map(element => {
+    axios.get('reports/' + this.report.id + '/items').then((response: any) => {
+      response.body.map((element: Item) => {
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)
         element.in_db = true
@@ -156,11 +177,11 @@ export default {
       }
     })
 
-    this.$http.get('employees').then(response => {
+    axios.get('employees').then((response: any) => {
       this.employees = response.body
     })
   }
-}
+})
 </script>
 
 <style scoped>
