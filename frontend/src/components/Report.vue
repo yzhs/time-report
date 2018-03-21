@@ -89,19 +89,23 @@ export class Item {
               public end: string, public remark: string) {}
 }
 
+export class Report {
+  constructor(public id: number, public title: String, public mindate: String, public maxdate: String) {}
+}
+
 export default Vue.extend({
-  data () {
+  data (): {id: number, mintime: String, maxtime: String, report: Report, numItems: number, employees: String[], items: Item[]} {
     let id: number = 1
     let maxdate: String = formatDate(new Date())
 
     return {
       id,
-      mintime: '12:30' as String,
-      maxtime: '16:00' as String,
+      mintime: '12:30',
+      maxtime: '16:00',
       report: {id, title: '', mindate: '2017-08-01', maxdate},
-      numItems: 0 as number,
-      employees: [] as String[],
-      items: [] as Item[]
+      numItems: 0,
+      employees: [],
+      items: []
     }
   },
 
