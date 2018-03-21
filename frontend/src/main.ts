@@ -8,9 +8,7 @@ import router from './router'
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
 
-/*
-Vue.http.options.root = 'http://localhost:8000/api'
-*/
+axios.defaults.baseURL = 'http://localhost:8000/api'
 
 /* eslint-disable no-new */
 let v = new Vue({
