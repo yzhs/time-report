@@ -97,7 +97,6 @@ export default Vue.extend({
 
     downloadPdf (index: number) {
       let report = this.reports[index]
-      console.log('Downloading report #' + report.id)
       let link = 'http://localhost:8000/api/reports/' + report.id + '/pdf/' + report.title + '.pdf'
       window.open(link, '_blank')
     }

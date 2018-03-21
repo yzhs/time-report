@@ -123,7 +123,7 @@ export default Vue.extend({
       this.updateTitle(e)
       axios.put('reports/' + this.report.id, JSON.stringify(this.report), useJsonHeader)
           .then((response: any) => {
-        console.log('Updated report #' + this.report.id + ':', this.report)
+            // TODO error checking
       })
     },
 
@@ -141,7 +141,6 @@ export default Vue.extend({
 
     onItemChange (index: number) {
       let item = this.items[index]
-      console.log('Changed item #' + item.id + ':', item.name, item.day, item.type_of_week, item.start, item.end, item.remark)
       let updateItem = item as any
       if (!item.in_db) {
         updateItem.id = 0
@@ -150,7 +149,6 @@ export default Vue.extend({
       updateItem.end_time = item.end
       axios.put('reports/' + this.report.id + '/items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader)
           .then((response: any) => {
-        console.log('Done', item.in_db ? 'updating' : 'inserting')
         if (!item.in_db) {
           item.in_db = true
           item.id = response.data
