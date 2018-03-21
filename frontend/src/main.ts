@@ -10,9 +10,6 @@ Vue.prototype.$http = axios
 
 /*
 Vue.http.options.root = 'http://localhost:8000/api'
-
-require('./assets/normalize.css')
-require('./assets/main.css')
 */
 
 /* eslint-disable no-new */
