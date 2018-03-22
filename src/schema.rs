@@ -1,7 +1,7 @@
 infer_schema!("dotenv:DATABASE_URL");
 
-/// Tell diesel about `items_view`.
 table! {
+    /// Representation of the `items_view` view.
     items_view (id, employee_id, report_id, name, name_sort, day, type_of_week, start, end, remark) {
         id -> Integer,
         employee_id -> Integer,
