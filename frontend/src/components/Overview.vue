@@ -57,6 +57,7 @@ let useJsonHeader = {
 
 export class Report {
   inDb: boolean = false
+  was_pdf_generated: boolean = false
 
   constructor(public id: number, public title: String, public start_date: String, public end_date: String) {}
 }
@@ -102,6 +103,7 @@ export default Vue.extend({
 
     downloadPdf (index: number) {
       let report = this.reports[index]
+      report.was_pdf_generated = true
       let link = 'http://localhost:8000/api/reports/' + report.id + '/pdf/' + report.title + '.pdf'
       window.open(link, '_blank')
     }
