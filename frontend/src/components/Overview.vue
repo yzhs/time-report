@@ -56,6 +56,8 @@ let useJsonHeader = {
 }
 
 export class Report {
+  inDb: boolean = false
+
   constructor(public id: number, public title: String, public start_date: String, public end_date: String) {}
 }
 
@@ -75,16 +77,25 @@ export default Vue.extend({
 
     updateReport (i: number) {
       let report = this.reports[i]
-      let id = report.id
-      axios.put('reports/' + id, JSON.stringify(report), useJsonHeader).then((response: any) => {
-        console.log('Updated report #' + id + ':', JSON.stringify(report))
-      })
+      if (report.inDb) {
+        let id = report.id
+        axios.put('reports/' + id, JSON.stringify(report), useJsonHeader).then((response: any) => {
+          console.log('Updated report #' + id)
+        })
+      } else {
+        axios.post('reports', report, useJsonHeader).then((response: any) => {
+          console.log('Created new report #' + response.data)
+          report.id = response.data
+          report.inDb = true
+        })
+      }
     },
 
     newReport () {
       axios.get('reports/new').then((response: any) => {
         let template = response.data
         console.log('Creating new report:', template)
+        template.inDb = false
         this.reports.push(template)
       })
     },
@@ -99,7 +110,7 @@ export default Vue.extend({
   beforeMount () {
     axios.get('reports').then((response: any) => {
       response.data.forEach((element: any) => {
-        element.in_db = true
+        element.inDb = true
         this.reports.push(element)
       })
     })
