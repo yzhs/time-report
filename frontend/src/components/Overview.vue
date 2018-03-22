@@ -9,7 +9,7 @@
           <th>bis</th>
         </thead>
         <tbody>
-          <tr class="report" v-for="(report, index) in reports" :key="report.id">
+          <tr class="report" v-for="(report, index) in reports" :key="index">
             <td>
               <input type="text" class="title" name="title" v-model="report.title"
                      required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"

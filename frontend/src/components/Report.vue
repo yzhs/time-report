@@ -20,7 +20,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in items" :key="item.id">
+        <tr v-for="(item, index) in items" :key="index">
           <td>
             <input type="text" name="name" placeholder="Vorname Nachname"
                   list="employees" spellcheck="false"
