@@ -1,8 +1,6 @@
 <template>
   <div id="app" style="text-align:center">
-    <h1>
-      Abrechnung BetreuerInnen
-    </h1>
+    <h1>Abrechnung BetreuerInnen</h1>
     <input type="text" name="heading" id="heading" placeholder="Zeitraum"
            required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
            title="Bitte nur Buchstaben, Zahlen, Leerzeichen und Punkte verwenden"
@@ -26,16 +24,16 @@
                   list="employees" spellcheck="false"
                   minlength="2" maxlength="100"
                   pattern=".*[^. ,-]+.*" required
-                  v-model="item.name" v-on:change="onItemChange(index)"/>
+                  v-model="item.name" v-on:change="updateItem(index)"/>
           </td>
           <td>
             <input type="date" name="day" placeholder="Datum" required
                   :min="report.mindate" :max="report.maxdate"
-                  v-model="item.day"  v-on:change="onItemChange(index)"/>
+                  v-model="item.day"  v-on:change="updateItem(index)"/>
           </td>
           <td>
             <select name="week" v-model.number="item.type_of_week" tabindex="-1"
-                    v-on:change="onItemChange(index)">
+                    v-on:change="updateItem(index)">
               <option value="0">A</option>
               <option value="1">B</option>
               <option value="2">C</option>
@@ -45,16 +43,16 @@
           <td>
             <input type="time" name="start" placeholder="von" step="300"
                   :min="mintime" :max="maxtime" required
-                  v-model="item.start" v-on:change="onItemChange(index)"/>
+                  v-model="item.start" v-on:change="updateItem(index)"/>
             </td>
             <td>
             <input type="time" name="end" placeholder="bis" step="300"
                   :min="mintime" :max="maxtime" required
-                  v-model="item.end" v-on:change="onItemChange(index)"/>
+                  v-model="item.end" v-on:change="updateItem(index)"/>
           </td>
           <td>
             <input type="text" name="remark" placeholder="Bemerkung"
-                  v-model="item.remark" v-on:change="onItemChange(index)"/>
+                  v-model="item.remark" v-on:change="updateItem(index)"/>
           </td>
         </tr>
       </tbody>
@@ -139,7 +137,7 @@ export default Vue.extend({
       this.numItems++
     },
 
-    onItemChange (index: number) {
+    updateItem (index: number) {
       let item = this.items[index]
       let updateItem = item as any
       if (!item.inDb) {
