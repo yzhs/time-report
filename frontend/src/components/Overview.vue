@@ -27,7 +27,8 @@
                      required :min="report.start_date" :max="report.maxdate" v-on:change="updateReport(index)">
             </td>
             <td>
-              <router-link class="edit" :to="{name: 'report', params: {id: report.id}}">
+              <router-link class="edit" style="padding: 0 1.5em;"
+                           :to="{name: 'report', params: {id: report.id}}">
                 
               </router-link>
             </td>
@@ -200,5 +201,6 @@ button {
   text-decoration: none;
   white-space: nowrap;
   color: #369;
+  font-size: 150%;
 }
 </style>
