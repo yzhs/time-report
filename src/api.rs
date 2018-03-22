@@ -83,8 +83,8 @@ fn put_report(conn: db::DbConn, id: i32, report: Json<Report>) -> Result<()> {
 }
 
 #[post("/reports", format = "application/json", data = "<report>")]
-fn add_report(conn: db::DbConn, report: Json<Report>) -> Result<()> {
-    reports::add(&conn, &report.into_inner())
+fn add_report(conn: db::DbConn, report: Json<Report>) -> Result<Json<i32>> {
+    reports::add(&conn, &report.into_inner()).map(Json)
 }
 
 #[get("/reports/<id>/pdf/<_filename>")]

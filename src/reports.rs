@@ -38,14 +38,23 @@ pub fn get_all(conn: &SqliteConnection) -> Result<Vec<Report>> {
 }
 
 /// Insert a new report into the database.
-pub fn add(conn: &SqliteConnection, report: &Report) -> Result<()> {
+pub fn add(conn: &SqliteConnection, report: &Report) -> Result<i32> {
+    use schema::reports::dsl::*;
+
     assert!(report.id >= 0);
 
-    diesel::insert_into(reports::table)
+    diesel::insert_into(reports)
         .values(report)
         .execute(conn)
-        .map(|_| ())
-        .chain_err(|| format!("Failed to insert new report: {:?}", report))
+        .chain_err(|| format!("Failed to insert new report: {:?}", report))?;
+
+    reports
+        .select(id)
+        .filter(start_date.eq(&report.start_date))
+        .filter(end_date.eq(&report.end_date))
+        .filter(title.eq(&report.title))
+        .first(conn)
+        .chain_err(|| "Failed to get report that was just inserted")
 }
 
 /// Replace a report in the database.
