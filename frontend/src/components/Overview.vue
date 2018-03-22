@@ -4,9 +4,9 @@
 
       <table>
         <thead>
-          <th>Titel</th>
-          <th>von</th>
-          <th>bis</th>
+          <th style="min-width: 20em;">Titel</th>
+          <th style="min-width: 10em;">von</th>
+          <th style="min-width: 10em;">bis</th>
         </thead>
         <tbody>
           <tr class="report" v-for="(report, index) in reports" :key="index">
