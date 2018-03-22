@@ -7,6 +7,8 @@
           <th style="min-width: 20em;">Titel</th>
           <th style="min-width: 10em;">von</th>
           <th style="min-width: 10em;">bis</th>
+          <th style="min-width: 5em;">Bearbeiten</th>
+          <th style="min-width: 5em;" colspan="2">PDF</th>
         </thead>
         <tbody>
           <tr class="report" v-for="(report, index) in reports" :key="index">
@@ -26,12 +28,14 @@
             </td>
             <td>
               <router-link class="edit" :to="{name: 'report', params: {id: report.id}}">
-                Bearbeiten
+                
               </router-link>
             </td>
             <td>
-              <a class="edit" href="#" v-if="report.was_pdf_generated" v-on:click="downloadPdf(index)">PDF speichern</a>
-              <a class="edit" href="#" v-else v-on:click="downloadPdf(index)">PDF erzeugen</a>
+              <input type="checkbox" onclick="return false;" v-model="report.was_pdf_generated">
+            </td>
+            <td>
+              <a class="edit" href="#" v-on:click="downloadPdf(index)"></a>
             </td>
           </tr>
         </tbody>
@@ -186,7 +190,13 @@ button {
   margin: 1em;
 }
 
+@font-face {
+  font-family: FontAwesome;
+  src: url("../assets/fa-regular-400.woff2");
+}
+
 .edit {
+  font-family: FontAwesome;
   text-decoration: none;
   white-space: nowrap;
   color: #369;
