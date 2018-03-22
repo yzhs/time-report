@@ -129,7 +129,7 @@ fn run() -> Result<()> {
     let (allowed_origins, _failed_origins) = AllowedOrigins::some(&["http://localhost:8080"]);
     let options = rocket_cors::Cors {
         allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Put]
+        allowed_methods: vec![Method::Get, Method::Post, Method::Put]
             .into_iter()
             .map(From::from)
             .collect(),
