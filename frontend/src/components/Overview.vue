@@ -18,11 +18,11 @@
             </td>
             <td>
               <input type="date" name="start_date" v-model="report.start_date"
-                     required :min="mindate" :max="maxdate" v-on:change="updateReport(index)">
+                     required :min="report.mindate" :max="report.end_date" v-on:change="updateReport(index)">
             </td>
             <td>
               <input type="date" name="end_date" v-model="report.end_date"
-                     required :min="mindate" :max="maxdate" v-on:change="updateReport(index)">
+                     required :min="report.start_date" :max="report.maxdate" v-on:change="updateReport(index)">
             </td>
             <td>
               <router-link class="edit" :to="{name: 'report', params: {id: report.id}}">
@@ -58,13 +58,15 @@ let useJsonHeader = {
 export class Report {
   inDb: boolean = false
   was_pdf_generated: boolean = false
+  mindate: String = '2017-08-01'
+  maxdate: String = formatDate(new Date())
 
   constructor(public id: number, public title: String, public start_date: String, public end_date: String) {}
 }
 
 export default Vue.extend({
   data (): {mindate: String, maxdate: String, reports: Report[]} {
-    let mindate = '2017-07-01'
+    let mindate = '2017-08-01'
     let maxdate = formatDate(new Date())
     let reports: Report[] = []
 
@@ -90,15 +92,57 @@ export default Vue.extend({
           report.inDb = true
         })
       }
+
+      this.updateNeighbors(i)
     },
 
     newReport () {
       axios.get('reports/new').then((response: any) => {
-        let template = response.data
-        console.log('Creating new report:', template)
+        let template: Report = response.data
         template.inDb = false
-        this.reports.push(template)
+
+        console.log('Creating new report:', template)
+
+        this.pushReport(template)
       })
+    },
+
+    /**
+     * Adjust the `mindate` and `maxdate` of the following or previous report,
+     * respectively.
+     */
+    updateNeighbors (i: number = -1) {
+      if (i === -1) {
+        i = this.reports.length - 1
+      }
+      let len = this.reports.length
+      let report = this.reports[i]
+      if (len == 1) {
+        report.mindate = this.mindate
+        report.maxdate = this.maxdate
+        return
+      }
+
+      if (i > 0) {
+        this.reports[i - 1].maxdate = report.start_date
+        report.mindate = this.reports[i - 1].end_date
+      }
+      if (i < len - 1) {
+        this.reports[i + 1].mindate = report.end_date
+        report.maxdate = this.reports[i + 1].start_date
+      }
+    },
+
+    /**
+     * Add a new report to the list of reports. Set the `maxdate` property on
+     * that report and adjust the maxdate on the previous report.
+     */
+    pushReport (report: Report) {
+      report.maxdate = formatDate(new Date())
+
+      this.reports.push(report)
+
+      this.updateNeighbors()
     },
 
     downloadPdf (index: number) {
@@ -113,7 +157,7 @@ export default Vue.extend({
     axios.get('reports').then((response: any) => {
       response.data.forEach((element: any) => {
         element.inDb = true
-        this.reports.push(element)
+        this.pushReport(element)
       })
     })
   }
