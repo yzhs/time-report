@@ -65,6 +65,11 @@ fn get_reports(conn: db::DbConn) -> Result<Json<Vec<Report>>> {
     reports::get_all(&conn).map(Json)
 }
 
+#[get("/reports/new", format = "application/json")]
+fn report_template(conn: db::DbConn) -> Json<Report> {
+    Json(reports::template(&conn))
+}
+
 #[get("/reports/<id>", format = "application/json")]
 fn get_report(conn: db::DbConn, id: i32) -> Result<Json<Report>> {
     reports::get(&conn, id).map(Json)
@@ -91,6 +96,7 @@ fn generate_pdf_report(conn: db::DbConn, id: i32, _filename: String) -> Result<N
 pub fn routes() -> Vec<::rocket::Route> {
     routes![
         item_template,
+        report_template,
         get_reports,
         get_report,
         put_report,

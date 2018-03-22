@@ -82,17 +82,11 @@ export default Vue.extend({
     },
 
     newReport () {
-      let lastReport = this.reports[this.numReports() - 1]
-      let reportTemplate = {
-        id: lastReport.id + 1,
-        title: '',
-        start_date: lastReport.end_date,
-        end_date: '2018-01-01',
-        was_pdf_generated: false,
-        in_db: false
-      }
-      console.log('Creating new report:', reportTemplate)
-      this.reports.push(reportTemplate)
+      axios.get('reports/new').then((response: any) => {
+        let template = response.data
+        console.log('Creating new report:', template)
+        this.reports.push(template)
+      })
     },
 
     downloadPdf (index: number) {

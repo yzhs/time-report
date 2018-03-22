@@ -1,7 +1,10 @@
+use chrono::NaiveDate;
+use chrono::Local;
 use diesel;
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 
+use DATE_FORMAT;
 use errors::*;
 use schema::reports;
 use weeks::TYPE_OF_WEEK_NAME;
@@ -202,4 +205,38 @@ pub fn set_pdf_generated(conn: &SqliteConnection, id: i32) {
         .set(reports::was_pdf_generated.eq(true))
         .execute(conn)
         .expect("Failed to update was_pdf_generated");
+}
+
+/// Generate reasonable start and end date for a new report.
+pub fn template(conn: &SqliteConnection) -> Report {
+    use schema::reports;
+
+    let id;
+    let start_date;
+
+    match reports::table
+        .order(reports::end_date.desc())
+        .first::<Report>(conn)
+    {
+        Ok(last_report) => {
+            id = last_report.id + 1;
+
+            let tmp = ::holidays::next_schoolday(
+                NaiveDate::parse_from_str(&last_report.end_date, DATE_FORMAT).unwrap(),
+            );
+            start_date = format!("{}", tmp.format(DATE_FORMAT));
+        }
+        Err(e) => {
+            warn!("No previous report ({}). Taking a guess...", e);
+            id = 1;
+            start_date = "2017-08-30".to_string(); // TODO first day of the current school year
+        }
+    }
+    Report {
+        id,
+        title: "".to_string(),
+        start_date,
+        end_date: format!("{}", Local::today().format(DATE_FORMAT)),
+        was_pdf_generated: false,
+    }
 }
