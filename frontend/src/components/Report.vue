@@ -83,7 +83,7 @@ let useJsonHeader = {
 }
 
 export class Item {
-  in_db: boolean = false
+  inDb: boolean = false
   constructor(public id: number, public name: string, public day: string,
               public type_of_week: number, public start: string,
               public end: string, public remark: string) {}
@@ -133,7 +133,7 @@ export default Vue.extend({
         let obj = response.data
         obj.start = obj.start.substr(0, 5)
         obj.end = obj.end.substr(0, 5)
-        obj.in_db = false
+        obj.inDb = false
         this.items.push(obj)
       })
       this.numItems++
@@ -142,15 +142,15 @@ export default Vue.extend({
     onItemChange (index: number) {
       let item = this.items[index]
       let updateItem = item as any
-      if (!item.in_db) {
+      if (!item.inDb) {
         updateItem.id = 0
       }
       updateItem.start_time = item.start
       updateItem.end_time = item.end
       axios.put('reports/' + this.report.id + '/items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader)
           .then((response: any) => {
-        if (!item.in_db) {
-          item.in_db = true
+        if (!item.inDb) {
+          item.inDb = true
           item.id = response.data
         }
       })
@@ -170,7 +170,7 @@ export default Vue.extend({
       response.data.map((element: Item) => {
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)
-        element.in_db = true
+        element.inDb = true
         this.items.push(element)
         this.numItems++
       })
