@@ -27,10 +27,15 @@ impl RawReportData {
         Ok(RawReportData { metadata, items })
     }
 
+    fn sanitized_path(&self) -> String {
+        let slashes_replaced = self.metadata.title.replace('/', "_");
+        slashes_replaced.replace('\0', "_")
+    }
+
     fn write_csv(&self) -> Result<()> {
         let mut path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("csv")
-            .join(&self.metadata.title);
+            .join(&self.sanitized_path());
         path.set_extension("csv");
 
         let mut writer = csv::Writer::from_file(path).expect("Failed to create CSV writer");
@@ -75,7 +80,7 @@ impl RawReportData {
 
         let dir = TempDir::new("generate-pdf").expect("Failed to create temporary directory");
 
-        let path = dir.path().join(self.metadata.title.clone().add(".tex"));
+        let path = dir.path().join(self.sanitized_path().add(".tex"));
 
         let mut file = File::create(&path).expect("Failed to create LaTeX file");
         file.write_all(latex.as_bytes())
