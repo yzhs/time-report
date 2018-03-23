@@ -49,31 +49,17 @@
 <script lang="ts">
 import Vue from 'vue'
 import axios from 'axios'
+import { Report, formatDate, useJsonHeader } from '../util'
 
-function formatDate (date: Date) {
-  return date.toISOString().split('T')[0]
-}
-
-let useJsonHeader = {
-  headers: {
-    'Content-Type': 'application/json'
-  }
-}
-
-export class Report {
+export class ExtendedReport extends Report {
   inDb: boolean = false
-  was_pdf_generated: boolean = false
-  mindate: String = '2017-08-01'
-  maxdate: String = formatDate(new Date())
-
-  constructor(public id: number, public title: String, public start_date: String, public end_date: String) {}
 }
 
 export default Vue.extend({
-  data (): {mindate: String, maxdate: String, reports: Report[]} {
+  data (): {mindate: string, maxdate: string, reports: ExtendedReport[]} {
     let mindate = '2017-08-01'
     let maxdate = formatDate(new Date())
-    let reports: Report[] = []
+    let reports: ExtendedReport[] = []
 
     return { mindate, maxdate, reports }
   },
@@ -103,7 +89,7 @@ export default Vue.extend({
 
     newReport () {
       axios.get('reports/new').then((response: any) => {
-        let template: Report = response.data
+        let template: ExtendedReport = response.data
         template.inDb = false
 
         console.log('Creating new report:', template)
@@ -142,7 +128,7 @@ export default Vue.extend({
      * Add a new report to the list of reports. Set the `maxdate` property on
      * that report and adjust the maxdate on the previous report.
      */
-    pushReport (report: Report) {
+    pushReport (report: ExtendedReport) {
       report.maxdate = formatDate(new Date())
 
       this.reports.push(report)

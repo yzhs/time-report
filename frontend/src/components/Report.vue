@@ -70,31 +70,22 @@
 <script lang="ts">
 import Vue from 'vue'
 import axios from 'axios'
+import { Item, Report, formatDate, useJsonHeader } from '../util'
 
-function formatDate (date: Date) {
-  return date.toISOString().split('T')[0]
-}
-let useJsonHeader = {
-  headers: {
-    'Content-Type': 'application/json'
-  }
-}
-
-export class Item {
-  inDb: boolean = false
-  constructor(public id: number, public name: string, public day: string,
-              public type_of_week: number, public start: string,
-              public end: string, public remark: string) {}
-}
-
-export class Report {
-  constructor(public id: number, public title: String, public mindate: String, public maxdate: String) {}
+interface ReportData {
+  id: number,
+  mintime: string
+  maxtime: string
+  report: any
+  numItems: number
+  employees: string[]
+  items: Item[]
 }
 
 export default Vue.extend({
-  data (): {id: number, mintime: String, maxtime: String, report: Report, numItems: number, employees: String[], items: Item[]} {
+  data (): ReportData {
     let id: number = 1
-    let maxdate: String = formatDate(new Date())
+    let maxdate: string = formatDate(new Date())
 
     return {
       id,

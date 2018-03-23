@@ -16,5 +16,9 @@ export class Item {
 }
 
 export class Report {
-  constructor(public id: number, public title: String, public mindate: String, public maxdate: String) {}
+  mindate: string = '2017-08-01'
+  maxdate: string = formatDate(new Date())
+  was_pdf_generated: boolean = false
+
+  constructor(public id: number, public title: string, public start_date: string, public end_date: string) {}
 }
