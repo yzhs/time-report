@@ -77,7 +77,6 @@ interface ReportData {
   mintime: string
   maxtime: string
   report: any
-  numItems: number
   employees: string[]
   items: Item[]
 }
@@ -92,7 +91,6 @@ export default Vue.extend({
       mintime: '12:30',
       maxtime: '16:00',
       report: {id, title: '', mindate: '2017-08-01', maxdate},
-      numItems: 0,
       employees: [],
       items: []
     }
@@ -125,7 +123,6 @@ export default Vue.extend({
         obj.inDb = false
         this.items.push(obj)
       })
-      this.numItems++
     },
 
     updateItem (index: number) {
@@ -162,9 +159,8 @@ export default Vue.extend({
         element.end = element.end.substr(0, 5)
         element.inDb = true
         this.items.push(element)
-        this.numItems++
       })
-      if (this.numItems === 0) {
+      if (this.items.length === 0) {
         this.newItem()
       }
     })
