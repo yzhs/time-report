@@ -166,6 +166,7 @@ export default Vue.extend({
     })
     axios.get('reports/' + this.report.id + '/items').then((response: any) => {
       response.data.map((element: Item) => {
+        // Strip trailing ':00' from time strings
         element.start = element.start.substr(0, 5)
         element.end = element.end.substr(0, 5)
         element.inDb = true
