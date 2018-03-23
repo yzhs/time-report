@@ -58,7 +58,7 @@
       </tbody>
     </table>
 
-    <button id="add-item" v-on:click="addItem">neue Zeile</button>
+    <button id="add-item" v-on:click="newItem">neue Zeile</button>
     <button id="generate" name="generate" v-on:click="generatePdf">PDF erzeugen</button>
 
     <datalist id="employees">
@@ -125,7 +125,7 @@ export default Vue.extend({
       })
     },
 
-    addItem () {
+    newItem () {
       axios.get('reports/' + this.report.id + '/items/template')
           .then((response: any) => {
         let obj = response.data
@@ -173,7 +173,7 @@ export default Vue.extend({
         this.numItems++
       })
       if (this.numItems === 0) {
-        this.addItem()
+        this.newItem()
       }
     })
 
