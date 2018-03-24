@@ -11,7 +11,7 @@ use weeks::{get_type_of_week, NewWeek};
 use DATE_FORMAT;
 use TIME_FORMAT;
 
-lazy_static!{
+lazy_static! {
     static ref START_DEFAULT: NaiveTime = NaiveTime::from_hms(13, 0, 0);
     static ref END_DEFAULT: NaiveTime = NaiveTime::from_hms(15, 30, 0);
 }
@@ -108,10 +108,9 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
         .order(items_view::day.desc())
         .first::<InvoiceItem>(conn)
     {
-        Ok(last) => {
-            let mut result = last.next();
-            result.id = 0;
-            result
+        Ok(mut last) => {
+            last.id = 0;
+            last
         }
         Err(e) => {
             warn!("Could not find previous item: {:?}", e);
