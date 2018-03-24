@@ -103,13 +103,17 @@ export default Vue.extend({
       return item.name !== ''
     },
 
+    setTitle (title: string) {
+      document.title = 'Abrechung BetreuerInnen ' + title
+    },
+
     updateTitle (e: Event) {
-      document.title = 'Abrechung BetreuerInnen ' + (e.target as any).value
+      this.setTitle((e.target as any).value)
     },
 
     titleChanged (e: Event) {
       this.updateTitle(e)
-      axios.put('reports/' + this.report.id, JSON.stringify(this.report), useJsonHeader)
+      axios.put('reports/' + this.report.id, this.report)
       .catch((reason: any) => {
         console.error('Error creating updating title:', reason.response.data.message)
       })
@@ -156,6 +160,7 @@ export default Vue.extend({
   beforeMount () {
     axios.get('reports/' + this.report.id).then((response: any) => {
       this.report = response.data
+      this.setTitle(this.report.title)
     }).catch((reason: any) => {
       console.error('Error getting current report:', reason.response.data.message)
     })
