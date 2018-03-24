@@ -27,9 +27,11 @@
                   v-model="item.name" v-on:change="updateItem(index)"/>
           </td>
           <td>
+            <button class="plus-minus minus" v-on:mousedown="previousDate(index)" tabindex="-1">–</button>
             <input type="date" name="day" placeholder="Datum" required
                   :min="report.mindate" :max="report.maxdate"
                   v-model="item.day"  v-on:change="updateItem(index)"/>
+            <button class="plus-minus plus" v-on:mousedown="nextDate(index)" tabindex="-1">+</button>
           </td>
           <td>
             <select name="week" v-model.number="item.type_of_week" tabindex="-1"
@@ -70,7 +72,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Route } from "vue-router"
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { Item, Report, formatDate, useJsonHeader } from '../util'
 
 interface ReportData {
@@ -151,6 +153,20 @@ export default Vue.extend({
       })
     },
 
+    nextDate (i: number) {
+      axios.get('next_schoolday/' + this.items[i].day)
+           .then((response: AxiosResponse<string>) => {
+             this.items[i].day = response.data
+           })
+    },
+
+    previousDate (i: number) {
+      axios.get('previous_schoolday/' + this.items[i].day)
+           .then((response: AxiosResponse<string>) => {
+             this.items[i].day = response.data
+           })
+    },
+
     generatePdf () {
       let link = 'http://localhost:8000/api/reports/' + this.report.id + '/pdf/' + this.report.title + '.pdf'
       window.open(link, '_blank')
@@ -198,14 +214,35 @@ button {
   font-size: 150%;
   color: white;
   background-color: #369;
-  color: white;
   margin: 1em;
   padding: 0.3em;
   border-radius: 0;
+}
+
+button.plus-minus {
+  width: 1.5em;
+  font-size: 100%;
+  margin: 0;
+  color: #369;
+  background-color: rgba(0, 0, 0, 0.1);
+  font-weight: bolder;
+}
+
+button.minus {
+  border-radius: 5px 0 0 5px
+}
+
+button.plus {
+  border-radius: 0 5px 5px 0
 }
 
 td:nth-child(1) {
   min-width: 20ex;
   text-align: left;
 }
+
+td:nth-child(2) {
+  min-width: 11em;
+}
+
 </style>
