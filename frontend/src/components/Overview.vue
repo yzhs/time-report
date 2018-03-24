@@ -75,12 +75,16 @@ export default Vue.extend({
         let id = report.id
         axios.put('reports/' + id, JSON.stringify(report), useJsonHeader).then((response: any) => {
           console.log('Updated report #' + id)
+        }).catch((reason: any) => {
+          console.error('Error updating report #' + id+ ':', reason.response.data.message)
         })
       } else {
         axios.post('reports', report, useJsonHeader).then((response: any) => {
           console.log('Created new report #' + response.data)
           report.id = response.data
           report.inDb = true
+        }).catch((reason: any) => {
+          console.error('Error posting report:', reason.response.data.message)
         })
       }
 
@@ -95,6 +99,8 @@ export default Vue.extend({
         console.log('Creating new report:', template)
 
         this.pushReport(template)
+      }).catch((reason: any) => {
+        console.error('Error getting report template:', reason.response.data.message)
       })
     },
 
@@ -150,6 +156,8 @@ export default Vue.extend({
         element.inDb = true
         this.pushReport(element)
       })
+    }).catch((reason: any) => {
+      console.error('Error getting all reports:', reason.response.data.message)
     })
   }
 })

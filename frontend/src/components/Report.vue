@@ -110,8 +110,8 @@ export default Vue.extend({
     titleChanged (e: Event) {
       this.updateTitle(e)
       axios.put('reports/' + this.report.id, JSON.stringify(this.report), useJsonHeader)
-          .then((response: any) => {
-            // TODO error checking
+      .catch((reason: any) => {
+        console.error('Error creating updating title:', reason.response.data.message)
       })
     },
 
@@ -123,6 +123,8 @@ export default Vue.extend({
         obj.end = obj.end.substr(0, 5)
         obj.inDb = false
         this.items.push(obj)
+      }).catch((reason: any) => {
+        console.error('Error creating new item:', reason.response.data.message)
       })
     },
 
@@ -140,6 +142,8 @@ export default Vue.extend({
           item.inDb = true
           item.id = response.data
         }
+      }).catch((reason: any) => {
+        console.error('Error creating updating item:', reason.response.data.message)
       })
     },
 
@@ -152,6 +156,8 @@ export default Vue.extend({
   beforeMount () {
     axios.get('reports/' + this.report.id).then((response: any) => {
       this.report = response.data
+    }).catch((reason: any) => {
+      console.error('Error getting current report:', reason.response.data.message)
     })
     axios.get('reports/' + this.report.id + '/items').then((response: any) => {
       response.data.map((element: Item) => {
@@ -164,10 +170,15 @@ export default Vue.extend({
       if (this.items.length === 0) {
         this.newItem()
       }
+    }).catch((reason: any) => {
+      console.error('Error getting all items:', reason.response.data.message)
     })
 
     axios.get('employees').then((response: any) => {
+      // TODO update employees later?
       this.employees = response.data
+    }).catch((reason: any) => {
+      console.error('Error list of employees:', reason.response.data.message)
     })
   }
 })
