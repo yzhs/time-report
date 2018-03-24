@@ -148,7 +148,7 @@ export default Vue.extend({
     },
 
     generatePdf () {
-      let link = 'http://localhost:8000/api/reports/' + this.report.id + '/pdf'
+      let link = 'http://localhost:8000/api/reports/' + this.report.id + '/pdf/' + this.report.title + '.pdf'
       window.open(link, '_blank')
     }
   },
