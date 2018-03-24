@@ -239,6 +239,19 @@ pub fn next_schoolday(mut date: NaiveDate) -> NaiveDate {
     date
 }
 
+/// The previous day of school
+///
+/// Return the last day of school befor `date`, i.e. the last day that is neither a school or
+/// other holiday, nor on a weekend.
+pub fn previous_schoolday(mut date: NaiveDate) -> NaiveDate {
+    use chrono::Weekday;
+    date = date.pred();
+    while date.weekday() == Weekday::Sat || date.weekday() == Weekday::Sun || is_holiday(date) {
+        date = date.pred();
+    }
+    date
+}
+
 /// Map of all holidays in the database.
 ///
 /// Return a map of all holidays mapping dates formatted as a string to the name of the holiday.

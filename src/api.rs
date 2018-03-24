@@ -103,6 +103,14 @@ fn get_next_schoolday(day: String) -> Result<Json<NaiveDate>> {
         .map(Json)
 }
 
+#[get("/previous_schoolday/<day>")]
+fn get_previous_schoolday(day: String) -> Result<Json<NaiveDate>> {
+    NaiveDate::parse_from_str(&day, DATE_FORMAT)
+        .chain_err(|| "Invalid date format")
+        .map(holidays::previous_schoolday)
+        .map(Json)
+}
+
 pub fn routes() -> Vec<::rocket::Route> {
     routes![
         item_template,
@@ -118,5 +126,6 @@ pub fn routes() -> Vec<::rocket::Route> {
         set_item,
         generate_pdf_report,
         get_next_schoolday,
+        get_previous_schoolday,
     ]
 }
