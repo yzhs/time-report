@@ -5,9 +5,11 @@
 
 use std::collections::HashMap;
 
+use chrono::NaiveDate;
 use rocket::response::NamedFile;
 use rocket_contrib::Json;
 
+use DATE_FORMAT;
 use db;
 use errors::*;
 use employees;
@@ -93,6 +95,14 @@ fn generate_pdf_report(conn: db::DbConn, id: i32, _filename: String) -> Result<N
     NamedFile::open(&pdf_file).chain_err(|| format!("Failed to open file {:?}", pdf_file))
 }
 
+#[get("/next_schoolday/<day>")]
+fn get_next_schoolday(day: String) -> Result<Json<NaiveDate>> {
+    NaiveDate::parse_from_str(&day, DATE_FORMAT)
+        .chain_err(|| "Invalid date format")
+        .map(holidays::next_schoolday)
+        .map(Json)
+}
+
 pub fn routes() -> Vec<::rocket::Route> {
     routes![
         item_template,
@@ -107,5 +117,6 @@ pub fn routes() -> Vec<::rocket::Route> {
         add_report,
         set_item,
         generate_pdf_report,
+        get_next_schoolday,
     ]
 }
