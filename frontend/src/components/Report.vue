@@ -69,6 +69,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Route } from "vue-router"
 import axios from 'axios'
 import { Item, Report, formatDate, useJsonHeader } from '../util'
 
@@ -83,7 +84,7 @@ interface ReportData {
 
 export default Vue.extend({
   data (): ReportData {
-    let id: number = 1
+    let id: number = Number(this.$route.params.id)
     let maxdate: string = formatDate(new Date())
 
     return {
