@@ -156,14 +156,16 @@ export default Vue.extend({
     nextDate (i: number) {
       axios.get('next_schoolday/' + this.items[i].day)
            .then((response: AxiosResponse<string>) => {
-             this.items[i].day = response.data
+              this.items[i].day = response.data
+              this.updateItem(i)
            })
     },
 
     previousDate (i: number) {
       axios.get('previous_schoolday/' + this.items[i].day)
            .then((response: AxiosResponse<string>) => {
-             this.items[i].day = response.data
+              this.items[i].day = response.data
+              this.updateItem(i)
            })
     },
 
