@@ -149,18 +149,18 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
         .values(&new_week)
         .execute(conn)
         .chain_err(|| "Failed to replace week values")?;
+    let new_item = (
+        items::employee_id.eq(employee_id),
+        items::report_id.eq(report_id),
+        items::start_datetime.eq(format!("{}", start_datetime)),
+        items::end_datetime.eq(format!("{}", end_datetime)),
+        items::remark.eq(&new_row.remark),
+    );
 
     // TODO Can we merge both branches?
     if id == 0 {
         // Insert new item
         info!("Creating new item: {:?}", new_row);
-        let new_item = (
-            items::employee_id.eq(employee_id),
-            items::report_id.eq(report_id),
-            items::start_datetime.eq(format!("{}", start_datetime)),
-            items::end_datetime.eq(format!("{}", end_datetime)),
-            items::remark.eq(&new_row.remark),
-        );
         diesel::insert_into(items::table)
             .values(&new_item)
             .execute(conn)
@@ -173,18 +173,10 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
     } else {
         // Update existing item
         info!("Updating item #{}: {:?}", id, new_row);
-        let new_item = (
-            items::id.eq(id),
-            items::employee_id.eq(employee_id),
-            items::report_id.eq(report_id),
-            items::start_datetime.eq(format!("{}", start_datetime)),
-            items::end_datetime.eq(format!("{}", end_datetime)),
-            items::remark.eq(&new_row.remark),
-        );
-        diesel::replace_into(items::table)
-            .values(&new_item)
+        diesel::update(items::table.filter(items::id.eq(id)))
+            .set(new_item.clone())
             .execute(conn)
-            .chain_err(|| format!("Failed to replace item {:?}", new_item))?;
+            .chain_err(|| format!("Failed to update item {:?}", new_item))?;
         Ok(id)
     }
 }
