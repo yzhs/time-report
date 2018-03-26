@@ -112,6 +112,7 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
     {
         Ok(mut last) => {
             last.id = 0;
+            last.name = "".into();
             last
         }
         Err(e) => {
