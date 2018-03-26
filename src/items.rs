@@ -88,6 +88,8 @@ pub fn get(conn: &SqliteConnection, report_id: i32) -> Result<Vec<InvoiceItem>> 
 
     items_view::table
         .filter(items_view::report_id.eq(report_id))
+        .order(items_view::day)
+        .order(items_view::name)
         .load::<InvoiceItem>(conn)
         .chain_err(|| {
             format!(
