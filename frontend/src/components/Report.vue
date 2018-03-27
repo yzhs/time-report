@@ -19,21 +19,21 @@
       </thead>
       <tbody>
         <tr v-for="(item, index) in items" :key="index">
-          <td>
+          <td v-bind:class="{ unmodified: !item.isModified('name') }">
             <input type="text" name="name" placeholder="Vorname Nachname"
                   list="employees" spellcheck="false"
                   minlength="2" maxlength="100"
                   pattern=".*[^. ,-]+.*" required
-                  v-model="item.name" v-on:change="updateItem(index)"/>
+                  v-model="item.name" v-on:change="updateItem(index, 'name')"/>
           </td>
-          <td>
+          <td v-bind:class="{ unmodified: !item.isModified('date') }">
             <button class="plus-minus minus" v-on:mousedown="previousDate(index)" tabindex="-1">–</button>
             <input type="date" name="day" placeholder="Datum" required
                   :min="report.mindate" :max="report.maxdate"
-                  v-model="item.day"  v-on:change="updateItem(index)"/>
+                  v-model="item.day"  v-on:change="updateItem(index, 'date')"/>
             <button class="plus-minus plus" v-on:mousedown="nextDate(index)" tabindex="-1">+</button>
           </td>
-          <td>
+          <td v-bind:class="{ unmodified: !item.isModified('date') }">
             <select name="week" v-model.number="item.type_of_week" tabindex="-1"
                     v-on:change="updateItem(index)">
               <option value="0">A</option>
@@ -42,15 +42,15 @@
               <option value="3">D</option>
             </select>
           </td>
-          <td>
+          <td v-bind:class="{ unmodified: !item.isModified('start') }">
             <input type="time" name="start" placeholder="von" step="300"
                   :min="mintime" :max="maxtime" required
-                  v-model="item.start" v-on:change="updateItem(index)"/>
-            </td>
-            <td>
+                  v-model="item.start" v-on:change="updateItem(index, 'start')"/>
+          </td>
+          <td v-bind:class="{ unmodified: !item.isModified('end') }">
             <input type="time" name="end" placeholder="bis" step="300"
                   :min="mintime" :max="maxtime" required
-                  v-model="item.end" v-on:change="updateItem(index)"/>
+                  v-model="item.end" v-on:change="updateItem(index, 'end')"/>
           </td>
           <td>
             <input type="text" name="remark" placeholder="Bemerkung"
@@ -73,7 +73,7 @@
 import Vue from 'vue'
 import { Route } from "vue-router"
 import axios, { AxiosResponse } from 'axios'
-import { Item, Report, formatDate, useJsonHeader } from '../util'
+import { Item, Report, formatDate, newItem, useJsonHeader } from '../util'
 
 interface ReportData {
   id: number,
@@ -124,18 +124,20 @@ export default Vue.extend({
     newItem () {
       axios.get('reports/' + this.report.id + '/items/template')
           .then((response: any) => {
-        let obj = response.data
-        obj.start = obj.start.substr(0, 5)
-        obj.end = obj.end.substr(0, 5)
-        obj.inDb = false
-        this.items.push(obj)
+        let item = newItem(response.data)
+        this.items.push(item)
       }).catch((reason: any) => {
         console.error('Error creating new item:', reason.response.data.message)
       })
     },
 
-    updateItem (index: number) {
+    updateItem (index: number, field?: string) {
       let item = this.items[index]
+
+      if (field !== null) {
+        item.modify(field!)
+      }
+
       let updateItem = item as any
       if (!item.inDb) {
         updateItem.id = 0
@@ -144,9 +146,10 @@ export default Vue.extend({
       updateItem.end_time = item.end
       axios.put('reports/' + this.report.id + '/items/' + updateItem.id, JSON.stringify(updateItem), useJsonHeader)
           .then((response: any) => {
+        let newItem = response.data
         if (!item.inDb) {
           item.inDb = true
-          item.id = response.data
+          item.id = newItem.id
         }
       }).catch((reason: any) => {
         console.error('Error creating updating item:', reason.response.data.message)
@@ -157,7 +160,7 @@ export default Vue.extend({
       axios.get('next_schoolday/' + this.items[i].day)
            .then((response: AxiosResponse<string>) => {
               this.items[i].day = response.data
-              this.updateItem(i)
+              this.updateItem(i, 'date')
            })
     },
 
@@ -165,7 +168,7 @@ export default Vue.extend({
       axios.get('previous_schoolday/' + this.items[i].day)
            .then((response: AxiosResponse<string>) => {
               this.items[i].day = response.data
-              this.updateItem(i)
+              this.updateItem(i, 'date')
            })
     },
 
@@ -184,11 +187,10 @@ export default Vue.extend({
     })
     axios.get('reports/' + this.report.id + '/items').then((response: any) => {
       response.data.map((element: Item) => {
-        // Strip trailing ':00' from time strings
-        element.start = element.start.substr(0, 5)
-        element.end = element.end.substr(0, 5)
-        element.inDb = true
-        this.items.push(element)
+        let item = newItem(element)
+        item.inDb = true
+        item.allModified()
+        this.items.push(item)
       })
       if (this.items.length === 0) {
         this.newItem()
@@ -210,6 +212,10 @@ export default Vue.extend({
 <style scoped>
 #heading {
   width: 23em;
+}
+
+.unmodified > * {
+  background: lightblue;
 }
 
 button {
