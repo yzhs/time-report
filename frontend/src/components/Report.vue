@@ -31,7 +31,8 @@
             <button class="plus-minus minus" v-on:mousedown="previousDate(index)" tabindex="-1">–</button>
             <input type="date" name="day" placeholder="Datum" required
                   :min="report.mindate" :max="report.maxdate"
-                  v-model="item.day"  v-on:change="updateItem(index, 'date')"/>
+                  v-model="item.day"  v-on:change="updateItem(index, 'date')"
+                  v-on:blur="item.modify('date')"/>
             <button class="plus-minus plus" v-on:mousedown="nextDate(index)" tabindex="-1">+</button>
           </td>
           <td v-bind:class="{ unmodified: !item.isModified('date') }">
@@ -46,12 +47,14 @@
           <td v-bind:class="{ unmodified: !item.isModified('start') }">
             <input type="time" name="start" placeholder="von" step="300"
                   :min="mintime" :max="maxtime" required
-                  v-model="item.start" v-on:change="updateItem(index, 'start')"/>
+                  v-model="item.start" v-on:change="updateItem(index, 'start')"
+                  v-on:blur="item.modify('start')"/>
           </td>
           <td v-bind:class="{ unmodified: !item.isModified('end') }">
             <input type="time" name="end" placeholder="bis" step="300"
                   :min="mintime" :max="maxtime" required
-                  v-model="item.end" v-on:change="updateItem(index, 'end')"/>
+                  v-model="item.end" v-on:change="updateItem(index, 'end')"
+                  v-on:blur="item.modify('end')"/>
           </td>
           <td>
             <input type="text" name="remark" placeholder="Bemerkung"
