@@ -15,6 +15,7 @@
           <th>von</th>
           <th>bis</th>
           <th>Bemerkung</th>
+          <th>gespeichert</th>
         </tr>
       </thead>
       <tbody>
@@ -55,6 +56,9 @@
           <td>
             <input type="text" name="remark" placeholder="Bemerkung"
                   v-model="item.remark" v-on:change="updateItem(index)"/>
+          </td>
+          <td>
+            <input type="checkbox" onclick="return false;" v-model="item.inDb">
           </td>
         </tr>
       </tbody>
