@@ -58,7 +58,7 @@
                   v-model="item.remark" v-on:change="updateItem(index)"/>
           </td>
           <td>
-            <input type="checkbox" onclick="return false;" v-model="item.inDb">
+            <input type="checkbox" onclick="return false;" v-model="item.inDb" tabindex="-1">
           </td>
         </tr>
       </tbody>
