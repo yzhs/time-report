@@ -151,6 +151,7 @@ export default Vue.extend({
           item.inDb = true
           item.id = newItem.id
         }
+        item.type_of_week = newItem.type_of_week
       }).catch((reason: any) => {
         console.error('Error creating updating item:', reason.response.data.message)
       })

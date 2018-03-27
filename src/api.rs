@@ -48,7 +48,12 @@ fn item_template(conn: db::DbConn, report_id: i32) -> Json<InvoiceItem> {
 }
 
 #[put("/reports/<report_id>/items/<id>", format = "application/json", data = "<item>")]
-fn set_item(conn: db::DbConn, report_id: i32, id: i32, item: Json<NewRow>) -> Result<Json<i32>> {
+fn set_item(
+    conn: db::DbConn,
+    report_id: i32,
+    id: i32,
+    item: Json<NewRow>,
+) -> Result<Json<InvoiceItem>> {
     items::update(&conn, report_id, id, &item.into_inner()).map(Json)
 }
 

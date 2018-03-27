@@ -124,8 +124,13 @@ pub fn template(conn: &SqliteConnection, report_id: i32) -> InvoiceItem {
 }
 
 /// Update an item with a specific id, or create a new item if `id == 0`.
-pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow) -> Result<i32> {
-    use schema::{items, weeks};
+pub fn update(
+    conn: &SqliteConnection,
+    report_id: i32,
+    id: i32,
+    new_row: &NewRow,
+) -> Result<InvoiceItem> {
+    use schema::{items, items_view, weeks};
 
     assert!(report_id >= 0);
     assert!(id >= 0);
@@ -165,11 +170,10 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
             .values(&new_item)
             .execute(conn)
             .chain_err(|| format!("Failed to insert into items table: {:?}", new_item))?;
-        items::table
-            .select(diesel::dsl::max(items::id))
-            .first::<Option<_>>(conn)
-            .chain_err(|| "Query failed")?
-            .chain_err(|| "items_view empty")
+        items_view::table
+            .order(items_view::id.desc())
+            .first::<InvoiceItem>(conn)
+            .chain_err(|| "Query failed")
     } else {
         // Update existing item
         info!("Updating item #{}: {:?}", id, new_row);
@@ -177,6 +181,9 @@ pub fn update(conn: &SqliteConnection, report_id: i32, id: i32, new_row: &NewRow
             .set(new_item.clone())
             .execute(conn)
             .chain_err(|| format!("Failed to update item {:?}", new_item))?;
-        Ok(id)
+        items_view::table
+            .filter(items_view::id.eq(id))
+            .first(conn)
+            .chain_err(|| "Query failed")
     }
 }
