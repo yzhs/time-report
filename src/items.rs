@@ -6,7 +6,7 @@ use employees;
 use errors::*;
 use holidays;
 use schema::items;
-use weeks::{get_type_of_week, NewWeek};
+use weeks::get_type_of_week;
 
 use DATE_FORMAT;
 use TIME_FORMAT;
@@ -130,7 +130,7 @@ pub fn update(
     id: i32,
     new_row: &NewRow,
 ) -> Result<InvoiceItem> {
-    use schema::{items, items_view, weeks};
+    use schema::{items, items_view};
 
     assert!(report_id >= 0);
     assert!(id >= 0);
@@ -146,14 +146,6 @@ pub fn update(
     let start_datetime = date.and_time(start_time);
     let end_datetime = date.and_time(end_time);
 
-    // TODO Do we actually need this?
-    // TODO Move into weeks.rs?
-    // TODO Update all following weeks?
-    let new_week = NewWeek::new(date, new_row.type_of_week);
-    diesel::replace_into(weeks::table)
-        .values(&new_week)
-        .execute(conn)
-        .chain_err(|| "Failed to replace week values")?;
     let new_item = (
         items::employee_id.eq(employee_id),
         items::report_id.eq(report_id),
