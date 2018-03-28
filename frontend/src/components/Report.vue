@@ -130,7 +130,9 @@ export default Vue.extend({
 
     newItem () {
       // The previous record seems to have been finished, so we can mark it as done.
-      this.items[this.items.length - 1].allModified()
+      if (this.items.length !== 0) {
+        this.items[this.items.length - 1].allModified()
+      }
 
       axios.get('reports/' + this.report.id + '/items/template')
           .then((response: any) => {
