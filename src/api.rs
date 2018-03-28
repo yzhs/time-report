@@ -100,7 +100,7 @@ fn generate_pdf_report(conn: db::DbConn, id: i32, _filename: String) -> Result<N
     NamedFile::open(&pdf_file).chain_err(|| format!("Failed to open file {:?}", pdf_file))
 }
 
-#[get("/next_schoolday/<day>")]
+#[get("/next_schoolday/<day>", format = "application/json")]
 fn get_next_schoolday(day: String) -> Result<Json<NaiveDate>> {
     NaiveDate::parse_from_str(&day, DATE_FORMAT)
         .chain_err(|| "Invalid date format")
@@ -108,7 +108,7 @@ fn get_next_schoolday(day: String) -> Result<Json<NaiveDate>> {
         .map(Json)
 }
 
-#[get("/previous_schoolday/<day>")]
+#[get("/previous_schoolday/<day>", format = "application/json")]
 fn get_previous_schoolday(day: String) -> Result<Json<NaiveDate>> {
     NaiveDate::parse_from_str(&day, DATE_FORMAT)
         .chain_err(|| "Invalid date format")
