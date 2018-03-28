@@ -154,7 +154,6 @@ pub fn update(
         items::remark.eq(&new_row.remark),
     );
 
-    // TODO Can we merge both branches?
     if id == 0 {
         // Insert new item
         info!("Creating new item: {:?}", new_row);

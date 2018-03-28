@@ -8,9 +8,8 @@ use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 use errors::*;
 use schema::weeks;
 
-lazy_static!{
-    static ref TYPE_OF_WEEK: Mutex<TypeOfWeek> =
-        Mutex::new(TypeOfWeek::new(&::db::connect()));
+lazy_static! {
+    static ref TYPE_OF_WEEK: Mutex<TypeOfWeek> = Mutex::new(TypeOfWeek::new(&::db::connect()));
 }
 
 /// Names for the different types of weeks.
