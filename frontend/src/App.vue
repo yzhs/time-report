@@ -2,6 +2,7 @@
   <div id="app">
     <nav>
       <router-link :to="{name: 'overview'}">Übersicht</router-link>
+      <router-link :to="{name: 'employees'}">Mitarbeiter</router-link>
     </nav>
     <router-view/>
   </div>
