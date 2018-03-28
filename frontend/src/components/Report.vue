@@ -71,7 +71,7 @@
     <button id="generate" name="generate" v-on:click="generatePdf">PDF erzeugen</button>
 
     <datalist id="employees">
-      <option v-for="employee in employees" :key="employee">{{employee}}</option>
+      <option v-for="employee in employees" :key="employee.id">{{employee.name}}</option>
     </datalist>
   </div>
 </template>

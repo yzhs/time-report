@@ -12,7 +12,7 @@ use rocket_contrib::Json;
 use DATE_FORMAT;
 use db;
 use errors::*;
-use employees;
+use employees::{self, Employee};
 use items::{self, InvoiceItem, NewRow};
 use holidays;
 use reports::{self, Report};
@@ -58,8 +58,24 @@ fn set_item(
 }
 
 #[get("/employees", format = "application/json")]
-fn get_employees(conn: db::DbConn) -> Json<Vec<String>> {
-    Json(employees::get(&conn))
+fn get_employees(conn: db::DbConn) -> Result<Json<Vec<Employee>>> {
+    employees::get(&conn).map(Json)
+}
+
+#[put("/employees/<id>", format = "application/json", data = "<employee>")]
+fn update_employee(conn: db::DbConn, id: i32, employee: Json<Employee>) -> Result<Json<i32>> {
+    warn!("Not implemented");
+    Ok(Json(0))
+}
+
+#[post("/employees", format = "application/json", data = "<employee>")]
+fn add_employee(conn: db::DbConn, employee: Json<Employee>) -> Result<Json<i32>> {
+    employees::insert(&conn, employee.into_inner().name).map(Json)
+}
+
+#[delete("/employees/<id>")]
+fn delete_employee(conn: db::DbConn, id: i32) -> Result<Json<()>> {
+    employees::delete(&conn, id).map(Json)
 }
 
 #[get("/holidays", format = "application/json")]
@@ -125,6 +141,9 @@ pub fn routes() -> Vec<::rocket::Route> {
         put_report,
         get_globals,
         get_employees,
+        add_employee,
+        update_employee,
+        delete_employee,
         get_items,
         get_holidays,
         add_report,

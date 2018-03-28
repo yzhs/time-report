@@ -1,12 +1,23 @@
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 
+use errors::*;
+
+#[derive(Serialize, Deserialize, Queryable)]
+pub struct Employee {
+    pub id: i32,
+    pub name: String,
+
+    #[serde(default)]
+    pub name_sort: String,
+}
+
 /// Get all employees from the database.
-pub fn get(conn: &SqliteConnection) -> Vec<String> {
-    use schema::employees::*;
-    table
-        .select(name)
-        .load::<String>(conn)
-        .expect("Query failed")
+pub fn get(conn: &SqliteConnection) -> Result<Vec<Employee>> {
+    use schema::employees::dsl::*;
+    employees
+        .order(name_sort)
+        .load::<Employee>(conn)
+        .chain_err(|| "Failed to read table employees")
 }
 
 /// Insert a new employee into the database.
@@ -14,10 +25,7 @@ pub fn get(conn: &SqliteConnection) -> Vec<String> {
 /// Create the `name_sort` column from the `name` by assuming that the last word of the full name
 /// is the last name. That is not true in general but should be enough for our purposes: sorting a
 /// list of employees by name in an invoice.
-pub fn insert<S: AsRef<str>>(
-    conn: &SqliteConnection,
-    name: S,
-) -> Result<i32, diesel::result::Error> {
+pub fn insert<S: AsRef<str>>(conn: &SqliteConnection, name: S) -> Result<i32> {
     use schema::employees;
 
     let reversed_name = {
@@ -36,15 +44,24 @@ pub fn insert<S: AsRef<str>>(
         employees::name_sort.eq(reversed_name),
     );
 
-    diesel::insert_or_ignore_into(employees::table)
+    diesel::insert_into(employees::table)
         .values(&values)
         .execute(conn)
-        .expect("Error creating new employee record");
+        .chain_err(|| "Error creating new employee record")?;
 
     employees::table
         .select(employees::id)
         .filter(employees::name.eq(name.as_ref()))
         .first::<i32>(conn)
+        .chain_err(|| "Failed to get employee id")
+}
+
+pub fn delete(conn: &SqliteConnection, id: i32) -> Result<()> {
+    use schema::employees;
+    diesel::delete(employees::table.filter(employees::id.eq(id)))
+        .execute(conn)
+        .map(|_| ())
+        .chain_err(|| format!("Failed to delete employee #{}", id))
 }
 
 #[cfg(test)]
