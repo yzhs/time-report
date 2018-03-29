@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div>
       <h1>Abrechnungen</h1>
 
       <table>

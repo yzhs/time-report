@@ -1,5 +1,5 @@
 <template>
-  <div id="app" style="text-align:center">
+  <div style="text-align:center">
     <h1>Abrechnung BetreuerInnen</h1>
     <input type="text" name="heading" id="heading" placeholder="Zeitraum"
            required minlength="8" maxlength="100" pattern="[^a-z][a-zA-Zäöuß0-9. ]+"
