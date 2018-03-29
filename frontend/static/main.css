@@ -71,8 +71,5 @@ input#heading:focus {
 }
 
 button {
-  background-color: yellow;
   border: none;
-  border-radius: 5px;
-  margin-right: 10px;
 }
