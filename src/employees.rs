@@ -1,8 +1,9 @@
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 
 use errors::*;
+use schema::employees;
 
-#[derive(Serialize, Deserialize, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct Employee {
     pub id: i32,
     pub name: String,
@@ -26,8 +27,6 @@ pub fn get(conn: &SqliteConnection) -> Result<Vec<Employee>> {
 /// is the last name. That is not true in general but should be enough for our purposes: sorting a
 /// list of employees by name in an invoice.
 pub fn insert<S: AsRef<str>>(conn: &SqliteConnection, name: S) -> Result<i32> {
-    use schema::employees;
-
     let reversed_name = {
         let words: Vec<_> = name.as_ref().split(' ').collect();
         let len = words.len();
@@ -44,7 +43,7 @@ pub fn insert<S: AsRef<str>>(conn: &SqliteConnection, name: S) -> Result<i32> {
         employees::name_sort.eq(reversed_name),
     );
 
-    diesel::insert_into(employees::table)
+    diesel::insert_or_ignore_into(employees::table)
         .values(&values)
         .execute(conn)
         .chain_err(|| "Error creating new employee record")?;
@@ -56,8 +55,19 @@ pub fn insert<S: AsRef<str>>(conn: &SqliteConnection, name: S) -> Result<i32> {
         .chain_err(|| "Failed to get employee id")
 }
 
+pub fn update(conn: &SqliteConnection, id: i32, employee: Employee) -> Result<i32> {
+    diesel::update(employees::table.filter(employees::id.eq(id)))
+        .set((
+            employees::name.eq(&employee.name),
+            employees::name_sort.eq(&employee.name_sort),
+        ))
+        .execute(conn)
+        .chain_err(|| format!("Failed to update employee #{}: {:?}", id, employee))?;
+
+    Ok(id)
+}
+
 pub fn delete(conn: &SqliteConnection, id: i32) -> Result<()> {
-    use schema::employees;
     diesel::delete(employees::table.filter(employees::id.eq(id)))
         .execute(conn)
         .map(|_| ())

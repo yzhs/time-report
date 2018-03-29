@@ -64,8 +64,10 @@ fn get_employees(conn: db::DbConn) -> Result<Json<Vec<Employee>>> {
 
 #[put("/employees/<id>", format = "application/json", data = "<employee>")]
 fn update_employee(conn: db::DbConn, id: i32, employee: Json<Employee>) -> Result<Json<i32>> {
-    warn!("Not implemented");
-    Ok(Json(0))
+    let employee = employee.into_inner();
+    assert_eq!(employee.id, id);
+
+    employees::update(&conn, id, employee).map(Json)
 }
 
 #[post("/employees", format = "application/json", data = "<employee>")]
