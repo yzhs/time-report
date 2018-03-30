@@ -6,8 +6,13 @@ use schema::employees;
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct Employee {
     pub id: i32,
+
+    /// The name of an employee as it will appear on the report.
     pub name: String,
 
+    /// Value used for sorting employees. For people with a name of the form "<first names>
+    /// <last name>", this is "<last name>, <first names>".
+    /// For names with only one space-separated component, it is "<name>, ".
     #[serde(default)]
     pub name_sort: String,
 }
@@ -55,6 +60,9 @@ pub fn insert<S: AsRef<str>>(conn: &SqliteConnection, name: S) -> Result<i32> {
         .chain_err(|| "Failed to get employee id")
 }
 
+/// Change the name of an employee.
+///
+/// Update `name` and `name_sort` components of the record with the given `id`.
 pub fn update(conn: &SqliteConnection, id: i32, employee: Employee) -> Result<i32> {
     diesel::update(employees::table.filter(employees::id.eq(id)))
         .set((
@@ -67,6 +75,7 @@ pub fn update(conn: &SqliteConnection, id: i32, employee: Employee) -> Result<i3
     Ok(id)
 }
 
+/// Remove an employee from the database.
 pub fn delete(conn: &SqliteConnection, id: i32) -> Result<()> {
     diesel::delete(employees::table.filter(employees::id.eq(id)))
         .execute(conn)
