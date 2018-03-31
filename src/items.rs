@@ -4,9 +4,7 @@ use diesel::{self, SqliteConnection};
 
 use employees;
 use errors::*;
-use holidays;
 use schema::items;
-use weeks::get_type_of_week;
 
 use DATE_FORMAT;
 use TIME_FORMAT;
@@ -69,14 +67,6 @@ impl InvoiceItem {
             end: *END_DEFAULT,
             remark: "".into(),
         }
-    }
-
-    pub fn next(&self) -> Self {
-        let next_schoolday = holidays::next_schoolday(self.day);
-        let mut item = InvoiceItem::new();
-        item.day = next_schoolday;
-        item.type_of_week = get_type_of_week(next_schoolday);
-        item
     }
 }
 
