@@ -3,7 +3,7 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl, SqliteConnection};
 use errors::*;
 use schema::employees;
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Queryable)]
 pub struct Employee {
     pub id: i32,
 
@@ -15,6 +15,18 @@ pub struct Employee {
     /// For names with only one space-separated component, it is "<name>, ".
     #[serde(default)]
     pub name_sort: String,
+}
+
+impl PartialOrd for Employee {
+    fn partial_cmp(&self, other: &Employee) -> Option<::std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Employee {
+    fn cmp(&self, other: &Employee) -> ::std::cmp::Ordering {
+        self.name_sort.cmp(&other.name_sort)
+    }
 }
 
 /// Get all employees from the database.
@@ -118,8 +130,9 @@ mod test {
             super::insert(&conn, name).unwrap();
         }
 
-        let mut retrieved_names = ::employees::get(&conn);
-        retrieved_names.sort_unstable();
+        let mut employees = ::employees::get(&conn).unwrap();
+        employees.sort_unstable();
+        let retrieved_names: Vec<_> = employees.into_iter().map(|x| x.name).collect();
         assert_eq!(retrieved_names, names);
     }
 }
