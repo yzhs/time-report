@@ -98,7 +98,8 @@ export default Vue.extend({
 
     return {
       id,
-      mintime: '12:30',
+      // TODO get data from backend
+      mintime: '12:00',
       maxtime: '16:00',
       report: {id, title: '', mindate: '2017-08-01', maxdate},
       employees: [],

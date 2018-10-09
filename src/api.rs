@@ -26,7 +26,7 @@ pub struct Globals {
 impl Globals {
     pub fn new() -> Globals {
         Globals {
-            mintime: "12:30",
+            mintime: "12:00",
             maxtime: "16:00",
         }
     }
